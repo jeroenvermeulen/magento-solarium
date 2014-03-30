@@ -14,6 +14,11 @@
             <jeroenvermeulen_solarium_resource>
                 <class>JeroenVermeulen_Solarium_Model_Resource</class>
             </jeroenvermeulen_solarium_resource>
+            <catalogsearch_resource>
+                <rewrite>
+                    <fulltext>JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext</fulltext>
+                </rewrite>
+            </catalogsearch_resource>
         </models>
         <blocks>
             <jeroenvermeulen_solarium>
