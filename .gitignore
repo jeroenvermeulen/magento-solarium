@@ -8,7 +8,11 @@
 /app/code/core
 /app/code/local
 /app/design
-/app/etc
+/app/etc/modules/Cm_*
+/app/etc/modules/Mage_*
+/app/etc/modules/Phoenix_*
+/app/etc/config.xml
+/app/etc/local.xml*
 /app/locale
 /app/Mage.php
 /cron.php
