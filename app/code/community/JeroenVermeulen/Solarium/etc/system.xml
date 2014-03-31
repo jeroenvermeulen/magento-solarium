@@ -52,49 +52,59 @@
                     </fields>
                 </general>
                 <server translate="label" module="jeroenvermeulen_solarium">
-                    <label>Solr 4 Server</label>
+                    <label>Solr 4.x Server</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>1000</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <host translate="label">
                             <label>Hostname or IP</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store><!-- TODO Can this be configured per storeview? -->
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </host>
                         <port translate="label">
                             <label>Port Number</label>
-                            <comment>Source model provider Magento's default Yes/No values</comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <validate>validate-greater-than-zero</validate>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store><!-- TODO Can this be configured per storeview? -->
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </port>
                         <path translate="label">
                             <label>Path</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store><!-- TODO Can this be configured per storeview? -->
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </path>
                         <core translate="label">
                             <label>Core</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store><!-- TODO Can this be configured per storeview? -->
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </core>
                     </fields>
                 </server>
+                <results>
+                    <max translate="label">
+                        <label>Maximum number of results</label>
+                        <frontend_type>text</frontend_type>
+                        <sort_order>10</sort_order>
+                        <validate>validate-greater-than-zero</validate>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>1</show_in_website>
+                        <show_in_store>1</show_in_store>
+                    </max>
+                </results>
             </groups>
         </jeroenvermeulen_solarium>
     </sections>

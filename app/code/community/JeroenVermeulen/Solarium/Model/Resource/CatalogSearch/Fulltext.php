@@ -58,24 +58,18 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      * @param Mage_CatalogSearch_Model_Query    $query
      * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
-    public function prepareResult($object, $queryText, $query)
+    public function prepareResult( $object, $queryText, $query )
     {
         if (!$query->getIsProcessed()) {
             if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
                 try {
                     $adapter           = $this->_getWriteAdapter();
                     $searchResultTable = $this->getTable('catalogsearch/result');
-                    $searchResultSet = Mage::getSingleton('jeroenvermeulen_solarium/engine')->query( $queryText
-                                                                                                   , $query->getStoreId() );
-                    if( $searchResultSet->getNumFound() ) {
-                        /** @var Solarium\QueryType\Select\Result\Document $document */
-                        foreach ($searchResultSet as $document) {
-                            $documentFields = $document->getFields();
-                            $data = array( 'query_id'   => $query->getId(),
-                                           'product_id' => $documentFields['product_id'],
-                                           'relevance'  => $documentFields['score'] );
-                            $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
-                        }
+                    $engine            = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+                    $searchResult      = $engine->query( $query->getStoreId(), $queryText );
+                    foreach ($searchResult as $data) {
+                        $data['query_id'] = $query->getId();
+                        $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
                     }
                     $query->setIsProcessed(1);
                 } catch (Exception $e) {
@@ -83,7 +77,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 }
             }
             if ( !$query->getIsProcessed() ) {
-                // Something went wrong
+                // Solr disabled or something went wrong, fallback to MySQL
                 return parent::prepareResult($object, $queryText, $query);
             }
         }

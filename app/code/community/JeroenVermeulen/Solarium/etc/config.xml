@@ -76,6 +76,9 @@
                 <path>/solr</path>
                 <core>collection1</core>
             </server>
+            <results>
+                <max>100</max>
+            </results>
         </jeroenvermeulen_solarium>
     </default>
 </config>
