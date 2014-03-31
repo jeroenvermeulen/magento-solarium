@@ -2,7 +2,7 @@
     "name": "jeroenvermeulen/solarium",
     "type": "magento-module",
     "description": "Solr based full text search for Magento CE. Uses the Solarium library.",
-    "homepage": "http://www.jeroenvermeulen.eu",
+    "homepage": "https://github.com/jeroenvermeulen/magento-solarium/",
     "license": "Open Software License (OSL 3.0)",
     "authors":[
         {
