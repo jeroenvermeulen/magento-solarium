@@ -20,7 +20,6 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-
 class JeroenVermeulen_Solarium_Model_Engine {
 
     /** @var \Solarium\Client */
@@ -36,7 +35,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
      * @return bool
      */
     public static function isEnabled() {
-        return boolval( self::getConf('general/enabled') );
+        return (boolean) self::getConf('general/enabled');
     }
 
     /**
@@ -77,7 +76,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
      * @return bool - True if engine is working
      */
     public function isWorking() {
-        return boolval( $this->_working );
+        return (boolean) $this->_working;
     }
 
     /**
