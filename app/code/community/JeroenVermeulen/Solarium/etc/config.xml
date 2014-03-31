@@ -24,7 +24,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
@@ -51,6 +51,7 @@
             <jeroenvermeulen_solarium_setup>
                 <setup>
                     <module>JeroenVermeulen_Solarium</module>
+                    <class>Mage_Catalog_Model_Resource_Setup</class>
                 </setup>
             </jeroenvermeulen_solarium_setup>
         </resources>

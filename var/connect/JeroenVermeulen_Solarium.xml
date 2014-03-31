@@ -15,7 +15,7 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL 3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.0.0</version>
+   <version>1.0.1</version>
    <stability>beta</stability>
    <notes>Beta version.
 Do not use on a production shop right away.</notes>
@@ -47,7 +47,7 @@ Do not use on a production shop right away.</notes>
             <max/>
          </max>
          <files>
-            <files>     </files>
+            <files>                </files>
          </files>
       </package>
       <extension>
@@ -67,18 +67,26 @@ Do not use on a production shop right away.</notes>
          <target>magelocal</target>
          <target>magecommunity</target>
          <target>mageetc</target>
+         <target>magelib</target>
+         <target>magelib</target>
       </target>
       <path>
          <path/>
          <path>JeroenVermeulen/Solarium</path>
          <path>modules/JeroenVermeulen_Solarium.xml</path>
+         <path>Solarium</path>
+         <path>Symfony/Component/EventDispatcher</path>
       </path>
       <type>
          <type>file</type>
          <type>dir</type>
          <type>file</type>
+         <type>dir</type>
+         <type>dir</type>
       </type>
       <include>
+         <include/>
+         <include/>
          <include/>
          <include/>
          <include/>
@@ -87,6 +95,12 @@ Do not use on a production shop right away.</notes>
          <ignore/>
          <ignore/>
          <ignore/>
+         <ignore/>
+         <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>

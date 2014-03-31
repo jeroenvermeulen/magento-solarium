@@ -53,13 +53,15 @@ class JeroenVermeulen_Solarium_Model_Engine {
      */
     public function __construct() {
         if ( self::isEnabled() ) {
+            $host = trim( self::getConf('server/host') );
+            $host = str_replace( array('http://','/'), array('',''), $host );
             $config = array(
                 'endpoint' => array(
                     'default' => array(
-                        'host' => self::getConf('server/host'),
-                        'port' => self::getConf('server/port'),
-                        'path' => self::getConf('server/path'),
-                        'core' => self::getConf('server/core'),
+                        'host' => $host,
+                        'port' => intval( self::getConf('server/port') ),
+                        'path' => trim( self::getConf('server/path') ),
+                        'core' => trim( self::getConf('server/core') ),
                         'timeout' => 5
                     )
                 )

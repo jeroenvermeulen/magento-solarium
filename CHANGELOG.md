@@ -1,6 +1,6 @@
 # Change Log
 
-### RELEASE-1.0.0
+### RELEASE-1.0.1
 
   * Initial Magento Connect release
   * Solarium version: 3.2.0
