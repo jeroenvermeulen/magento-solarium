@@ -20,7 +20,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         parent::cleanIndex($storeId, $productIds);
 
 //        if(Mage::getStoreConfigFlag('solr/active/admin')) { // TODO: Enable
-            Mage::getModel('jeroenvermeulen_solarium/solarium')->cleanIndex( $storeId, $productIds );
+            Mage::getModel('jeroenvermeulen_solarium/engine')->cleanIndex( $storeId, $productIds );
 //        }
 
         return $this;
@@ -39,7 +39,12 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         parent::rebuildIndex($storeId,$productIds);
 
         //if(Mage::getStoreConfigFlag('solr/active/admin')) {  // TODO ENABLE
-            Mage::getSingleton('jeroenvermeulen_solarium/solarium')->rebuildIndex( $storeId, $productIds );
+            $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+            $ok = $engine->rebuildIndex( $storeId, $productIds );
+            if ( !$ok ) {
+                Mage::getSingleton('adminhtml/session')->addError( sprintf('Error reindexing Solr: %s', $engine->getLastError()) );
+            }
+
         //}
 
         return $this;
@@ -62,21 +67,21 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         //}
 
         $adapter = $this->_getWriteAdapter();
+        $searchResultTable = $this->getTable('catalogsearch/result');
         if (!$query->getIsProcessed()) {
 
             try {
-                $solarium = Mage::getSingleton('jeroenvermeulen_solarium/solarium');
+                $solarium = Mage::getSingleton('jeroenvermeulen_solarium/engine');
                 $searchResultSet = $solarium->query( $queryText, (int)$query->getStoreId() );
                 if( $searchResultSet->getNumFound() ) {
-                    $data = array();
                     /** @var Solarium\QueryType\Select\Result\Document $document */
                     foreach ($searchResultSet as $document) {
                         $documentFields = $document->getFields();
-                        $data[] = array('query_id'   => $query->getId(),
-                                        'product_id' => $documentFields['product_id'],
-                                        'relevance'  => $documentFields['score']);
+                        $data = array( 'query_id'   => $query->getId(),
+                                       'product_id' => $documentFields['product_id'],
+                                       'relevance'  => $documentFields['score'] );
+                        $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
                     }
-                    $adapter->insertMultiple($this->getTable('catalogsearch/result'),$data);
                 }
                 $query->setIsProcessed(1);
 
