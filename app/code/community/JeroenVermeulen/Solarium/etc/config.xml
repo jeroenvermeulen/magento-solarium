@@ -24,7 +24,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>0.2.0</version>
+            <version>0.1.0</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
@@ -65,4 +65,17 @@
             </controller_front_init_before>
         </events>
     </global>
+    <default>
+        <jeroenvermeulen_solarium>
+            <general>
+                <enabled>0</enabled>
+            </general>
+            <server>
+                <host>localhost</host>
+                <port>8983</port>
+                <path>/solr</path>
+                <core>collection1</core>
+            </server>
+        </jeroenvermeulen_solarium>
+    </default>
 </config>

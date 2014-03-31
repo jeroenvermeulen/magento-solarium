@@ -24,44 +24,85 @@
 class JeroenVermeulen_Solarium_Model_Engine {
 
     /** @var \Solarium\Client */
-    protected $client;
-    protected $working = false;
-    protected $lastError = '';
+    protected $_client;
+    /** @var bool */
+    protected $_working = false;
+    /** @var string */
+    protected $_lastError = '';
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return bool
+     */
+    public static function isEnabled() {
+        return boolval( self::getConf('general/enabled') );
+    }
+
+    /**
+     * @param string $setting - Path inside the "jeroenvermeulen_solarium" config section
+     * @return mixed
+     */
+    public static function getConf( $setting ) {
+        return Mage::getStoreConfig('jeroenvermeulen_solarium/'.$setting);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Constructor
+     */
     public function __construct() {
-        $config = array(
-            'endpoint' => array(
-                'localhost' => array(
-                    'host' => '54.187.2.124',  // TODO
-                    'port' => 8983,              // TODO
-                    'path' => '/solr/',          // TODO
+        if ( self::isEnabled() ) {
+            $config = array(
+                'endpoint' => array(
+                    'default' => array(
+                        'host' => self::getConf('server/host'),
+                        'port' => self::getConf('server/port'),
+                        'path' => self::getConf('server/path'),
+                        'core' => self::getConf('server/core'),
+                        'timeout' => 5
+                    )
                 )
-            )
-            // TODO Timeout
-        );
-        $this->client = new Solarium\Client($config);
-        $this->working = $this->ping();
+            );
+            $this->_client = new Solarium\Client($config);
+            $this->_working = $this->ping();
+        } else {
+            // This should not happen, you should not construct this class when it is disabled.
+            $this->_lastError = 'Solarium Search is not enabled via System Configuration.';
+        }
     }
 
+    /**
+     * @return bool - True if engine is working
+     */
     public function isWorking() {
-        return boolval( $this->working );
+        return boolval( $this->_working );
     }
 
+    /**
+     * @return string - Last occurred error
+     */
     public function getLastError() {
-        return strval( $this->lastError );
+        return strval( $this->_lastError );
     }
 
+    /**
+     * @return bool - True on success
+     */
     public function ping() {
-        // This function should NOT check the $this->working variable.
+        /**
+         * This function should not check the $this->_working variable,
+         * because it is used to check if everything is working.
+         */
         $result = false;
         try {
-            $queryResult = $this->client->ping(  $this->client->createPing() );
+            $queryResult = $this->_client->ping(  $this->_client->createPing() );
             $resultData = $queryResult->getData();
             if ( !empty($resultData['status']) && 'OK' === $resultData['status'] ) {
                 $result = true;
             }
         } catch ( Exception $e ) {
-            /** @var Solarium\Exception\HttpException $message */
             $message = $e->getMessage();
             if ( is_a( $e, 'Solarium\\Exception\\HttpException' ) ) {
                 $messageData = json_decode( $e->getBody(), true );
@@ -69,37 +110,44 @@ class JeroenVermeulen_Solarium_Model_Engine {
                     $message = $messageData['error']['msg'];
                 }
             }
-            $this->lastError = $message;
+            $this->_lastError = $message;
             Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::DEBUG );
         }
         return $result;
     }
 
-    public function update( Solarium\QueryType\Update\Query\Query $updateQuery, $actionText='action' ) {
-        if ( !$this->working ) {
+    /**
+     * @param int $storeId     - Store View Id
+     * @param null $productIds - $productIds - Product Entity Id(s)
+     * @return bool            - True on success
+     */
+    public function cleanIndex( $storeId, $productIds = null)  // TODO Use $storeId
+    {
+        if ( !$this->_working ) {
             return false;
         }
-        $updateResult = $this->client->update($updateQuery);
-        if ( 0 ==  $updateResult->getStatus() ) {
-            Mage::getSingleton('adminhtml/session')->addSuccess( sprintf( 'Solr %s successful, query time: %d'
-                                                                        , $actionText
-                                                                        , $updateResult->getQueryTime()
-                                                                        )
-                                                               );
+        $solrUpdate = $this->_client->createUpdate();
+
+        if(is_numeric($productIds)) {
+            $solrUpdate->addDeleteById( $productIds );
+        } else if(is_array($productIds)) {
+            $solrUpdate->addDeleteByIds( $productIds );
         } else {
-            $this->lastError = $updateResult->getStatus();
-            Mage::getSingleton('adminhtml/session')->addError( sprintf( 'Solr %s error, status: %d, query time: %d'
-                                                                      , $actionText
-                                                                      , $updateResult->getStatus()
-                                                                      , $updateResult->getQueryTime()
-                                                                      )
-                                                             );
+            $solrUpdate->addDeleteQuery('*:*');
         }
-        return ( 0 === $updateResult->getStatus() );
+
+        $solrUpdate->addCommit();
+
+        return $this->_update( $solrUpdate, 'clean' );
     }
 
+    /**
+     * @param int $storeId     - Store View Id
+     * @param null $productIds - $productIds - Product Entity Id(s)
+     * @return bool            - True on success
+     */
     public function rebuildIndex( $storeId, $productIds ) { // TODO Use $storeId
-        if ( !$this->working ) {
+        if ( !$this->_working ) {
             return false;
         }
         $coreResource = Mage::getSingleton('core/resource');
@@ -116,7 +164,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
         }
         $products = $readAdapter->query( $query );
 
-        $solrUpdate = $this->client->createUpdate();
+        $solrUpdate = $this->_client->createUpdate();
 
         while($product = $products->fetch()) {
             $document = $solrUpdate->createDocument();
@@ -129,45 +177,60 @@ class JeroenVermeulen_Solarium_Model_Engine {
 
         $solrUpdate->addCommit();
         $solrUpdate->addOptimize( true, false, 5 ); // TODO check params
-        $this->update( $solrUpdate, 'rebuild' ); // TODO: error if fails?
 
-        return true;
+        return $this->_update( $solrUpdate, 'rebuild' );
     }
 
-    public function cleanIndex( $storeId, $productIds = null)  // TODO Use $storeId
-    {
-        if ( !$this->working ) {
-            return false;
-        }
-        $solrUpdate = $this->client->createUpdate();
-
-        if(is_numeric($productIds)) {
-            $solrUpdate->addDeleteById( $productIds );
-        } else if(is_array($productIds)) {
-            $solrUpdate->addDeleteByIds( $productIds );
-        } else {
-            $solrUpdate->addDeleteQuery('*:*');
-        }
-
-        $solrUpdate->addCommit();
-        $this->update( $solrUpdate, 'clean' ); // TODO: error if fails?
-        return true;
-    }
-
+    /**
+     * @param string $queryString - Text to search for
+     * @param int    $storeId     - Store View Id
+     * @return bool|\Solarium\QueryType\Select\Result\Result
+     */
     public function query( $queryString, $storeId=0 ) {
-        if ( !$this->working ) {
+        if ( !$this->_working ) {
             return false;
         }
-        $query = $this->client->createSelect();
+        $storeId = intval( $storeId );
+        $query = $this->_client->createSelect();
         $query->setQuery( $queryString );
         $query->setRows( 100 ); // TODO make configurable
-        $query->setFields( array('product_id','score') ); // ,'store_id','fulltext'
+        $query->setFields( array('product_id','score') );
         if ( $storeId ) {
             $query->createFilterQuery('store_id')->setQuery('store_id:'.$storeId);
         }
         $query->addSort( 'score', $query::SORT_DESC );
-        $resultset = $this->client->select( $query );
+        $resultset = $this->_client->select( $query );
         return $resultset;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @param \Solarium\QueryType\Update\Query\Query $updateQuery
+     * @param string $actionText
+     * @return bool
+     */
+    protected function _update( Solarium\QueryType\Update\Query\Query $updateQuery, $actionText='action' ) {
+        if ( !$this->_working ) {
+            return false;
+        }
+        $updateResult = $this->_client->update($updateQuery);
+        if ( 0 ==  $updateResult->getStatus() ) {
+            Mage::getSingleton('adminhtml/session')->addSuccess( sprintf( 'Solr %s successful, query time: %d'
+                                                                     , $actionText
+                                                                     , $updateResult->getQueryTime()
+                                                                 )
+            );
+        } else {
+            $this->_lastError = $updateResult->getStatus();
+            Mage::getSingleton('adminhtml/session')->addError( sprintf( 'Solr %s error, status: %d, query time: %d'
+                                                                   , $actionText
+                                                                   , $updateResult->getStatus()
+                                                                   , $updateResult->getQueryTime()
+                                                               )
+            );
+        }
+        return ( 0 === $updateResult->getStatus() );
     }
 
 }

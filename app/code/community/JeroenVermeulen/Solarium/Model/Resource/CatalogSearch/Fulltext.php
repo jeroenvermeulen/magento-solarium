@@ -23,90 +23,70 @@
 class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mage_CatalogSearch_Model_Resource_Fulltext {
 
     /**
-     * Overloaded method cleanIndex.
-     * Delete search index data for store
-     *
-     * @param int $storeId Store View Id
-     * @param int|array|null $productIds Product Entity Id
-     * @return Mage_CatalogSearch_Model_Resource_Fulltext
+     * @param int            $storeId    - Store View Id
+     * @param int|array|null $productIds - Product Entity Id(s)
+     * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
-    public function cleanIndex($storeId = null, $productIds = null)
-    {
+    public function cleanIndex( $storeId = null, $productIds = null ) {
         parent::cleanIndex($storeId, $productIds);
-
-//        if(Mage::getStoreConfigFlag('solr/active/admin')) { // TODO: Enable
-            Mage::getModel('jeroenvermeulen_solarium/engine')->cleanIndex( $storeId, $productIds );
-//        }
-
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
+            Mage::getSingleton('jeroenvermeulen_solarium/engine')->cleanIndex( $storeId, $productIds );
+        }
         return $this;
     }
 
     /**
-     * Overloaded method rebuildIndex.
-     * Regenerate search index for store(s)
-     *
-     * @param  int|null $storeId
-     * @param  int|array|null $productIds
-     * @return Magentix_Solr_Model_CatalogSearch_Resource_Fulltext
+     * @param  int|null       $storeId    - Store View Id
+     * @param  int|array|null $productIds - Product Entity Id(s)
+     * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
-    public function rebuildIndex($storeId = null, $productIds = null)
-    {
+    public function rebuildIndex( $storeId = null, $productIds = null ) {
         parent::rebuildIndex($storeId,$productIds);
-
-        //if(Mage::getStoreConfigFlag('solr/active/admin')) {  // TODO ENABLE
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
             $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
             $ok = $engine->rebuildIndex( $storeId, $productIds );
             if ( !$ok ) {
                 Mage::getSingleton('adminhtml/session')->addError( sprintf('Error reindexing Solr: %s', $engine->getLastError()) );
             }
-
-        //}
-
+        }
         return $this;
     }
 
     /**
-     * Overloaded method prepareResult.
-     * Prepare results for query.
-     * Replaces the traditional fulltext search with a Solr Search (if active).
-     *
      * @param Mage_CatalogSearch_Model_Fulltext $object
-     * @param string $queryText
-     * @param Mage_CatalogSearch_Model_Query $query
-     * @return Magentix_Solr_Model_CatalogSearch_Resource_Fulltext
+     * @param string                            $queryText
+     * @param Mage_CatalogSearch_Model_Query    $query
+     * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
-    public function prepareResult($object, $queryText, $query, $try=1)
+    public function prepareResult($object, $queryText, $query)
     {
-        // TODO if(!Mage::getStoreConfigFlag('solr/active/frontend')) {
-        //    return parent::prepareResult($object, $queryText, $query);
-        //}
-
-        $adapter = $this->_getWriteAdapter();
-        $searchResultTable = $this->getTable('catalogsearch/result');
         if (!$query->getIsProcessed()) {
-
-            try {
-                $solarium = Mage::getSingleton('jeroenvermeulen_solarium/engine');
-                $searchResultSet = $solarium->query( $queryText, (int)$query->getStoreId() );
-                if( $searchResultSet->getNumFound() ) {
-                    /** @var Solarium\QueryType\Select\Result\Document $document */
-                    foreach ($searchResultSet as $document) {
-                        $documentFields = $document->getFields();
-                        $data = array( 'query_id'   => $query->getId(),
-                                       'product_id' => $documentFields['product_id'],
-                                       'relevance'  => $documentFields['score'] );
-                        $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
+            if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
+                try {
+                    $adapter           = $this->_getWriteAdapter();
+                    $searchResultTable = $this->getTable('catalogsearch/result');
+                    $searchResultSet = Mage::getSingleton('jeroenvermeulen_solarium/engine')->query( $queryText
+                                                                                                   , $query->getStoreId() );
+                    if( $searchResultSet->getNumFound() ) {
+                        /** @var Solarium\QueryType\Select\Result\Document $document */
+                        foreach ($searchResultSet as $document) {
+                            $documentFields = $document->getFields();
+                            $data = array( 'query_id'   => $query->getId(),
+                                           'product_id' => $documentFields['product_id'],
+                                           'relevance'  => $documentFields['score'] );
+                            $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
+                        }
                     }
+                    $query->setIsProcessed(1);
+                } catch (Exception $e) {
+                    Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::WARN );
                 }
-                $query->setIsProcessed(1);
-
-            } catch (Exception $e) {
-                Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::WARN );
+            }
+            if ( !$query->getIsProcessed() ) {
+                // Something went wrong
                 return parent::prepareResult($object, $queryText, $query);
             }
-
         }
-
         return $this;
     }
 
