@@ -6,7 +6,13 @@
       <version_ids>2</version_ids>
    </version_ids>
    <summary>Solr based full text search for Magento CE. Uses the Solarium library.</summary>
-   <description>Solr based full text search for Magento CE. Uses the Solarium library.</description>
+   <description>Solr based full text search for Magento CE. Uses the Solarium library.
+
+GitHub repo: https://github.com/jeroenvermeulen/magento-solarium
+
+Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
+
+</description>
    <license>OSL 3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
    <version>1.0.0</version>
@@ -41,7 +47,7 @@ Do not use on a production shop right away.</notes>
             <max/>
          </max>
          <files>
-            <files>   </files>
+            <files>     </files>
          </files>
       </package>
       <extension>
@@ -83,8 +89,4 @@ Do not use on a production shop right away.</notes>
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
