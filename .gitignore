@@ -47,4 +47,11 @@
 /RELEASE_NOTES.txt
 /shell
 /skin
-/var
+/var/cache
+/var/connect/package.xml
+/var/locks
+/var/log
+/var/package
+/var/report
+/var/session
+/var/.htaccess
