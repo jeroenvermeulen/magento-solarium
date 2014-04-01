@@ -1,7 +1,7 @@
 magento-solarium
 ================
 
-The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. I have used the Solarium PHP library to build Solr into Magento CE. In the future I plan to build autocorrect of search terms and other features. If you have some funds available for these improvements, pleas contact me.
+The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. I have used the Solarium PHP library to build Solr into Magento CE. In the future I plan to build auto correct of search terms and other features. If you have some funds available for these improvements, pleas contact me.
 
 ## Requirements
 
