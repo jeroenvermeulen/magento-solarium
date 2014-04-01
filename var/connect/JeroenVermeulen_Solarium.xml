@@ -1,5 +1,6 @@
 <_>
    <form_key>oZ4ZfnH4k3xxNzmZ</form_key>
+   <_create/>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -47,7 +48,7 @@ Do not use on a production shop right away.</notes>
             <max/>
          </max>
          <files>
-            <files>                </files>
+            <files>                    </files>
          </files>
       </package>
       <extension>
@@ -99,8 +100,4 @@ Do not use on a production shop right away.</notes>
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
