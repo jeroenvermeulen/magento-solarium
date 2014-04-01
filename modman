@@ -1,2 +1,6 @@
+## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
+
 app/code/community/JeroenVermeulen/Solarium/  app/code/community/JeroenVermeulen/Solarium/
 app/etc/modulesJeroenVermeulen_Solarium.xml   app/etc/modulesJeroenVermeulen_Solarium.xml
+lib/Solarium                                  lib/Solarium
+lib/Symfony/Component/EventDispatcher         lib/Symfony/Component/EventDispatcher
