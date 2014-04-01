@@ -53,7 +53,7 @@ app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml</notes>
             <max/>
          </max>
          <files>
-            <files>                     </files>
+            <files>                      </files>
          </files>
       </package>
       <extension>
