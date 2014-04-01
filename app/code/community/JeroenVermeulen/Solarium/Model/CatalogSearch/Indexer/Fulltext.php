@@ -26,7 +26,7 @@ class JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext extends Mage
     {
         $result = parent::getDescription();
         if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
-            $result .= ' ' . Mage::helper('jeroenvermeulen_solarium')->__('POWERED BY SOLARIUM');
+            $result .= ' - ' . Mage::helper('jeroenvermeulen_solarium')->__('POWERED BY SOLARIUM');
         }
         return $result;
     }
