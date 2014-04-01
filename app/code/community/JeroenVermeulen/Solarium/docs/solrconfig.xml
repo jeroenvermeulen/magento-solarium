@@ -141,6 +141,7 @@
             <int name="maxInspections">5</int>
             <int name="minQueryLength">4</int>
             <float name="maxQueryFrequency">0.01</float>
+            <str name="buildOnOptimize">true</str>
         </lst>
     </searchComponent>
 

@@ -202,26 +202,60 @@ class JeroenVermeulen_Solarium_Model_Engine {
     /**
      * @param int    $storeId     - Store View Id
      * @param string $queryString - Text to search for
-     * @return bool|\Solarium\QueryType\Select\Result\Result
+     * @return array
      */
-    public function query( $storeId, $queryString ) {
+    public function query( $storeId, $queryString, $try=1 ) {
         if ( !$this->_working ) {
             return false;
         }
         $query = $this->_client->createSelect();
         $query->setQuery( $queryString );
-        $query->setRows( $this::getConf('results/max') );
+        $query->setRows( self::getConf('results/max') );
         $query->setFields( array('product_id','score') );
         if ( is_numeric( $storeId ) ) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval($storeId) );
         }
         $query->addSort( 'score', $query::SORT_DESC );
-        $solrResults = $this->_client->select( $query );
-        $resultset = array();
-        foreach( $solrResults as $solrResult ) {
-            $resultset[] = array( 'relevance' => $solrResult['score'], 'product_id' => $solrResult['product_id'] );
+        $doAutoCorrect = ( 1 == $try && self::getConf('results/autocorrect') );
+        if ( $doAutoCorrect ) {
+            //$query->addParam( 'spellcheck', true );
+            $spellCheck = $query->getSpellcheck();
+            $spellCheck->setQuery( $queryString );
         }
-        return $resultset;
+        $solrResultSet = $this->_client->select( $query );
+
+        $result = array();
+        foreach( $solrResultSet as $solrResult ) {
+            $result[] = array( 'relevance' => $solrResult['score'], 'product_id' => $solrResult['product_id'] );
+        }
+
+        $correctedQueryString = false;
+        if ( $doAutoCorrect ) {
+            $spellCheckResult = $solrResultSet->getSpellcheck();
+            if ( $spellCheckResult && ! $spellCheckResult->getCorrectlySpelled() ) {
+                $collation = $spellCheckResult->getCollation();
+                if ( $collation ) {
+                    $correctedQueryString = $collation->getQuery();
+                }
+                if ( empty($correctedQueryString) ) {
+                    $suggestions = $spellCheckResult->getSuggestions();
+                    if ( !empty($suggestions) ) {
+                        $words = array();
+                        /** @var Solarium\QueryType\Select\Result\Spellcheck\Suggestion $suggestion */
+                        foreach ( $suggestions as $suggestion ) {
+                            $words[] = $suggestion->getWord();
+                        }
+                        $correctedQueryString = implode( ' ', $words );
+                    }
+                }
+                if ( ! empty($correctedQueryString) ) {
+                    // Add results from auto correct
+                    $result = array_merge( $result, $this->query( $storeId, $correctedQueryString, $try+1 ) );
+                }
+            }
+        }
+
+        return $result;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
