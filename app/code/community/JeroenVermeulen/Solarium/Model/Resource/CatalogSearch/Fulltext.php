@@ -62,18 +62,18 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
     {
         if (!$query->getIsProcessed()) {
             if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
-                try {
-                    $adapter           = $this->_getWriteAdapter();
-                    $searchResultTable = $this->getTable('catalogsearch/result');
-                    $engine            = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+                $adapter           = $this->_getWriteAdapter();
+                $searchResultTable = $this->getTable('catalogsearch/result');
+                $engine            = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+                if ( $engine->isWorking() ) {
                     $searchResult      = $engine->query( $query->getStoreId(), $queryText );
-                    foreach ($searchResult as $data) {
-                        $data['query_id'] = $query->getId();
-                        $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
+                    if ( false !== $searchResult ) {
+                        foreach ($searchResult as $data) {
+                            $data['query_id'] = $query->getId();
+                            $adapter->insertOnDuplicate( $searchResultTable, $data, array('relevance') );
+                        }
+                        $query->setIsProcessed(1);
                     }
-                    $query->setIsProcessed(1);
-                } catch (Exception $e) {
-                    Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::WARN );
                 }
             }
             if ( !$query->getIsProcessed() ) {
