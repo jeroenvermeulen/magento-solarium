@@ -1,5 +1,9 @@
-magento-solarium
+
+Solr search extension for Magento
 ================
+[![Solr](https://lucene.apache.org/images/solr.png)](https://lucene.apache.org/solr/)
+[![Solarium](http://www.raspberry.nl/wp-content/uploads/2011/12/solarium.gif)](http://www.solarium-project.org/)
+[![Magento](http://21inspired.com/wp-content/uploads/2010/01/magento-logo-1.jpg)](http://magento.com/)
 
 The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. I have used the Solarium PHP library to build Solr into Magento CE. In the future I plan to build auto correct of search terms and other features. If you have some funds available for these improvements, pleas contact me.
 
