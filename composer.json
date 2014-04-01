@@ -28,9 +28,19 @@
                     "path": "JeroenVermeulen/Solarium"
                 },
                 {
-                    "type":"mageetc",
-                    "structure":"file",
-                    "path":"modules/JeroenVermeulen_Solarium.xml"
+                    "type": "mageetc",
+                    "structure": "file",
+                    "path": "modules/JeroenVermeulen_Solarium.xml"
+                },
+                {
+                    "type": "magelib",
+                    "structure": "dir",
+                    "path": "Solarium"
+                },
+                {
+                    "type": "magelib",
+                    "structure": "dir",
+                    "path": "Symfony/Component/EventDispatcher"
                 }
             ]
         }
