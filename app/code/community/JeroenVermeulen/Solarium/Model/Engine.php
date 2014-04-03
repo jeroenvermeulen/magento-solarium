@@ -58,11 +58,11 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $config = array(
                 'endpoint' => array(
                     'default' => array(
-                        'host' => $host,
-                        'port' => intval( self::getConf('server/port') ),
-                        'path' => trim( self::getConf('server/path') ),
-                        'core' => trim( self::getConf('server/core') ),
-                        'timeout' => 5
+                        'host'    => $host,
+                        'port'    => intval( self::getConf('server/port') ),
+                        'path'    => trim( self::getConf('server/path') ),
+                        'core'    => trim( self::getConf('server/core') ),
+                        'timeout' => intval( self::getConf('server/timeout') )
                     )
                 )
             );
@@ -87,15 +87,17 @@ class JeroenVermeulen_Solarium_Model_Engine {
     public function getLastError() {
         $result = '';
         if ( is_a( $this->_lastError, 'Solarium\\Exception\\HttpException' ) ) {
-            $data = json_decode( $this->_lastError->getBody(), true );
-            if ( !empty($data['error']['msg']) ) {
-                $result = $data['error']['msg'];
+            if ( $this->_lastError->getBody() ) {
+                $data = json_decode( $this->_lastError->getBody(), true );
+                if ( !empty($data['error']['msg']) ) {
+                    $result = $data['error']['msg'];
+                }
             }
         }
-        else if ( is_a( $this->_lastError, 'Exception' ) ) {
+        if ( empty($result) && is_a( $this->_lastError, 'Exception' ) ) {
             $result = $this->_lastError->getMessage();
         }
-        else if ( is_string( $this->_lastError ) ) {
+        if ( empty($result) && is_string( $this->_lastError ) ) {
             $result = $this->_lastError;
         }
         return strval( $result );
@@ -304,6 +306,10 @@ class JeroenVermeulen_Solarium_Model_Engine {
             );
         }
         return ( 0 === $updateResult->getStatus() );
+    }
+
+    protected function _filterString( $str ) {
+        return preg_replace( '/(^"|"$)/', '' , json_encode( $str ) );
     }
 
 }

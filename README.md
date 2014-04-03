@@ -1,4 +1,3 @@
-
 Solr search extension for Magento
 ================
 [![Solr](https://lucene.apache.org/images/solr.png)](https://lucene.apache.org/solr/)
@@ -15,7 +14,11 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 ## Installation & Usage
 
   * Inside this repository you can find the [solrconfig.xml](https://github.com/jeroenvermeulen/magento-solarium/blob/master/app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml) and [schema.xml](https://github.com/jeroenvermeulen/magento-solarium/blob/master/app/code/community/JeroenVermeulen/Solarium/docs/schema.xml)
-  * After installing this extension you can configure it via: *System > Configuration > CATALOG > Solarium Search.*
+  * After installing this extension:
+    * Log out of the Admin
+    * Log in on the Admin again
+    * Configure and enable it via: *System > Configuration > CATALOG > Solarium Search.*
+    * Reindex the *Catalog Search Index*
 
 ## Support
 
