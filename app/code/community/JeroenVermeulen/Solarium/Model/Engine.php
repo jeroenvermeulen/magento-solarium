@@ -241,7 +241,6 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $query->addSort( 'score', $query::SORT_DESC );
             $doAutoCorrect = ( 1 == $try && self::getConf('results/autocorrect') );
             if ( $doAutoCorrect ) {
-                //$query->addParam( 'spellcheck', true );
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
             }
