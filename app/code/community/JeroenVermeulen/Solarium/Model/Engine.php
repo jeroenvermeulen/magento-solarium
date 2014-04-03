@@ -205,7 +205,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
                 $document->id         = $product['fulltext_id'];
                 $document->product_id = $product['product_id'];
                 $document->store_id   = $product['store_id'];
-                $document->text       = $product['data_index'];
+                $document->text       = $this->_filterString( $product['data_index'] );
                 $solrUpdate->addDocument( $document );
             }
 
@@ -232,7 +232,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
         $result = false;
         try {
             $query = $this->_client->createSelect();
-            $query->setQuery( $queryString );
+            $query->setQuery( $this->_filterString($queryString) );
             $query->setRows( $this::getConf('results/max') );
             $query->setFields( array('product_id','score') );
             if ( is_numeric( $storeId ) ) {
@@ -263,7 +263,16 @@ class JeroenVermeulen_Solarium_Model_Engine {
             return false;
         }
         $updateResult = $this->_client->update($updateQuery);
-        if ( 0 !==  $updateResult->getStatus() ) {
+        if ( 0 ===  $updateResult->getStatus() ) {
+            Mage::log( sprintf( 'Solr %s success, status: %d, query time: %d'
+                              , $actionText
+                              , $updateResult->getStatus()
+                              , $updateResult->getQueryTime()
+                              )
+                     , Zend_Log::DEBUG
+                     );
+        }
+        else {
             $this->_lastError = $updateResult->getStatus();
             Mage::getSingleton('adminhtml/session')->addError( sprintf( 'Solr %s error, status: %d, query time: %d'
                                                                    , $actionText
@@ -276,7 +285,11 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     protected function _filterString( $str ) {
-        return preg_replace( '/(^"|"$)/', '' , json_encode( $str ) );
+        $badChars = '';
+        for ( $ord = 0; $ord < 32; $ord++ ) {
+            $badChars .= chr($ord);
+        }
+        return preg_replace( '/['.preg_quote($badChars,'/').']+/', ' ' , $str );
     }
 
 }
