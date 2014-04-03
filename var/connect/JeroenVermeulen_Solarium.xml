@@ -1,6 +1,5 @@
 <_>
-   <form_key>oZ4ZfnH4k3xxNzmZ</form_key>
-   <_create/>
+   <form_key>PKNui6Ys5dW62tWh</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -16,7 +15,7 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL 3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.0.1</version>
+   <version>1.0.2</version>
    <stability>beta</stability>
    <notes>Beta version.
 Do not use on a production shop right away.</notes>
@@ -48,7 +47,7 @@ Do not use on a production shop right away.</notes>
             <max/>
          </max>
          <files>
-            <files>                    </files>
+            <files>                     </files>
          </files>
       </package>
       <extension>
