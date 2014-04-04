@@ -9,7 +9,7 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 ## Requirements
 
   * Magento Community Edition 1.6+
-  * Solr 4.3+
+  * A working Solr 4.3+ server
 
 ## Installation & Usage
 
@@ -24,3 +24,4 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 ## Support
 
 If you have an issue, you can open a bug report in [GitHub's issue tracker](https://github.com/jeroenvermeulen/magento-solarium/issues).
+This extension is also on [Magento Connect](http://www.magentocommerce.com/magento-connect/catalog/product/view/id/22478/).
