@@ -8,4 +8,7 @@
 
 ### RELEASE 1.1.0
 
+  * Fix for issue #1: Solr xml illegal character issue on Magento indexing
+  * Improved error catching
+  * Added configurable timeout
   * Added confirmation after rebuilding Solr index
