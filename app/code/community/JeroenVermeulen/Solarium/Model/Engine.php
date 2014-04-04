@@ -28,6 +28,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     protected $_working = false;
     /** @var Exception|string */
     protected $_lastError = '';
+    /** @var int - in milliseconds */
+    protected $_lastQueryTime = 0;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +54,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
      * Constructor
      */
     public function __construct() {
+        $helper = Mage::helper('jeroenvermeulen_solarium');
         if ( self::isEnabled() ) {
             $host = trim( self::getConf('server/host') );
             $host = str_replace( array('http://','/'), array('',''), $host );
@@ -70,7 +73,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $this->_working = $this->ping();
         } else {
             // This should not happen, you should not construct this class when it is disabled.
-            $this->_lastError = new Exception('Solarium Search is not enabled via System Configuration.');
+            $this->_lastError = new Exception( $helper->__('Solarium Search is not enabled via System Configuration.') );
         }
     }
 
@@ -101,6 +104,11 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $result = $this->_lastError;
         }
         return strval( $result );
+    }
+
+    /** @return float - in in milliseconds */
+    public function getLastQueryTime() {
+        return intval( $this->_lastQueryTime ) / 1000;
     }
 
     /**
@@ -183,7 +191,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $readAdapter = $coreResource->getConnection('core_read');
 
             $select = $readAdapter->select();
-            $select->from( $coreResource->getTableName('catalogsearch/fulltext'), array('product_id','store_id','data_index','fulltext_id') );
+            $select->from( $coreResource->getTableName('catalogsearch/fulltext')
+                         , array('product_id','store_id','data_index','fulltext_id') );
 
             if ( !empty($storeId) ) {
                 $select->where( 'store_id', $storeId );
@@ -240,9 +249,11 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $query->addSort( 'score', $query::SORT_DESC );
             $solrResults = $this->_client->select( $query );
+            $this->_lastQueryTime = $solrResults->getQueryTime();
             $result = array();
             foreach( $solrResults as $solrResult ) {
-                $result[] = array( 'relevance' => $solrResult['score'], 'product_id' => $solrResult['product_id'] );
+                $result[] = array( 'relevance' => $solrResult['score']
+                                 , 'product_id' => $solrResult['product_id'] );
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
@@ -262,15 +273,16 @@ class JeroenVermeulen_Solarium_Model_Engine {
         if ( !$this->_working ) {
             return false;
         }
+        $helper = Mage::helper('jeroenvermeulen_solarium');
         $updateResult = $this->_client->update($updateQuery);
+        $this->_lastQueryTime = $updateResult->getQueryTime();
         if ( 0 !==  $updateResult->getStatus() ) {
             $this->_lastError = $updateResult->getStatus();
-            Mage::getSingleton('adminhtml/session')->addError( sprintf( 'Solr %s error, status: %d, query time: %d'
-                                                                   , $actionText
-                                                                   , $updateResult->getStatus()
-                                                                   , $updateResult->getQueryTime()
-                                                               )
-            );
+            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession->addError( $helper->__( 'Solr %s error, status: %d, query time: %d'
+                                                , $actionText
+                                                , $updateResult->getStatus()
+                                                , $updateResult->getQueryTime() ) );
         }
         return ( 0 === $updateResult->getStatus() );
     }
