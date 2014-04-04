@@ -80,18 +80,12 @@
 
     <requestHandler name="/select" class="solr.SearchHandler">
         <lst name="defaults">
-            <str name="echoParams">explicit</str>
-            <int name="rows">10</int>
+            <int name="rows">250</int>
             <str name="df">text</str>
-            <str name="spellcheck.onlyMorePopular">false</str>
-            <str name="spellcheck.extendedResults">false</str>
-            <str name="spellcheck.count">10</str>
-            <str name="spellcheck.maxCollationEvaluations">10</str>
-            <str name="spellcheck.maxResultsForSuggest">5</str>
+            <str name="spellcheck.count">1</str>
+            <str name="spellcheck.maxResultsForSuggest">1</str>
             <str name="spellcheck.collate">true</str>
-            <str name="spellcheck.collateExtendedResults">true</str>
-            <str name="spellcheck.maxCollationTries">10</str>
-            <str name="spellcheck.maxCollations">5</str>
+            <str name="spellcheck.maxCollations">1</str>
         </lst>
 
         <arr name="last-components">
@@ -131,16 +125,11 @@
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
         <str name="queryAnalyzerFieldType">text_general</str>
         <lst name="spellchecker">
-            <str name="name">default</str>
             <str name="field">text</str>
-            <str name="classname">solr.DirectSolrSpellChecker</str>
-            <str name="distanceMeasure">internal</str>
-            <float name="accuracy">0.5</float>
             <int name="maxEdits">2</int>
-            <int name="minPrefix">1</int>
-            <int name="maxInspections">5</int>
-            <int name="minQueryLength">4</int>
-            <float name="maxQueryFrequency">0.01</float>
+            <int name="minPrefix">0</int>
+            <int name="minQueryLength">3</int>
+            <str name="buildOnOptimize">true</str>
         </lst>
     </searchComponent>
 

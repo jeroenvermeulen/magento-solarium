@@ -1,5 +1,5 @@
 <_>
-   <form_key>PKNui6Ys5dW62tWh</form_key>
+   <form_key>lBAcVNlDOm6AWftL</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -15,10 +15,16 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL 3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.0.2</version>
+   <version>1.1.0</version>
    <stability>beta</stability>
    <notes>Beta version.
-Do not use on a production shop right away.</notes>
+Do not use on a production shop right away.
+
+Added autocorrect for search terms.
+You can enable this via the configuration.
+
+Your solrconfig.xml must be configured to support spellcheck on the /select handler. An example solrconfig.xml is included:
+app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -47,7 +53,7 @@ Do not use on a production shop right away.</notes>
             <max/>
          </max>
          <files>
-            <files>                     </files>
+            <files>                    </files>
          </files>
       </package>
       <extension>

@@ -24,7 +24,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>1.0.2</version>
+            <version>1.1.0</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
@@ -85,6 +85,7 @@
             </server>
             <results>
                 <max>100</max>
+                <autocorrect>1</autocorrect>
             </results>
         </jeroenvermeulen_solarium>
     </default>
