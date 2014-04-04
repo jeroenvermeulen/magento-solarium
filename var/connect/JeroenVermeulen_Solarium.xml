@@ -1,12 +1,19 @@
 <_>
-   <form_key>lBAcVNlDOm6AWftL</form_key>
+   <form_key>U4vjsysbzRNT8FEF</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
       <version_ids>2</version_ids>
    </version_ids>
    <summary>Solr based full text search for Magento CE. Uses the Solarium library.</summary>
-   <description>Solr based full text search for Magento CE. Uses the Solarium library.
+   <description>Solr based full text search for Magento CE. Has an option to enable auto correct of search terms. Uses the Solarium library.
+
+  * After installing this extension:
+    * Clear the *Configuration* cache
+    * Log out of the Admin
+    * Log in on the Admin again
+    * Configure and enable it via: *System &gt; Configuration &gt; CATALOG &gt; Solarium Search*
+    * Reindex the *Catalog Search Index*, this will update Solr (if enabled)
 
 GitHub repo: https://github.com/jeroenvermeulen/magento-solarium
 
@@ -20,8 +27,14 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
    <notes>Beta version.
 Do not use on a production shop right away.
 
-Added autocorrect for search terms.
-You can enable this via the configuration.
+  * Fix for issue #1: Solr xml illegal character issue on Magento indexing
+  * Added auto correct for search terms
+  * Improved error catching
+  * Added configurable timeout
+  * Added confirmation after rebuilding Solr index
+  * Symfony EventDispatcher version: 2.4.2
+  * Improved error catching
+  * Removed some unnecessary settings from solrconfig.xml
 
 Your solrconfig.xml must be configured to support spellcheck on the /select handler. An example solrconfig.xml is included:
 app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml</notes>
@@ -53,7 +66,7 @@ app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml</notes>
             <max/>
          </max>
          <files>
-            <files>                    </files>
+            <files>                         </files>
          </files>
       </package>
       <extension>
