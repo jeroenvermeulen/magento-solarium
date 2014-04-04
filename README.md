@@ -17,8 +17,8 @@ The default MySQL Fulltext search is not performing very well on more serious sh
   * After installing this extension:
     * Log out of the Admin
     * Log in on the Admin again
-    * Configure and enable it via: *System > Configuration > CATALOG > Solarium Search.*
-    * Reindex the *Catalog Search Index*
+    * Configure and enable it via: *System > Configuration > CATALOG > Solarium Search*
+    * Reindex the *Catalog Search Index*, this will update Solr (if enabled)
 
 ## Support
 

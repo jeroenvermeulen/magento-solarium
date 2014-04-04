@@ -12,5 +12,6 @@
 
 ### Feature Branches
 
-  * feature-autocorrect: Added autocorrect for search terms
+  * feature-autocorrect: Added auto correct for search terms
+  * feature-autocorrect: Removed some unnecessary settings from solrconfig.xml
 
