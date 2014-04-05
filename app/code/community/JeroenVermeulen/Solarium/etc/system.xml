@@ -41,7 +41,7 @@
                     <fields>
                         <enabled translate="label comment">
                             <label>Enabled</label>
-                            <comment><![CDATA[After switching on please reindex the<br /><em>Catalog Search Index</em>.]]></comment>
+                            <comment><![CDATA[After switching please reindex the<br /><em>Catalog Search Index</em>.]]></comment>
                             <frontend_type>select</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
