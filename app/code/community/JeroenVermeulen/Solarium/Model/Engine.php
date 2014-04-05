@@ -34,18 +34,35 @@ class JeroenVermeulen_Solarium_Model_Engine {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Check if Solr search is enabled.
+     * If no storeId specified we consider it enabled when it is for one store view, because then we need to
+     * build the index.
+     * @param int $storeId - Store View Id
      * @return bool
      */
-    public static function isEnabled() {
-        return (boolean) self::getConf('general/enabled');
+    public static function isEnabled( $storeId=null ) {
+        $result = false;
+        if ( empty($storeId) ) {
+            $stores = Mage::app()->getStores( true );
+            foreach ( $stores as $store ) {
+                $result = (boolean) self::getConf( 'general/enabled', $store->getId() );
+                if ( $result ) {
+                    break;
+                }
+            }
+        } else {
+            $result = (boolean) self::getConf( 'general/enabled', $storeId );
+        }
+        return $result;
     }
 
     /**
      * @param string $setting - Path inside the "jeroenvermeulen_solarium" config section
+     * @param int    $storeId - Store View Id
      * @return mixed
      */
-    public static function getConf( $setting ) {
-        return Mage::getStoreConfig('jeroenvermeulen_solarium/'.$setting);
+    public static function getConf( $setting, $storeId=null ) {
+        return Mage::getStoreConfig( 'jeroenvermeulen_solarium/'.$setting, $storeId );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

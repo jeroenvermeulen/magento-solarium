@@ -29,7 +29,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      */
     public function cleanIndex( $storeId = null, $productIds = null ) {
         parent::cleanIndex($storeId, $productIds);
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId ) ) {
             Mage::getSingleton('jeroenvermeulen_solarium/engine')->cleanIndex( $storeId, $productIds );
         }
         return $this;
@@ -42,7 +42,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      */
     public function rebuildIndex( $storeId = null, $productIds = null ) {
         parent::rebuildIndex($storeId,$productIds);
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId ) ) {
             $helper       = Mage::helper('jeroenvermeulen_solarium');
             $engine       = Mage::getSingleton('jeroenvermeulen_solarium/engine');
             $adminSession = Mage::getSingleton('adminhtml/session');
@@ -67,7 +67,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
     public function prepareResult( $object, $queryText, $query )
     {
         if (!$query->getIsProcessed()) {
-            if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
+            if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
                 $adapter           = $this->_getWriteAdapter();
                 $searchResultTable = $this->getTable('catalogsearch/result');
                 $engine            = Mage::getSingleton('jeroenvermeulen_solarium/engine');
