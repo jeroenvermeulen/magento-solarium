@@ -120,6 +120,9 @@ class JeroenVermeulen_Solarium_Model_Engine {
         if ( empty($result) && is_string( $this->_lastError ) ) {
             $result = $this->_lastError;
         }
+        if ( !empty($result) && preg_match( '#<pre>(.+)</pre>#', $result, $matches ) ) {
+            $result = trim( $matches[1] );
+        }
         return strval( $result );
     }
 
