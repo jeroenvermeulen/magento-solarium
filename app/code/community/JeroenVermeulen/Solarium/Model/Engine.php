@@ -158,6 +158,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $query = $this->_client->createPing();
             // Default field, needed when it is not specified in solrconfig.xml
             $query->addParam( 'df', 'text' );
+            $query->setTimeAllowed( intval( self::getConf('server/search_timeout') ) ); // Not 100% sure if this works.
             $queryResult = $this->_client->ping( $query );
             $resultData = $queryResult->getData();
             if ( !empty($resultData['status']) && 'OK' === $resultData['status'] ) {
@@ -182,30 +183,30 @@ class JeroenVermeulen_Solarium_Model_Engine {
         }
         $result = false;
         try {
-            $query = array();
+            $queryText = array();
             if ( !empty($storeId) ) {
-                $query[] .= 'store_id:' . $storeId;
+                $queryText[] .= 'store_id:' . $storeId;
             }
             if ( is_numeric($productIds) ) {
-                $query[] .= 'product_id:' . $productIds;
+                $queryText[] .= 'product_id:' . $productIds;
             }
             if ( is_array($productIds) ) {
                 $or = array();
                 foreach ( $productIds as $id ) {
                     $or[] = 'product_id:' . $id;
                 }
-                $query[] .= '('.implode( ' OR ', $or ).')';
+                $queryText[] .= '('.implode( ' OR ', $or ).')';
             }
 
-            if ( empty($query) ) {
-                $query[] = '*:*'; // Delete all
+            if ( empty($queryText) ) {
+                $queryText[] = '*:*'; // Delete all
             }
 
-            $solrUpdate = $this->_client->createUpdate();
-            $solrUpdate->addDeleteQuery( implode( ' ', $query ) );
-            $solrUpdate->addCommit();
+            $query = $this->_client->createUpdate();
+            $query->addDeleteQuery( implode( ' ', $queryText ) );
+            $query->addCommit();
 
-            $result = $this->_update( $solrUpdate, 'clean' );
+            $result = $this->_update( $query, 'clean' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
@@ -244,21 +245,21 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $products = $readAdapter->query( $select );
 
-            $solrUpdate = $this->_client->createUpdate();
+            $query = $this->_client->createUpdate();
 
             while( $product = $products->fetch() ) {
-                $document = $solrUpdate->createDocument();
+                $document = $query->createDocument();
                 $document->id         = $product['fulltext_id'];
                 $document->product_id = $product['product_id'];
                 $document->store_id   = $product['store_id'];
                 $document->text       = $this->_filterString( $product['data_index'] );
-                $solrUpdate->addDocument( $document );
+                $query->addDocument( $document );
             }
 
-            $solrUpdate->addCommit();
-            $solrUpdate->addOptimize();
+            $query->addCommit();
+            $query->addOptimize();
 
-            $result = $this->_update( $solrUpdate, 'rebuild' );
+            $result = $this->_update( $query, 'rebuild' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
@@ -292,6 +293,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
             }
+            $query->setTimeAllowed( intval( self::getConf('server/search_timeout') ) );
             $solrResultSet = $this->_client->select( $query );
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result = array();

@@ -86,7 +86,8 @@
                 <port>8983</port>
                 <path>/solr</path>
                 <core>collection1</core>
-                <timeout>5</timeout>
+                <timeout>3600</timeout>
+                <search_timeout>5</search_timeout>
             </server>
             <results>
                 <max>100</max>
