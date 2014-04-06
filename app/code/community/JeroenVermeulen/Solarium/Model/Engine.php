@@ -152,7 +152,10 @@ class JeroenVermeulen_Solarium_Model_Engine {
          */
         $result = false;
         try {
-            $queryResult = $this->_client->ping(  $this->_client->createPing() );
+            $query = $this->_client->createPing();
+            // Default field, needed when it is not specified in solrconfig.xml
+            $query->addParam( 'df', 'text' );
+            $queryResult = $this->_client->ping( $query );
             $resultData = $queryResult->getData();
             if ( !empty($resultData['status']) && 'OK' === $resultData['status'] ) {
                 $result = true;
@@ -272,6 +275,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
         $result = false;
         try {
             $query = $this->_client->createSelect();
+            // Default field, needed when it is not specified in solrconfig.xml
+            $query->addParam( 'df', 'text' );
             $query->setQuery( $this->_filterString($queryString) );
             $query->setRows( $this::getConf('results/max') );
             $query->setFields( array('product_id','score') );
