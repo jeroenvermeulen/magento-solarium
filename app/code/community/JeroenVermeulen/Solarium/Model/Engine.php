@@ -247,14 +247,18 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $products = $readAdapter->query( $select );
 
-            $query = $this->_client->createUpdate();
-            $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
-
+            $query = false; // prevent IDE warning
             $documentSet = array();
             while( $product = $products->fetch() ) {
-                if ( 100 == count($documentSet) ) {
+                if ( 100 <= count($documentSet) ) {
                     $query->addDocuments( $documentSet );
+                    // No commit or optimize here, we will do it after adding all.
+                    $result = $this->_update( $query, 'rebuild' );
                     $documentSet = array();
+                }
+                if ( empty($documentSet) ) {
+                    $query = $this->_client->createUpdate();
+                    $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
                 }
                 $document = $query->createDocument();
                 $document->id         = $product['fulltext_id'];
@@ -264,10 +268,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
                 $documentSet[] = $document;
             }
             $query->addDocuments( $documentSet );
-
             $query->addCommit();
             $query->addOptimize();
-
             $result = $this->_update( $query, 'rebuild' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
