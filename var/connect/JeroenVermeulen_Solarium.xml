@@ -65,7 +65,7 @@ Do not use on a production shop right away.
             <max/>
          </max>
          <files>
-            <files>                          </files>
+            <files>                           </files>
          </files>
       </package>
       <extension>
@@ -117,8 +117,4 @@ Do not use on a production shop right away.
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
