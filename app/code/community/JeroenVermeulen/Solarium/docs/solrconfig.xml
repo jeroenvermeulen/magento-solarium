@@ -23,14 +23,11 @@
 -->
 <config>
 
-    <luceneMatchVersion>LUCENE_43</luceneMatchVersion>
+    <luceneMatchVersion>LUCENE_CURRENT</luceneMatchVersion>
 
     <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
 
     <dataDir>${solr.data.dir:}</dataDir>
-
-    <directoryFactory name="DirectoryFactory"
-                      class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
 
     <codecFactory class="solr.SchemaCodecFactory"/>
 
@@ -92,13 +89,7 @@
         </arr>
     </requestHandler>
 
-    <requestHandler name="/update" class="solr.UpdateRequestHandler">
-    </requestHandler>
-
-    <requestHandler name="/update/json" class="solr.JsonUpdateRequestHandler">
-        <lst name="defaults">
-            <str name="stream.contentType">application/json</str>
-        </lst>
+    <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
     </requestHandler>
 
     <requestHandler name="/analysis/field"
