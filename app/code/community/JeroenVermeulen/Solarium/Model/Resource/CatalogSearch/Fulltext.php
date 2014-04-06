@@ -83,7 +83,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 }
             }
             if ( !$query->getIsProcessed() ) {
-                // Solr disabled or something went wrong, fallback to MySQL
+                Mage::log( 'Solr disabled or something went wrong, fallback to MySQL', Zend_Log::WARN );
                 return parent::prepareResult($object, $queryText, $query);
             }
         }

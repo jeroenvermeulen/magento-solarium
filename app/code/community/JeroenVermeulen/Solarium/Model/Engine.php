@@ -157,6 +157,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
         try {
             $query = $this->_client->createPing();
             // Default field, needed when it is not specified in solrconfig.xml
+            $query->addParam( 'qt', '/select' ); // Needed for Solr < 3.6
             $query->addParam( 'df', 'text' );
             $query->setTimeAllowed( intval( self::getConf('server/search_timeout') ) ); // Not 100% sure if this works.
             $queryResult = $this->_client->ping( $query );
@@ -203,6 +204,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
 
             $query = $this->_client->createUpdate();
+            $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
             $query->addDeleteQuery( implode( ' ', $queryText ) );
             $query->addCommit();
 
@@ -246,6 +248,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $products = $readAdapter->query( $select );
 
             $query = $this->_client->createUpdate();
+            $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
 
             $documentSet = array();
             while( $product = $products->fetch() ) {
