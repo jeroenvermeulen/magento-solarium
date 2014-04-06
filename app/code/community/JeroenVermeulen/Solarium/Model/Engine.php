@@ -247,14 +247,20 @@ class JeroenVermeulen_Solarium_Model_Engine {
 
             $query = $this->_client->createUpdate();
 
+            $documentSet = array();
             while( $product = $products->fetch() ) {
+                if ( 100 == count($documentSet) ) {
+                    $query->addDocuments( $documentSet );
+                    $documentSet = array();
+                }
                 $document = $query->createDocument();
                 $document->id         = $product['fulltext_id'];
                 $document->product_id = $product['product_id'];
                 $document->store_id   = $product['store_id'];
                 $document->text       = $this->_filterString( $product['data_index'] );
-                $query->addDocument( $document );
+                $documentSet[] = $document;
             }
+            $query->addDocuments( $documentSet );
 
             $query->addCommit();
             $query->addOptimize();
