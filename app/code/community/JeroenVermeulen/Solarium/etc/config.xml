@@ -28,6 +28,11 @@
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
+        <blocks>
+            <jeroenvermeulen_solarium>
+                <class>JeroenVermeulen_Solarium_Block</class>
+            </jeroenvermeulen_solarium>
+        </blocks>
         <models>
             <jeroenvermeulen_solarium>
                 <class>JeroenVermeulen_Solarium_Model</class>

@@ -123,9 +123,23 @@ class JeroenVermeulen_Solarium_Model_Engine {
         return strval( $result );
     }
 
-    /** @return float - in in milliseconds */
+    /**
+     * @return float - in in milliseconds
+     */
     public function getLastQueryTime() {
         return intval( $this->_lastQueryTime ) / 1000;
+    }
+
+    /**
+     * Return an array with version info, to show in backend
+     * @return array
+     */
+    public function getVersionInfo() {
+        $helper = Mage::helper('jeroenvermeulen_solarium');
+        $versions = array();
+        $versions[ 'Extension version' ] = $helper->getExtensionVersion();
+        $versions[ 'Solarium library version' ] = Solarium\Client::VERSION;
+        return $versions;
     }
 
     /**

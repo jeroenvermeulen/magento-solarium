@@ -31,10 +31,19 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
+                <info translate="label" module="jeroenvermeulen_solarium">
+                    <label>Info</label>
+                    <frontend_type>text</frontend_type>
+                    <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_info</frontend_model>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </info>
                 <general translate="label" module="jeroenvermeulen_solarium">
                     <label>General Settings</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>100</sort_order>
+                    <sort_order>200</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -54,7 +63,7 @@
                 <server translate="label" module="jeroenvermeulen_solarium">
                     <label>Solr 4.x Server</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>200</sort_order>
+                    <sort_order>300</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
@@ -106,7 +115,7 @@
                 <results>
                     <label>Search Results</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>300</sort_order>
+                    <sort_order>400</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
