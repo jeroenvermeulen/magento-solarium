@@ -9,7 +9,7 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 ## Requirements
 
   * Magento Community Edition 1.6+
-  * A working Solr 4.3+ server
+  * A working Solr 3.6+ server
 
 ## Installation & Usage
 

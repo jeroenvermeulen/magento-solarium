@@ -61,7 +61,7 @@
                     </fields>
                 </general>
                 <server translate="label" module="jeroenvermeulen_solarium">
-                    <label>Solr 4.x Server</label>
+                    <label>Solr Server</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>300</sort_order>
                     <show_in_default>1</show_in_default>
