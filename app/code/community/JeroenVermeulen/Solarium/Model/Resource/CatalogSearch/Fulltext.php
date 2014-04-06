@@ -48,8 +48,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             $adminSession = Mage::getSingleton('adminhtml/session');
             $ok = $engine->rebuildIndex( $storeId, $productIds );
             if ( $ok ) {
-                $adminSession->addSuccess( $helper->__( 'Solr index was rebuilt in %.02f seconds.'
-                                                      , $engine->getLastQueryTime() ) );
+                $adminSession->addSuccess( $helper->__( 'Solr Index was rebuilt.' ) );
             } else {
                 $adminSession->addError( $helper->__( 'Error reindexing Solr: %s'
                                                     , $engine->getLastError() ) );
