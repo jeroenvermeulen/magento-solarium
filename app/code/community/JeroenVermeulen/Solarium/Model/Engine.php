@@ -37,6 +37,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
      * Check if Solr search is enabled.
      * If no storeId specified we consider it enabled when it is for one store view, because then we need to
      * build the index.
+     *
      * @param int $storeId - Store View Id
      * @return bool
      */
@@ -57,6 +58,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
+     * Shorthand to get a Magento Configuration setting of this extension.
+     *
      * @param string $setting - Path inside the "jeroenvermeulen_solarium" config section
      * @param int    $storeId - Store View Id
      * @return mixed
@@ -68,7 +71,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Constructor
+     * Constructor, initialize Solarium client and check if it is working.
      */
     public function __construct() {
         $helper = Mage::helper('jeroenvermeulen_solarium');
@@ -95,6 +98,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
+     * This function returns the cached status if Solr is working.
+     *
      * @return bool - True if engine is working
      */
     public function isWorking() {
@@ -102,6 +107,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
+     * Returns the last occurred error.
+     *
      * @return string - Last occurred error
      */
     public function getLastError() {
@@ -127,6 +134,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
+     * Returns the time in milliseconds the last Solr query took to execute.
+     *
      * @return float - in in milliseconds
      */
     public function getLastQueryTime() {
@@ -134,7 +143,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
-     * Return an array with version info, to show in backend
+     * Return an array with version info, to show in backend.
+     *
      * @return array
      */
     public function getVersionInfo() {
@@ -146,6 +156,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     }
 
     /**
+     * Ping Solr to test if it is working.
+     *
      * @return bool - True on success
      */
     public function ping() {
@@ -160,19 +172,21 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $query->addParam( 'qt', '/select' ); // Needed for Solr < 3.6
             $query->addParam( 'df', 'text' );
             $query->setTimeAllowed( intval( self::getConf('server/search_timeout') ) ); // Not 100% sure if this works.
-            $queryResult = $this->_client->ping( $query );
-            $resultData = $queryResult->getData();
+            $solariumResult = $this->_client->ping( $query );
+            $resultData = $solariumResult->getData();
             if ( !empty($resultData['status']) && 'OK' === $resultData['status'] ) {
                 $result = true;
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
-            Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
         return $result;
     }
 
     /**
+     * Clean the Solr index. If a Store ID or Product IDs are specified it is only cleared for those.
+     *
      * @param int            $storeId    - Store View Id
      * @param null|array|int $productIds - Product Entity Id(s)
      * @return bool                      - True on success
@@ -185,12 +199,15 @@ class JeroenVermeulen_Solarium_Model_Engine {
         $result = false;
         try {
             $queryText = array();
+
             if ( !empty($storeId) ) {
                 $queryText[] .= 'store_id:' . $storeId;
             }
+
             if ( is_numeric($productIds) ) {
                 $queryText[] .= 'product_id:' . $productIds;
             }
+
             if ( is_array($productIds) ) {
                 $or = array();
                 foreach ( $productIds as $id ) {
@@ -204,24 +221,26 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
 
             $query = $this->_client->createUpdate();
-            $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
             $query->addDeleteQuery( implode( ' ', $queryText ) );
             $query->addCommit();
 
-            $result = $this->_update( $query, 'clean' );
+            $solariumResult = $this->_client->update($query);
+            $result = $this->_processResult( $solariumResult, 'clean' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
-            Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
         return $result;
     }
 
     /**
-     * @param int $storeId     - Store View Id
-     * @param null $productIds - $productIds - Product Entity Id(s)
-     * @return bool            - True on success
+     * Rebuild the index. If a Store ID or Product IDs are specified it is only rebuilt for those.
+     *
+     * @param int|null   $storeId    - Store View Id
+     * @param int[]|null $productIds - Product Entity Id(s)
+     * @return bool                  - True on success
      */
-    public function rebuildIndex( $storeId, $productIds ) {
+    public function rebuildIndex( $storeId=null, $productIds=null ) {
         if ( !$this->_working ) {
             return false;
         }
@@ -247,40 +266,50 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $products = $readAdapter->query( $select );
 
-            $query = false; // prevent IDE warning
-            $documentSet = array();
+            /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
+            $buffer = $this->_client->getPlugin('bufferedadd');
+            $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
+            $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH
+                                                             , array( $this,'flushListener' ) );
             while( $product = $products->fetch() ) {
-                if ( 100 <= count($documentSet) ) {
-                    $query->addDocuments( $documentSet );
-                    // No commit or optimize here, we will do it after adding all.
-                    $result = $this->_update( $query, 'rebuild' );
-                    $documentSet = array();
-                }
-                if ( empty($documentSet) ) {
-                    $query = $this->_client->createUpdate();
-                    $query->addParam( 'qt', '/update' ); // Needed for Solr < 3.6
-                }
-                $document = $query->createDocument();
-                $document->id         = $product['fulltext_id'];
-                $document->product_id = $product['product_id'];
-                $document->store_id   = $product['store_id'];
-                $document->text       = $this->_filterString( $product['data_index'] );
-                $documentSet[] = $document;
+                $data = array( 'id'         => intval( $product['fulltext_id'] )
+                             , 'product_id' => intval( $product['product_id'] )
+                             , 'store_id'   => intval( $product['store_id'] )
+                             , 'text'       => $this->_filterString( $product['data_index'] ) );
+                $buffer->createDocument($data);
             }
-            $query->addDocuments( $documentSet );
-            $query->addCommit();
-            $query->addOptimize();
-            $result = $this->_update( $query, 'rebuild' );
+            $solariumResult = $buffer->flush();
+            $this->optimize(); // ignore result
+            $result = $this->_processResult( $solariumResult, 'commit buffered add' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
-            Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
         return $result;
     }
 
     /**
+     * Optimize the Solr index.
+     *
+     * @return bool - True on success
+     */
+    public function optimize() {
+        if ( !$this->_working ) {
+            return false;
+        }
+        // get an update query instance
+        $update = $this->_client->createUpdate();
+        $update->addOptimize();
+        $solariumResult = $this->_client->update($update);
+        return $this->_processResult( $solariumResult, 'optimize' );
+    }
+
+    /**
+     * Query the Solr server to search for a string.
+     *
      * @param int    $storeId     - Store View Id
      * @param string $queryString - Text to search for
+     * @param int    $try         - Times tried to find result
      * @return array
      */
     public function query( $storeId, $queryString, $try=1 ) {
@@ -340,36 +369,51 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
-            Mage::log( __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage(), Zend_Log::ERR );
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
         return $result;
+    }
+
+    /**
+     * Callback function for the BufferedAdd Solarium plugin.
+     * Later we can use this function to show progress to the user.
+     *
+     * @param \Solarium\Plugin\BufferedAdd\Event\PreFlush $event
+     */
+    function flushListener( Solarium\Plugin\BufferedAdd\Event\PreFlush $event ) {
+        Mage::Log( sprintf( '%s - Flushing buffer, %d docs', __CLASS__ , count($event->getBuffer()) )
+            , Zend_Log::DEBUG );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @param \Solarium\QueryType\Update\Query\Query $updateQuery
+     * Process the result of a Solarium update.
+     *
+     * @param Solarium\QueryType\Update\Result $solariumResult
      * @param string $actionText
      * @return bool
      */
-    protected function _update( Solarium\QueryType\Update\Query\Query $updateQuery, $actionText='action' ) {
-        if ( !$this->_working ) {
-            return false;
-        }
+    protected function _processResult( Solarium\QueryType\Update\Result $solariumResult, $actionText='query' ) {
         $helper = Mage::helper('jeroenvermeulen_solarium');
-        $updateResult = $this->_client->update($updateQuery);
-        $this->_lastQueryTime = $updateResult->getQueryTime();
-        if ( 0 !==  $updateResult->getStatus() ) {
-            $this->_lastError = $updateResult->getStatus();
-            $adminSession = Mage::getSingleton('adminhtml/session');
-            $adminSession->addError( $helper->__( 'Solr %s error, status: %d, query time: %d'
-                                                , $actionText
-                                                , $updateResult->getStatus()
-                                                , $updateResult->getQueryTime() ) );
+        $this->_lastQueryTime = $solariumResult->getQueryTime();
+        if ( 0 !==  $solariumResult->getStatus() ) {
+            $this->_lastError = $solariumResult->getStatus();
+            Mage::getSingleton('adminhtml/session')->addError(
+                $helper->__( 'Solr %s error, status: %d, query time: %d'
+                           , $actionText
+                           , $solariumResult->getStatus()
+                           , $solariumResult->getQueryTime() ) );
         }
-        return ( 0 === $updateResult->getStatus() );
+        return ( 0 === $solariumResult->getStatus() );
     }
 
+    /**
+     * Filter a string to be safe to add to Solr.
+     *
+     * @param string $str
+     * @return string
+     */
     protected function _filterString( $str ) {
         $badChars = '';
         for ( $ord = 0; $ord < 32; $ord++ ) {

@@ -46,9 +46,12 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             $helper       = Mage::helper('jeroenvermeulen_solarium');
             $engine       = Mage::getSingleton('jeroenvermeulen_solarium/engine');
             $adminSession = Mage::getSingleton('adminhtml/session');
+            $startTime    = microtime( true );
             $ok = $engine->rebuildIndex( $storeId, $productIds );
+            $timeUsed     = microtime( true ) - $startTime;
             if ( $ok ) {
-                $adminSession->addSuccess( $helper->__( 'Solr Index was rebuilt.' ) );
+                $adminSession->addSuccess( $helper->__( 'Solr Index was rebuilt in %s seconds.'
+                                         , sprintf( '%.02f', $timeUsed ) ) );
             } else {
                 $adminSession->addError( $helper->__( 'Error reindexing Solr: %s'
                                                     , $engine->getLastError() ) );

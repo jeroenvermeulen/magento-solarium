@@ -93,6 +93,9 @@
                 <max>100</max>
                 <autocorrect>1</autocorrect>
             </results>
+            <reindexing>
+                <buffersize>100</buffersize>
+            </reindexing>
         </jeroenvermeulen_solarium>
     </default>
 </config>

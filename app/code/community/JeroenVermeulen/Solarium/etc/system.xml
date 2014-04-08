@@ -149,6 +149,25 @@
                         </autocorrect>
                     </fields>
                 </results>
+                <reindexing>
+                    <label>Reindexing</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>500</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <buffersize translate="label">
+                            <label>Updates to post at once</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <validate>validate-greater-than-zero</validate>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </buffersize>
+                    </fields>
+                </reindexing>
             </groups>
         </jeroenvermeulen_solarium>
     </sections>

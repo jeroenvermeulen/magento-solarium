@@ -1,12 +1,12 @@
 # Change Log
 
-### RELEASE-1.0.1 - beta
+### v1.0.1-beta
 
   * Initial Magento Connect release
   * Solarium version: 3.2.0
   * Symfony EventDispatcher version: 2.4.2
 
-### RELEASE 1.1.0 - beta
+### v1.1.0-beta
 
   * Fix for issue #1: Solr xml illegal character issue on Magento indexing
   * Added auto correct for search terms
@@ -16,7 +16,7 @@
   * Improved error catching
   * Removed some unnecessary settings from solrconfig.xml
 
-### RELEASE 1.2.0 - beta
+### v1.2.0-beta
 
   * Improved Configuration Settings
   * Enable/Disable for separate storeviews is fixed
@@ -28,3 +28,7 @@
   * Updated to work from Solr 3.1.0
   * Removed some unnecessary stuff from solrconfig.xml
   * Improved index rebuild to send 100 products at once.
+
+### v1.2.1-beta
+
+  * Small change to composer.json: the licence code
