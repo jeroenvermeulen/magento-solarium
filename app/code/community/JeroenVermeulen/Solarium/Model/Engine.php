@@ -401,7 +401,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $this->_lastError = $solariumResult->getStatus();
             Mage::getSingleton('adminhtml/session')->addError(
                 $helper->__( 'Solr %s error, status: %d, query time: %d'
-                           , $actionText
+                           , $helper->__( $actionText )
                            , $solariumResult->getStatus()
                            , $solariumResult->getQueryTime() ) );
         }
