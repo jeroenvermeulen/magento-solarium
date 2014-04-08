@@ -280,7 +280,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $solariumResult = $buffer->flush();
             $this->optimize(); // ignore result
-            $result = $this->_processResult( $solariumResult, 'commit buffered add' );
+            $result = $this->_processResult( $solariumResult, 'flushing buffered add' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
