@@ -72,6 +72,9 @@ class JeroenVermeulen_Solarium_Model_Engine {
 
     /**
      * Constructor, initialize Solarium client and check if it is working.
+     *
+     * The 'admin' core is a workaround used to execute 'non core specific' admin queries.
+     * @see https://github.com/basdenooijer/solarium/issues/254
      */
     public function __construct() {
         $helper = Mage::helper('jeroenvermeulen_solarium');
@@ -85,6 +88,13 @@ class JeroenVermeulen_Solarium_Model_Engine {
                         'port'    => intval( self::getConf('server/port') ),
                         'path'    => trim( self::getConf('server/path') ),
                         'core'    => trim( self::getConf('server/core') ),
+                        'timeout' => intval( self::getConf('server/timeout') )
+                    ),
+                    'admin' => array(
+                        'host'    => $host,
+                        'port'    => intval( self::getConf('server/port') ),
+                        'path'    => trim( self::getConf('server/path') ),
+                        'core'    => 'admin',
                         'timeout' => intval( self::getConf('server/timeout') )
                     )
                 )
@@ -150,8 +160,30 @@ class JeroenVermeulen_Solarium_Model_Engine {
     public function getVersionInfo() {
         $helper = Mage::helper('jeroenvermeulen_solarium');
         $versions = array();
-        $versions[ 'Extension version' ] = $helper->getExtensionVersion();
-        $versions[ 'Solarium library version' ] = Solarium\Client::VERSION;
+        $versions[ 'Operating System' ] = php_uname();
+        $versions[ 'PHP' ] = phpversion();
+        $versions[ 'Magento' ] = Mage::getVersion();
+        $versions[ 'Extension' ] = $helper->getExtensionVersion();
+        $versions[ 'Solarium Library' ] = Solarium\Client::VERSION;
+        $versions[ 'Solr' ] = $helper->__('unknown');
+        $versions[ 'Java' ] = $helper->__('unknown');
+        try {
+            /**
+             * Abusing ping query to get system info
+             * @see https://github.com/basdenooijer/solarium/issues/254
+             */
+            $query = $this->_client->createPing();
+            $query->setHandler('system');
+            $data = $this->_client->ping( $query, 'admin' )->getData();
+            if ( !empty( $data['lucene']['solr-impl-version'] ) ) {
+                $versions[ 'Solr' ] = $data['lucene']['solr-impl-version'];
+            }
+            if ( !empty( $data['jvm']['version'] ) ) {
+                $versions[ 'Java' ] = $data['jvm']['version'];
+            }
+        } catch ( Exception $e ) {
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
+        }
         return $versions;
     }
 
