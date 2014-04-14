@@ -186,8 +186,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
                 if ( !empty( $data['lucene']['solr-impl-version'] ) ) {
                     $versions[ 'Solr' ] = $data['lucene']['solr-impl-version'];
                 }
-                if ( !empty( $data['jvm']['version'] ) ) {
-                    $versions[ 'Java' ] = $data['jvm']['version'];
+                if ( !empty( $data['jvm']['name'] ) && !empty( $data['jvm']['version'] ) ) {
+                    $versions[ 'Java' ] = $data['jvm']['name'] . ' ' . $data['jvm']['version'];
                 }
             } catch ( Exception $e ) {
                 Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
