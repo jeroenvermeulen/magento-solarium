@@ -88,6 +88,13 @@ class JeroenVermeulen_Solarium_Model_Engine {
                         'port'    => intval( self::getConf('server/port') ),
                         'path'    => trim( self::getConf('server/path') ),
                         'core'    => trim( self::getConf('server/core') ),
+                        'timeout' => intval( self::getConf('server/search_timeout') )
+                    ),
+                    'update' => array(
+                        'host'    => $host,
+                        'port'    => intval( self::getConf('server/port') ),
+                        'path'    => trim( self::getConf('server/path') ),
+                        'core'    => trim( self::getConf('server/core') ),
                         'timeout' => intval( self::getConf('server/timeout') )
                     ),
                     'admin' => array(
@@ -95,7 +102,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
                         'port'    => intval( self::getConf('server/port') ),
                         'path'    => trim( self::getConf('server/path') ),
                         'core'    => 'admin',
-                        'timeout' => intval( self::getConf('server/timeout') )
+                        'timeout' => intval( self::getConf('server/search_timeout') )
                     )
                 )
             );
@@ -167,22 +174,24 @@ class JeroenVermeulen_Solarium_Model_Engine {
         $versions[ 'Solarium Library' ] = Solarium\Client::VERSION;
         $versions[ 'Solr' ] = $helper->__('unknown');
         $versions[ 'Java' ] = $helper->__('unknown');
-        try {
-            /**
-             * Abusing ping query to get system info
-             * @see https://github.com/basdenooijer/solarium/issues/254
-             */
-            $query = $this->_client->createPing();
-            $query->setHandler('system');
-            $data = $this->_client->ping( $query, 'admin' )->getData();
-            if ( !empty( $data['lucene']['solr-impl-version'] ) ) {
-                $versions[ 'Solr' ] = $data['lucene']['solr-impl-version'];
+        if ( $this->isWorking() ) {
+            try {
+                /**
+                 * Abusing ping query to get system info
+                 * @see https://github.com/basdenooijer/solarium/issues/254
+                 */
+                $query = $this->_client->createPing();
+                $query->setHandler('system');
+                $data = $this->_client->ping( $query, 'admin' )->getData();
+                if ( !empty( $data['lucene']['solr-impl-version'] ) ) {
+                    $versions[ 'Solr' ] = $data['lucene']['solr-impl-version'];
+                }
+                if ( !empty( $data['jvm']['version'] ) ) {
+                    $versions[ 'Java' ] = $data['jvm']['version'];
+                }
+            } catch ( Exception $e ) {
+                Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
             }
-            if ( !empty( $data['jvm']['version'] ) ) {
-                $versions[ 'Java' ] = $data['jvm']['version'];
-            }
-        } catch ( Exception $e ) {
-            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
         return $versions;
     }
@@ -256,7 +265,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $query->addDeleteQuery( implode( ' ', $queryText ) );
             $query->addCommit();
 
-            $solariumResult = $this->_client->update($query);
+            $solariumResult = $this->_client->update( $query, 'update' );
             $result = $this->_processResult( $solariumResult, 'clean' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
@@ -301,6 +310,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
             $buffer = $this->_client->getPlugin('bufferedadd');
             $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
+            $buffer->setEndpoint( 'update' );
             $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH
                                                              , array( $this,'flushListener' ) );
             while( $product = $products->fetch() ) {
@@ -332,7 +342,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
         // get an update query instance
         $update = $this->_client->createUpdate();
         $update->addOptimize();
-        $solariumResult = $this->_client->update($update);
+        $solariumResult = $this->_client->update( $update, 'update' );
         return $this->_processResult( $solariumResult, 'optimize' );
     }
 
