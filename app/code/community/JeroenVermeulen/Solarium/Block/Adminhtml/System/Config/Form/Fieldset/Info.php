@@ -35,17 +35,11 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Info
         ob_start();
 ?>
             <table cellspacing="0" class="form-list">
-                <colgroup class="label"></colgroup>
-                <colgroup class="value"></colgroup>
-                <colgroup class="scope-label"></colgroup>
-                <colgroup class=""></colgroup>
                 <tbody>
                 <?php foreach ( $versions as $label => $value ): ?>
                     <tr>
                         <td class="label"><?php echo $helper->__($label); ?></td>
-                        <td class="value"><?php echo $value; ?></td>
-                        <td class="scope-label"></td>
-                        <td class=""></td>
+                        <td><?php echo $value; ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
