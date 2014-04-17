@@ -30,6 +30,8 @@ class JeroenVermeulen_Solarium_Model_Engine {
     protected $_lastError = '';
     /** @var int - in milliseconds */
     protected $_lastQueryTime = 0;
+    /** @var null|int[] $_enabledStores */
+    protected $_enabledStoreIds = null;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +46,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
     public static function isEnabled( $storeId=null ) {
         $result = false;
         if ( empty($storeId) ) {
-            $stores = Mage::app()->getStores( true );
+            $stores = Mage::app()->getStores( false );
             foreach ( $stores as $store ) {
                 $result = (boolean) self::getConf( 'general/enabled', $store->getId() );
                 if ( $result ) {
@@ -55,6 +57,24 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $result = (boolean) self::getConf( 'general/enabled', $storeId );
         }
         return $result;
+    }
+
+    /**
+     * Get an array of store Id's where Solarium Search is enabled for
+     *
+     * @return int[]
+     */
+    public function getEnabledStoreIds() {
+        if ( is_null( $this->_enabledStoreIds ) ) {
+            $this->_enabledStoreIds = array();
+            $stores = Mage::app()->getStores( false );
+            foreach ( $stores as $store ) {
+                if ( self::getConf( 'general/enabled', $store->getId() ) ) {
+                    array_push( $this->_enabledStoreIds, $store->getId() );
+                }
+            }
+        }
+        return $this->_enabledStoreIds;
     }
 
     /**
@@ -294,7 +314,9 @@ class JeroenVermeulen_Solarium_Model_Engine {
             $select->from( $coreResource->getTableName('catalogsearch/fulltext')
                          , array('product_id','store_id','data_index','fulltext_id') );
 
-            if ( !empty($storeId) ) {
+            if ( empty($storeId) ) {
+                $select->where( 'store_id IN (?)', $this->getEnabledStoreIds() );
+            } else {
                 $select->where( 'store_id', $storeId );
             }
             if ( !empty($productIds) ) {

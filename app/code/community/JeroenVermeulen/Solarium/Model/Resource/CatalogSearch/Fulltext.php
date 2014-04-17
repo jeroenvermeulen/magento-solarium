@@ -29,7 +29,11 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      */
     public function cleanIndex( $storeId = null, $productIds = null ) {
         parent::cleanIndex($storeId, $productIds);
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId ) ) {
+        /**
+         * If it is enabled for one store, clean for the current store.
+         * This is needed to clean up when you switch Solarium Search from enable to disable for a store.
+         */
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
             Mage::getSingleton('jeroenvermeulen_solarium/engine')->cleanIndex( $storeId, $productIds );
         }
         return $this;
