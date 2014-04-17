@@ -396,6 +396,7 @@ class JeroenVermeulen_Solarium_Model_Engine {
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
+                $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
             $query->setTimeAllowed( intval( self::getConf('server/search_timeout') ) );
             $solrResultSet = $this->_client->select( $query );
