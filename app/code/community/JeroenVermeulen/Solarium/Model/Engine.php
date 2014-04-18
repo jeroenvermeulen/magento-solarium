@@ -455,22 +455,28 @@ class JeroenVermeulen_Solarium_Model_Engine {
     /**
      * Process the result of a Solarium update.
      *
-     * @param Solarium\QueryType\Update\Result $solariumResult
+     * @param Solarium\QueryType\Update\Result|bool $solariumResult
      * @param string $actionText
      * @return bool
      */
-    protected function _processResult( Solarium\QueryType\Update\Result $solariumResult, $actionText='query' ) {
+    protected function _processResult( $solariumResult, $actionText='query' ) {
+        $result = false;
         $helper = Mage::helper('jeroenvermeulen_solarium');
-        $this->_lastQueryTime = $solariumResult->getQueryTime();
-        if ( 0 !==  $solariumResult->getStatus() ) {
-            $this->_lastError = $solariumResult->getStatus();
-            Mage::getSingleton('adminhtml/session')->addError(
-                $helper->__( 'Solr %s error, status: %d, query time: %d'
-                           , $helper->__( $actionText )
-                           , $solariumResult->getStatus()
-                           , $solariumResult->getQueryTime() ) );
+        if ( is_a($solariumResult,'Solarium\QueryType\Update\Result') ) {
+            $this->_lastQueryTime = $solariumResult->getQueryTime();
+            if ( 0 !==  $solariumResult->getStatus() ) {
+                $this->_lastError = $solariumResult->getStatus();
+                Mage::getSingleton('adminhtml/session')->addError(
+                    $helper->__( 'Solr %s error, status: %d, query time: %d'
+                               , $helper->__( $actionText )
+                               , $solariumResult->getStatus()
+                               , $solariumResult->getQueryTime() ) );
+            }
+            $result = ( 0 === $solariumResult->getStatus() );
+        } else {
+            $this->_lastError = $helper->__('Solr %s error, incorrect object received.', $actionText);
         }
-        return ( 0 === $solariumResult->getStatus() );
+        return $result;
     }
 
     /**
