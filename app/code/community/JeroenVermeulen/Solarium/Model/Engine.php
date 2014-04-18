@@ -329,22 +329,27 @@ class JeroenVermeulen_Solarium_Model_Engine {
             }
             $products = $readAdapter->query( $select );
 
+            if ( ! $products->rowCount() ) {
+                // No matching products, nothing to update, consider OK.
+                $result = true;
+            } else {
             /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
-            $buffer = $this->_client->getPlugin('bufferedadd');
-            $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
-            $buffer->setEndpoint( 'update' );
-            $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH
-                                                             , array( $this,'flushListener' ) );
-            while( $product = $products->fetch() ) {
-                $data = array( 'id'         => intval( $product['fulltext_id'] )
-                             , 'product_id' => intval( $product['product_id'] )
-                             , 'store_id'   => intval( $product['store_id'] )
-                             , 'text'       => $this->_filterString( $product['data_index'] ) );
-                $buffer->createDocument($data);
+                $buffer = $this->_client->getPlugin('bufferedadd');
+                $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
+                $buffer->setEndpoint( 'update' );
+                $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH
+                                                                 , array( $this,'flushListener' ) );
+                while( $product = $products->fetch() ) {
+                    $data = array( 'id'         => intval( $product['fulltext_id'] )
+                                 , 'product_id' => intval( $product['product_id'] )
+                                 , 'store_id'   => intval( $product['store_id'] )
+                                 , 'text'       => $this->_filterString( $product['data_index'] ) );
+                    $buffer->createDocument($data);
+                }
+                $solariumResult = $buffer->flush();
+                $this->optimize(); // ignore result
+                $result = $this->_processResult( $solariumResult, 'flushing buffered add' );
             }
-            $solariumResult = $buffer->flush();
-            $this->optimize(); // ignore result
-            $result = $this->_processResult( $solariumResult, 'flushing buffered add' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
