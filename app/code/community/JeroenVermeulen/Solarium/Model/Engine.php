@@ -374,6 +374,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
+                // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
             $query->setTimeAllowed( intval( self::getConf( 'server/search_timeout' ) ) );
