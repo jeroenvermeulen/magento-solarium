@@ -20,13 +20,14 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class JeroenVermeulen_Solarium_Helper_Data extends Mage_Core_Helper_Abstract {
+class JeroenVermeulen_Solarium_Helper_Data extends Mage_Core_Helper_Abstract
+{
 
     /**
      * @return string
      */
-    public function getExtensionVersion()
-    {
+    public function getExtensionVersion() {
+        /** @noinspection PhpUndefinedFieldInspection */
         return strval( Mage::getConfig()->getNode()->modules->JeroenVermeulen_Solarium->version );
     }
 

@@ -21,6 +21,7 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
+<!--suppress XmlUnboundNsPrefix -->
 <config>
 
     <luceneMatchVersion>LUCENE_CURRENT</luceneMatchVersion>
@@ -68,11 +69,11 @@
         <maxWarmingSearchers>2</maxWarmingSearchers>
     </query>
 
-    <requestDispatcher handleSelect="false" >
+    <requestDispatcher handleSelect="false">
         <requestParsers enableRemoteStreaming="true"
                         multipartUploadLimitInKB="2048000"
                         formdataUploadLimitInKB="2048"/>
-        <httpCaching never304="true" />
+        <httpCaching never304="true"/>
     </requestDispatcher>
 
     <requestHandler name="/select" class="solr.SearchHandler">
@@ -94,14 +95,14 @@
 
     <requestHandler name="/analysis/field"
                     startup="lazy"
-                    class="solr.FieldAnalysisRequestHandler" />
+                    class="solr.FieldAnalysisRequestHandler"/>
 
     <requestHandler name="/analysis/document"
                     class="solr.DocumentAnalysisRequestHandler"
-                    startup="lazy" />
+                    startup="lazy"/>
 
     <requestHandler name="/admin/"
-                    class="solr.admin.AdminHandlers" />
+                    class="solr.admin.AdminHandlers"/>
 
     <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
         <lst name="invariants">

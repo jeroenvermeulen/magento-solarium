@@ -21,7 +21,8 @@
  */
 
 class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Info
-    extends Mage_Adminhtml_Block_System_Config_Form_Fieldset {
+    extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
+{
 
     /**
      * Show version info
@@ -29,22 +30,22 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Info
      * @return string
      */
     protected function _getHeaderCommentHtml( $element ) {
-        $helper = Mage::helper('jeroenvermeulen_solarium');
-        $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+        $helper   = Mage::helper( 'jeroenvermeulen_solarium' );
+        $engine   = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
         $versions = $engine->getVersionInfo();
         ob_start();
-?>
-            <table cellspacing="0" class="form-list">
-                <tbody>
-                <?php foreach ( $versions as $label => $value ): ?>
-                    <tr>
-                        <td class="label"><?php echo $helper->__($label); ?></td>
-                        <td><?php echo $value; ?></td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-<?php
+        ?>
+        <table class="form-list">
+            <tbody>
+            <?php foreach ( $versions as $label => $value ): ?>
+                <tr>
+                    <td class="label"><?php echo $helper->__( $label ); ?></td>
+                    <td><?php echo $value; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php
         return ob_get_clean();
     }
 

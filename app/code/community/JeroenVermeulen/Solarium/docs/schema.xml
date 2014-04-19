@@ -21,21 +21,22 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
+<!--suppress XmlUnboundNsPrefix -->
 <schema name="magento_fulltext" version="100">
 
     <types>
         <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
-        <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
-        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0" />
+        <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
         <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
             <analyzer type="index">
                 <tokenizer class="solr.StandardTokenizerFactory"/>
-                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
                 <filter class="solr.LowerCaseFilterFactory"/>
             </analyzer>
             <analyzer type="query">
                 <tokenizer class="solr.StandardTokenizerFactory"/>
-                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" />
+                <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
                 <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
                 <filter class="solr.LowerCaseFilterFactory"/>
             </analyzer>
@@ -44,16 +45,16 @@
 
     <fields>
         <!-- Magento Fulltext Id -->
-        <field name="id" type="int" indexed="true" stored="true" required="true" />
-        
+        <field name="id" type="int" indexed="true" stored="true" required="true"/>
+
         <!-- Magento Product Id -->
-        <field name="product_id" type="int" indexed="true" stored="true" required="true" />
-        
+        <field name="product_id" type="int" indexed="true" stored="true" required="true"/>
+
         <!-- Magento Store Id -->
-        <field name="store_id" type="int" indexed="true" stored="true" required="true" />
-        
+        <field name="store_id" type="int" indexed="true" stored="true" required="true"/>
+
         <!-- Magento Product Fulltext -->
-        <field name="text" type="text_general" indexed="true" stored="true" />
+        <field name="text" type="text_general" indexed="true" stored="true"/>
 
         <field name="_version_" type="long" indexed="true" stored="true"/>
     </fields>

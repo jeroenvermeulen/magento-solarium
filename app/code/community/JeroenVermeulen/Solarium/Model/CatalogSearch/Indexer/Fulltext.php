@@ -20,13 +20,13 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext extends Mage_CatalogSearch_Model_Indexer_Fulltext {
+class JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext extends Mage_CatalogSearch_Model_Indexer_Fulltext
+{
 
-    public function getDescription()
-    {
+    public function getDescription() {
         $result = parent::getDescription();
         if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
-            $result .= ' - ' . Mage::helper('jeroenvermeulen_solarium')->__('POWERED BY SOLARIUM');
+            $result .= ' - ' . Mage::helper( 'jeroenvermeulen_solarium' )->__( 'POWERED BY SOLARIUM' );
         }
         return $result;
     }

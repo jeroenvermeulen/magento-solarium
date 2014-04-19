@@ -20,29 +20,31 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Observer {
+class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Observer
+{
 
     /**
      * This an observer function for the event 'controller_front_init_before'.
      * It prepends our autoloader, so we can load the extra libraries.
      *
-     * @param Varien_Event_Observer $event
+     * @param Varien_Event_Observer $observer
      */
-    public function controllerFrontInitBefore( $event ) {
-        spl_autoload_register( array($this, 'load'), true, true );
+    public function controllerFrontInitBefore( /** @noinspection PhpUnusedParameterInspection */ $observer ) {
+        spl_autoload_register( array( $this, 'load' ), true, true );
     }
 
     /**
-     * This function can autoloads classes starting with:
+     * This function can autoload classes starting with:
      * - Solarium
      * - Symfony\Component\EventDispatcher
      *
      * @param string $class
      */
-    public static function load( $class )
-    {
+    public static function load( $class ) {
         if ( preg_match( '#^(Solarium|Symfony\\\\Component\\\\EventDispatcher)\b#', $class ) ) {
-            $phpFile = Mage::getBaseDir('lib') . '/' . str_replace( '\\', '/', $class ) . '.php';
+            $phpFile = Mage::getBaseDir( 'lib' ) . DIRECTORY_SEPARATOR
+                       . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+            /** @noinspection PhpIncludeInspection */
             require_once( $phpFile );
         }
     }
