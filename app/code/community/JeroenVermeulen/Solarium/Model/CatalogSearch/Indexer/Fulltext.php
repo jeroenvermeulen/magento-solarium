@@ -23,6 +23,9 @@
 class JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext extends Mage_CatalogSearch_Model_Indexer_Fulltext
 {
 
+    /**
+     * @return string
+     */
     public function getDescription() {
         $result = parent::getDescription();
         if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {

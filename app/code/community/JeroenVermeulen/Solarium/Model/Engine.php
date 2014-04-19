@@ -315,6 +315,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
                 $buffer->setEndpoint( 'update' );
                 $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH, array( $this, 'flushListener' ) );
+                /** @noinspection PhpAssignmentInConditionInspection */
                 while ( $product = $products->fetch() ) {
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ), 'product_id' => intval( $product[ 'product_id' ] ), 'store_id' => intval( $product[ 'store_id' ] ), 'text' => $this->_filterString( $product[ 'data_index' ] ) );
                     $buffer->createDocument( $data );
