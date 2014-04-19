@@ -32,3 +32,13 @@
 ### v1.2.1-beta
 
   * Small change to composer.json: the licence code
+
+### v1.3.0-beta
+
+  * Improved indexing based on Solarium's BufferedAdd Plugin. Thanks @basdenooijer.
+  * Extended version info
+  * Improved timeouts when Solr is not responding
+  * Fix for enabling/disabling Solr search per storeview
+  * Added spellcheck.alternativeTermCount=1. Thanks @toonvd.
+  * Improved error handling, thanks @MikeYV
+  * If no products found, don't generate error but consider OK. Thanks @MikeYV
