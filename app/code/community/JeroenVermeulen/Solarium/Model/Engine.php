@@ -317,7 +317,10 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH, array( $this, 'flushListener' ) );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ( $product = $products->fetch() ) {
-                    $data = array( 'id' => intval( $product[ 'fulltext_id' ] ), 'product_id' => intval( $product[ 'product_id' ] ), 'store_id' => intval( $product[ 'store_id' ] ), 'text' => explode('|' , $this->_filterString( $product[ 'data_index' ] ) ) );
+                    $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
+                                   'product_id' => intval( $product[ 'product_id' ] ),
+                                   'store_id' => intval( $product[ 'store_id' ] ),
+                                   'text' => explode( '|' , $this->_filterString( $product[ 'data_index' ] ) ) );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->flush();
@@ -400,7 +403,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                             $words = array();
                             /** @var Solarium\QueryType\Select\Result\Spellcheck\Suggestion $suggestion */
                             foreach ( $suggestions as $suggestion ) {
-                                $words[ ] = $suggestion->getWord();
+                                $words[] = $suggestion->getWord();
                             }
                             $correctedQueryString = implode( ' ', $words );
                         }
@@ -460,9 +463,11 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @return string
      */
     protected function _filterString( $str ) {
-        $badChars = '';
-        for ( $ord = 0; $ord < 32; $ord++ ) {
-            $badChars .= chr( $ord );
+        static $badChars; // This variable is saved inside this function.
+        if ( !isset($badChars) ) {
+            for ( $ord = 0; $ord < 32; $ord++ ) {
+                $badChars .= chr( $ord );
+            }
         }
         return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', $str );
     }
