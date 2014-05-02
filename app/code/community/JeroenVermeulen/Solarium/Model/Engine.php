@@ -104,6 +104,17 @@ class JeroenVermeulen_Solarium_Model_Engine
             $host           = trim( self::getConf( 'server/host' ) );
             $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
             $config         = array( 'endpoint' => array( 'default' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'update' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/timeout' ) ) ), 'admin' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => 'admin', 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ) ) );
+            $requiresAuth   = self::getConf('server/requiresauth');
+            $username       = self::getConf('server/username');
+            $passwd         = Mage::helper('core')->decrypt(self::getConf('server/password'));
+            $credentials    = array('username' => $username, 'password' => $passwd);
+
+            if($requiresAuth){
+                $config['endpoint']['default'] = $credentials;
+                $config['endpoint']['update'] = $credentials;
+                $config['endpoint']['admin'] = $credentials;
+            }
+            
             $this->_client  = new Solarium\Client( $config );
             $this->_working = $this->ping();
         } else {
