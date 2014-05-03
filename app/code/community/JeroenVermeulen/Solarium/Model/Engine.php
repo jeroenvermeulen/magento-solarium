@@ -122,6 +122,15 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
+     * Detect if we are running as shell script or via web server
+     *
+     * @return bool - True = shell script
+     */
+    public function isShellScript() {
+        return ( null === Mage::app()->getRequest()->getControllerName() );
+    }
+
+    /**
      * Returns the last occurred error.
      *
      * @return string - Last occurred error
