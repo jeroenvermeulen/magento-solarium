@@ -1,5 +1,5 @@
 <_>
-   <form_key>xZBFJnPYEj4U4lXE</form_key>
+   <form_key>5Kpe8qbw8owI504A</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -22,18 +22,12 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.3.0</version>
+   <version>1.3.1</version>
    <stability>beta</stability>
    <notes>Beta version.
 Do not use on a production shop right away.
 
-  * Improved indexing based on Solarium&apos;s BufferedAdd Plugin. Thanks @basdenooijer.
-  * Extended version info
-  * Improved timeouts when Solr is not responding
-  * Fix for enabling/disabling Solr search per storeview
-  * Added spellcheck.alternativeTermCount=1. Thanks @toonvd.
-  * Improved error handling, thanks @MikeYV
-  * If no products found, don&apos;t generate error but consider OK. Thanks @MikeYV</notes>
+  * Fix for issue #8: Fatal error when using shell/indexer.php</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -62,7 +56,7 @@ Do not use on a production shop right away.
             <max/>
          </max>
          <files>
-            <files>                              </files>
+            <files>                               </files>
          </files>
       </package>
       <extension>
@@ -114,4 +108,8 @@ Do not use on a production shop right away.
          <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>
