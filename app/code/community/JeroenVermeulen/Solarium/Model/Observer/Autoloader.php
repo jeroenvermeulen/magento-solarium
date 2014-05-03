@@ -30,7 +30,18 @@ class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Ob
      * @param Varien_Event_Observer $observer
      */
     public function controllerFrontInitBefore( /** @noinspection PhpUnusedParameterInspection */ $observer ) {
-        spl_autoload_register( array( $this, 'load' ), true, true );
+        $this->_registerAutoLoader();
+    }
+
+    /**
+     * This an observer function for the event 'shell_reindex_init_process'.
+     * It prepends our autoloader, so we can load the extra libraries.
+     * When the shell script indexer.php is used, the "controller_front_init_before" event is not dispatched.
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function shellReindexInitProcess( /** @noinspection PhpUnusedParameterInspection */ $observer ) {
+        $this->_registerAutoLoader();
     }
 
     /**
@@ -46,6 +57,17 @@ class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Ob
                        . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
             /** @noinspection PhpIncludeInspection */
             require_once( $phpFile );
+        }
+    }
+
+    /**
+     * Prepends our autoloader, so we can load the extra libraries.
+     */
+    private function _registerAutoLoader() {
+        static $registered;
+        if ( empty( $registered ) ) {
+            $registered = true;
+            spl_autoload_register( array( $this, 'load' ), true, true );
         }
     }
 

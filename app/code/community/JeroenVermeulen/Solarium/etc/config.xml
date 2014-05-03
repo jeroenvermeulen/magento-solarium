@@ -75,6 +75,14 @@
                     </jeroenvermeulen_solarium_controller_front_init_before>
                 </observers>
             </controller_front_init_before>
+            <shell_reindex_init_process>
+                <observers>
+                    <jeroenvermeulen_solarium_shell_reindex_init_process>
+                        <class>jeroenvermeulen_solarium/observer_autoloader</class>
+                        <method>shellReindexInitProcess</method>
+                    </jeroenvermeulen_solarium_shell_reindex_init_process>
+                </observers>
+            </shell_reindex_init_process>
         </events>
     </global>
     <default>
