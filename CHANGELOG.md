@@ -46,3 +46,7 @@
 ### v1.3.1-beta
 
   * Fix for issue #8: Fatal error when using shell/indexer.php
+
+### v1.3.2-beta
+
+  * Fix for issue #9: Class not found when using shell/indexer.php in Magento 1.7
