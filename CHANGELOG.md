@@ -42,3 +42,7 @@
   * Added spellcheck.alternativeTermCount=1. Thanks @toonvd.
   * Improved error handling, thanks @MikeYV
   * If no products found, don't generate error but consider OK. Thanks @MikeYV
+
+### v1.3.1-beta
+
+  * Fix for issue #8: Fatal error when using shell/indexer.php
