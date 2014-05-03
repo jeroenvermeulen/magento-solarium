@@ -70,15 +70,16 @@
             <controller_front_init_before>
                 <observers>
                     <jeroenvermeulen_solarium_controller_front_init_before>
-                        <class>jeroenvermeulen_solarium/observer_autoloader</class>
+                        <class>jeroenvermeulen_solarium/observer</class>
                         <method>controllerFrontInitBefore</method>
                     </jeroenvermeulen_solarium_controller_front_init_before>
                 </observers>
             </controller_front_init_before>
             <shell_reindex_init_process>
+                <!-- This event only works for Magento >= 1.8 -->
                 <observers>
                     <jeroenvermeulen_solarium_shell_reindex_init_process>
-                        <class>jeroenvermeulen_solarium/observer_autoloader</class>
+                        <class>jeroenvermeulen_solarium/observer</class>
                         <method>shellReindexInitProcess</method>
                     </jeroenvermeulen_solarium_shell_reindex_init_process>
                 </observers>

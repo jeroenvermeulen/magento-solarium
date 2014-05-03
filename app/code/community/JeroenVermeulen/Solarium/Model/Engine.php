@@ -99,6 +99,8 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @see https://github.com/basdenooijer/solarium/issues/254
      */
     public function __construct() {
+        // Make sure the autoloader is registered, because in Magento < 1.8 some events are missing.
+        Mage::helper( 'jeroenvermeulen_solarium/autoloader' )->register();
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         if ( self::isEnabled() ) {
             $host           = trim( self::getConf( 'server/host' ) );
