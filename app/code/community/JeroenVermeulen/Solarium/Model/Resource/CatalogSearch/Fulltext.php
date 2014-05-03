@@ -55,9 +55,19 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             $ok           = $engine->rebuildIndex( $storeId, $productIds );
             $timeUsed     = microtime( true ) - $startTime;
             if ( $ok ) {
-                $adminSession->addSuccess( $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) ) );
+                $message = $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) );
+                if ( $engine->isShellScript() ) {
+                    echo $message . "\n";
+                } else {
+                    $adminSession->addSuccess( $message );
+                }
             } else {
-                $adminSession->addError( $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() ) );
+                $message = $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() );
+                if ( $engine->isShellScript() ) {
+                    echo $message . "\n";
+                } else {
+                    $adminSession->addError( $message );
+                }
             }
         }
         return $this;
