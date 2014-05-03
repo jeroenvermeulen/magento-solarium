@@ -24,6 +24,10 @@
 $installer = $this;
 $installer->startSetup();
 $notice = 'The extension <strong>JeroenVermeulen_Solarium</strong> has been installed.<br />';
-$notice .= 'Please configure via: <em>System &gt; Configuration &gt; CATALOG &gt; Solarium Search</em><br />';
+$notice .= 'Please follow these steps:<br />';
+$notice .= '&#8226; Clear cache<br />';
+$notice .= '&#8226; Log out<br />';
+$notice .= '&#8226; Log in<br />';
+$notice .= '&#8226; Configure via: <em>System &gt; Configuration &gt; CATALOG &gt; Solarium Search</em><br />';
 Mage::getSingleton( 'adminhtml/session' )->addNotice( $notice );
 $installer->endSetup();
