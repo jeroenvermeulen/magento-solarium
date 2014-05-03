@@ -29,8 +29,7 @@ class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Ob
      *
      * @param Varien_Event_Observer $observer
      */
-    public function controllerFrontInitBefore( /** @noinspection PhpUnusedParameterInspection */
-        $observer ) {
+    public function controllerFrontInitBefore( /** @noinspection PhpUnusedParameterInspection */ $observer ) {
         $this->_registerAutoLoader();
     }
 
@@ -41,8 +40,7 @@ class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Ob
      *
      * @param Varien_Event_Observer $observer
      */
-    public function shellReindexInitProcess( /** @noinspection PhpUnusedParameterInspection */
-        $observer ) {
+    public function shellReindexInitProcess( /** @noinspection PhpUnusedParameterInspection */ $observer ) {
         $this->_registerAutoLoader();
     }
 
@@ -55,7 +53,8 @@ class JeroenVermeulen_Solarium_Model_Observer_Autoloader extends Varien_Event_Ob
      */
     public static function load( $class ) {
         if ( preg_match( '#^(Solarium|Symfony\\\\Component\\\\EventDispatcher)\b#', $class ) ) {
-            $phpFile = Mage::getBaseDir( 'lib' ) . DIRECTORY_SEPARATOR . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+            $phpFile = Mage::getBaseDir( 'lib' ) . DIRECTORY_SEPARATOR
+                       . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
             /** @noinspection PhpIncludeInspection */
             require_once( $phpFile );
         }
