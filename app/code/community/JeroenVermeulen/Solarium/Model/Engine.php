@@ -112,11 +112,11 @@ class JeroenVermeulen_Solarium_Model_Engine
             $credentials    = array('username' => $username, 'password' => $passwd);
 
             if($requiresAuth){
-                $config['endpoint']['default'] = $credentials;
-                $config['endpoint']['update'] = $credentials;
-                $config['endpoint']['admin'] = $credentials;
+                $config['endpoint']['default'] = array_merge($config['endpoint']['default'], $credentials);
+                $config['endpoint']['update'] = array_merge($config['endpoint']['update'], $credentials);
+                $config['endpoint']['admin'] = array_merge($config['endpoint']['admin'],$credentials);
             }
-            
+
             $this->_client  = new Solarium\Client( $config );
             $this->_working = $this->ping();
         } else {
