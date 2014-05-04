@@ -49,9 +49,13 @@
 /skin
 /var/cache
 /var/connect/package.xml
+/var/export
+/var/importexport
+/var/import
 /var/locks
 /var/log
 /var/package
 /var/report
 /var/session
+/var/tmp
 /var/.htaccess

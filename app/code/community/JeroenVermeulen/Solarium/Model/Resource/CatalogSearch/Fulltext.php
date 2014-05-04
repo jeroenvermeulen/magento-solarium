@@ -50,23 +50,25 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId ) ) {
             $helper       = Mage::helper( 'jeroenvermeulen_solarium' );
             $engine       = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            $adminSession = Mage::getSingleton( 'adminhtml/session' );
             $startTime    = microtime( true );
             $ok           = $engine->rebuildIndex( $storeId, $productIds );
             $timeUsed     = microtime( true ) - $startTime;
-            if ( $ok ) {
-                $message = $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) );
-                if ( $engine->isShellScript() ) {
-                    echo $message . "\n";
+            // When product IDs are supplied, it is an automatic update, and we should not show messages.
+            if ( null == $productIds ) {
+                if ( $ok ) {
+                    $message = $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) );
+                    if ( $engine->isShellScript() ) {
+                        echo $message . "\n";
+                    } else {
+                        Mage::getSingleton( 'adminhtml/session' )->addSuccess( $message );
+                    }
                 } else {
-                    $adminSession->addSuccess( $message );
-                }
-            } else {
-                $message = $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() );
-                if ( $engine->isShellScript() ) {
-                    echo $message . "\n";
-                } else {
-                    $adminSession->addError( $message );
+                    $message = $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() );
+                    if ( $engine->isShellScript() ) {
+                        echo $message . "\n";
+                    } else {
+                        Mage::getSingleton( 'adminhtml/session' )->addError( $message );
+                    }
                 }
             }
         }
