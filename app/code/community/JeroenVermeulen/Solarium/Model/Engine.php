@@ -378,7 +378,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
                                    'product_id' => intval( $product[ 'product_id' ] ),
                                    'store_id' => intval( $product[ 'store_id' ] ),
-                                   'text' => $this->_filterString( $product[ 'data_index' ] ) );
+                                   'text' => explode( '|' , $this->_filterString( $product[ 'data_index' ] ) ) );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->flush();

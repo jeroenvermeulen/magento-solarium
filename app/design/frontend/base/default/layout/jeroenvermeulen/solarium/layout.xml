@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layout>
+    <default>
+        <reference name="head">
+            <action method="addJs" ifconfig="jeroenvermeulen_solarium/general/enabled">
+                <script>jeroenvermeulen/solarium/autocomplete.js</script>
+            </action>
+        </reference>
+    </default>
+</layout>
