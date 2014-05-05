@@ -120,16 +120,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </search_timeout>
-                        <requiresauth translate="label comment">
-                            <label>Authentication</label>
-                            <comment><![CDATA[Does the SOLR server require authentication?]]></comment>
+                        <requires_authentication translate="label comment">
+                            <label>Authentication Required</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                        </requiresauth>
+                        </requires_authentication>
                         <username translate="label">
                             <label>Username</label>
                             <frontend_type>text</frontend_type>
@@ -138,7 +137,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends><requiresauth>1</requiresauth></depends>
+                            <depends>
+                                <requires_authentication>1</requires_authentication>
+                            </depends>
                         </username>
                         <password translate="label">
                             <label>Password</label>
@@ -149,7 +150,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends><requiresauth>1</requiresauth></depends>
+                            <depends>
+                                <requires_authentication>1</requires_authentication>
+                            </depends>
                         </password>
                     </fields>
                 </server>
@@ -162,7 +165,7 @@
                     <show_in_store>0</show_in_store>
                     <fields>
                         <max translate="label">
-                            <label>Maximum number of results</label>
+                            <label>Maximum Number of Results</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <validate>validate-greater-than-zero</validate>
@@ -171,7 +174,7 @@
                             <show_in_store>1</show_in_store>
                         </max>
                         <autocorrect translate="label">
-                            <label>Auto correct search terms</label>
+                            <label>Auto Correct Search Terms</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -190,7 +193,7 @@
                     <show_in_store>0</show_in_store>
                     <fields>
                         <buffersize translate="label">
-                            <label>Updates to post at once</label>
+                            <label>Updates to Post At Once</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <validate>validate-greater-than-zero</validate>

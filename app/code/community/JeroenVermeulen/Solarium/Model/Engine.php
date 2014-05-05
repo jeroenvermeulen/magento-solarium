@@ -103,22 +103,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         Mage::helper( 'jeroenvermeulen_solarium/autoloader' )->register();
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         if ( self::isEnabled() ) {
-            $host           = trim( self::getConf( 'server/host' ) );
-            $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
-            $config         = array( 'endpoint' => array( 'default' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'update' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/timeout' ) ) ), 'suggest' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'admin' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => 'admin', 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ),  ) );
-            $requiresAuth   = self::getConf('server/requiresauth');
-            $username       = self::getConf('server/username');
-            $passwd         = Mage::helper('core')->decrypt(self::getConf('server/password'));
-            $credentials    = array('username' => $username, 'password' => $passwd);
-
-            if($requiresAuth){
-                $config['endpoint']['default'] = array_merge($config['endpoint']['default'], $credentials);
-                $config['endpoint']['update'] = array_merge($config['endpoint']['update'], $credentials);
-                $config['endpoint']['admin'] = array_merge($config['endpoint']['admin'],$credentials);
-                $config['endpoint']['suggest'] = array_merge($config['endpoint']['suggest'],$credentials);
-            }
-
-            $this->_client  = new Solarium\Client( $config );
+            $this->_client  = new Solarium\Client( $this->_getSolariumClientConfig() );
             $this->_working = $this->ping();
         } else {
             // This should not happen, you should not construct this class when it is disabled.
@@ -500,11 +485,41 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @param \Solarium\Plugin\BufferedAdd\Event\PreFlush $event
      */
-    function flushListener( Solarium\Plugin\BufferedAdd\Event\PreFlush $event ) {
+    public function flushListener( Solarium\Plugin\BufferedAdd\Event\PreFlush $event ) {
         Mage::Log( sprintf( '%s - Flushing buffer, %d docs', __CLASS__, count( $event->getBuffer() ) ), Zend_Log::DEBUG );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Get configuration for Solarium, based on this extension's settings in the Magento Configuration
+     *
+     * @return array
+     */
+    protected function _getSolariumClientConfig() {
+        $host           = trim( self::getConf( 'server/host' ) );
+        // If the user pasted a URL as hostname, clean it.
+        $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
+        $endPointConfig = array();
+        $endPointConfig['host'] = $host;
+        $endPointConfig['port'] = intval( self::getConf( 'server/port' ) );
+        $endPointConfig['path'] = trim( self::getConf( 'server/path' ) );
+        $endPointConfig['core'] = trim( self::getConf( 'server/core' ) );
+        if( self::getConf('server/requires_authentication') ) {
+            $endPointConfig['username'] = trim( self::getConf('server/username') );
+            $endPointConfig['password'] = Mage::helper('core')->decrypt( self::getConf( 'server/password' ) );
+        }
+        $config = array();
+        $config['endpoint'] = array();
+        $config['endpoint']['default'] = $endPointConfig;
+        $config['endpoint']['update']  = $endPointConfig;
+        $config['endpoint']['admin']   = $endPointConfig;
+        $config['endpoint']['default']['timeout'] = intval( self::getConf( 'server/search_timeout' ) );
+        $config['endpoint']['update']['timeout']  = intval( self::getConf( 'server/search_timeout' ) );
+        $config['endpoint']['admin']['timeout']   = intval( self::getConf( 'server/search_timeout' ) );
+        $config['endpoint']['admin']['core']      = 'admin';
+        return $config;
+    }
 
     /**
      * Process the result of a Solarium update.
