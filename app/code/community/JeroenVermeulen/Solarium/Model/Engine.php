@@ -122,6 +122,11 @@ class JeroenVermeulen_Solarium_Model_Engine
         $query->setQuery($queryString . '*');
         $query->setRows(0);
 
+        $groupComponent = $query->getGrouping();
+        $groupComponent->addField('product_id');
+        $groupComponent->setFacet(true);
+        $groupComponent->setLimit(1);
+
         //add facet for completion
         $facetSet = $query->getFacetSet();
         $facet = $facetSet->createFacetField('text')->setField('text')->setMincount(1)->setPrefix($queryString);
@@ -378,7 +383,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
                                    'product_id' => intval( $product[ 'product_id' ] ),
                                    'store_id' => intval( $product[ 'store_id' ] ),
-                                   'text' => explode( '|' , $this->_filterString( $product[ 'data_index' ] ) ) );
+                                   'text' => $this->_filterString( $product[ 'data_index' ] ) );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->flush();
