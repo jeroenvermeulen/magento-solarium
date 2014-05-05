@@ -86,6 +86,24 @@
             </shell_reindex_init_process>
         </events>
     </global>
+    <frontend>
+        <layout>
+            <updates>
+                <jeroenvermeulen_solarium>
+                    <file>jeroenvermeulen/solarium/layout.xml</file>
+                </jeroenvermeulen_solarium>
+            </updates>
+        </layout>
+        <routers>
+            <jeroenvermeulen_solarium>
+                <use>standard</use>
+                <args>
+                    <module>JeroenVermeulen_Solarium</module>
+                    <frontName>jeroenvermeulen_solarium</frontName>
+                </args>
+            </jeroenvermeulen_solarium>
+        </routers>
+    </frontend>
     <default>
         <jeroenvermeulen_solarium>
             <general>

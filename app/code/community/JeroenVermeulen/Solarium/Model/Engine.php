@@ -112,6 +112,61 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
+     * @param $queryString
+     * @return null|string
+     */
+    public function getAutoSuggestions($queryString){
+        //create basic query with wildcard
+        $query = $this->_client->createSelect();
+        $query->setFields('text');
+        $query->setQuery($queryString . '*');
+        $query->setRows(0);
+
+        $groupComponent = $query->getGrouping();
+        $groupComponent->addField('product_id');
+        $groupComponent->setFacet(true);
+        $groupComponent->setLimit(1);
+
+        //add facet for completion
+        $facetSet = $query->getFacetSet();
+        $facet = $facetSet->createFacetField('text')->setField('text')->setMincount(1)->setPrefix($queryString);
+        $solariumResult = $this->_client->select($query);
+        return $solariumResult->getFacetSet()->getFacet('text');
+    }
+
+    /**
+     * @param \Solarium\Client $client
+     */
+    public function setClient($client)
+    {
+        $this->_client = $client;
+    }
+
+    /**
+     * @return \Solarium\Client
+     */
+    public function getClient()
+    {
+        return $this->_client;
+    }
+
+    /**
+     * @param boolean $working
+     */
+    public function setWorking($working)
+    {
+        $this->_working = $working;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getWorking()
+    {
+        return $this->_working;
+    }
+
+    /**
      * This function returns the cached status if Solr is working.
      *
      * @return bool - True if engine is working
@@ -328,7 +383,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
                                    'product_id' => intval( $product[ 'product_id' ] ),
                                    'store_id' => intval( $product[ 'store_id' ] ),
-                                   'text' => explode( '|' , $this->_filterString( $product[ 'data_index' ] ) ) );
+                                   'text' => $this->_filterString( $product[ 'data_index' ] ) );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->flush();
