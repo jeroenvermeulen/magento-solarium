@@ -105,7 +105,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         if ( self::isEnabled() ) {
             $host           = trim( self::getConf( 'server/host' ) );
             $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
-            $config         = array( 'endpoint' => array( 'default' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'update' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/timeout' ) ) ), 'admin' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => 'admin', 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ) ) );
+            $config         = array( 'endpoint' => array( 'default' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'update' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/timeout' ) ) ), 'suggest' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => trim( self::getConf( 'server/core' ) ), 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ), 'admin' => array( 'host' => $host, 'port' => intval( self::getConf( 'server/port' ) ), 'path' => trim( self::getConf( 'server/path' ) ), 'core' => 'admin', 'timeout' => intval( self::getConf( 'server/search_timeout' ) ) ),  ) );
             $requiresAuth   = self::getConf('server/requiresauth');
             $username       = self::getConf('server/username');
             $passwd         = Mage::helper('core')->decrypt(self::getConf('server/password'));
@@ -115,6 +115,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $config['endpoint']['default'] = array_merge($config['endpoint']['default'], $credentials);
                 $config['endpoint']['update'] = array_merge($config['endpoint']['update'], $credentials);
                 $config['endpoint']['admin'] = array_merge($config['endpoint']['admin'],$credentials);
+                $config['endpoint']['suggest'] = array_merge($config['endpoint']['suggest'],$credentials);
             }
 
             $this->_client  = new Solarium\Client( $config );
@@ -123,6 +124,56 @@ class JeroenVermeulen_Solarium_Model_Engine
             // This should not happen, you should not construct this class when it is disabled.
             $this->_lastError = new Exception( $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
         }
+    }
+
+    /**
+     * @param $queryString
+     * @return null|string
+     */
+    public function getAutoSuggestions($queryString){
+        //create basic query with wildcard
+        $query = $this->_client->createSelect();
+        $query->setFields('text');
+        $query->setQuery($queryString . '*');
+        $query->setRows(0);
+
+        //add facet for completion
+        $facetSet = $query->getFacetSet();
+        $facet = $facetSet->createFacetField('text')->setField('text')->setMincount(1)->setPrefix($queryString);
+        $solariumResult = $this->_client->select($query);
+        return $solariumResult->getFacetSet()->getFacet('text');
+    }
+
+    /**
+     * @param \Solarium\Client $client
+     */
+    public function setClient($client)
+    {
+        $this->_client = $client;
+    }
+
+    /**
+     * @return \Solarium\Client
+     */
+    public function getClient()
+    {
+        return $this->_client;
+    }
+
+    /**
+     * @param boolean $working
+     */
+    public function setWorking($working)
+    {
+        $this->_working = $working;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getWorking()
+    {
+        return $this->_working;
     }
 
     /**
@@ -342,7 +393,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
                                    'product_id' => intval( $product[ 'product_id' ] ),
                                    'store_id' => intval( $product[ 'store_id' ] ),
-                                   'text' => explode( '|' , $this->_filterString( $product[ 'data_index' ] ) ) );
+                                   'text' => $this->_filterString( $product[ 'data_index' ] ) );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->flush();
