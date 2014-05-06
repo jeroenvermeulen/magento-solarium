@@ -92,10 +92,10 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                     if ( false !== $searchResult ) {
                         if ( 0 == count($searchResult) ) {
                             // No results, we need to check if the index is empty.
-                            if ( ! $engine->isEmpty( $query->getStoreId() ) ) {
-                                $query->setIsProcessed( 1 );
-                            } else {
+                            if ( $engine->isEmpty( $query->getStoreId() ) ) {
                                 Mage::Log( sprintf('%s - Warning: index is empty', __CLASS__), Zend_Log::WARN );
+                            } else {
+                                $query->setIsProcessed( 1 );
                             }
                         } else {
                             foreach ( $searchResult as $data ) {
