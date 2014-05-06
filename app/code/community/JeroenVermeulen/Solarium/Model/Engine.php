@@ -357,8 +357,6 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
                 $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
                 $buffer->setEndpoint( 'update' );
-                $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH,
-                                                                   array( $this, 'flushListener' ) );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ( $product = $products->fetch() ) {
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
@@ -392,6 +390,38 @@ class JeroenVermeulen_Solarium_Model_Engine
         $update->addOptimize();
         $solariumResult = $this->_client->update( $update, 'update' );
         return $this->_processResult( $solariumResult, 'optimize' );
+    }
+
+    /**
+     * Check if Solr index is empty.
+     * If storeId is supplied it is used as a filter.
+     *
+     * @param null|int $storeId
+     * @return int
+     */
+    public function isEmpty( $storeId = null ) {
+        return ( 0 == $this->getDocumentCount($storeId) );
+    }
+
+    /**
+     * Get number of documents in Solr index.
+     * If storeId is supplied it is used as a filter.
+     *
+     * @param null|int $storeId
+     * @return int
+     */
+    public function getDocumentCount( $storeId = null ) {
+        $query = $this->_client->createSelect();
+        // Default field, needed when it is not specified in solrconfig.xml
+        $query->addParam( 'df', 'text' );
+        $query->setRows( 0 );
+        $query->setFields( array( 'product_id' ) );
+        if ( is_numeric( $storeId ) ) {
+            $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
+        }
+        $query->setTimeAllowed( intval( self::getConf( 'server/timeout' ) ) );
+        $solrResultSet = $this->_client->select( $query );
+        return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
 
     /**
@@ -497,19 +527,6 @@ class JeroenVermeulen_Solarium_Model_Engine
         } else {
             return null;
         }
-    }
-
-    /**
-     * Callback function for the BufferedAdd Solarium plugin.
-     * Later we can use this function to show progress to the user.
-     *
-     * @param \Solarium\Plugin\BufferedAdd\Event\PreFlush $event
-     */
-    public function flushListener( Solarium\Plugin\BufferedAdd\Event\PreFlush $event ) {
-        Mage::Log( sprintf( '%s - Flushing buffer, %d docs',
-                            __CLASS__,
-                            count( $event->getBuffer() ) ),
-                   Zend_Log::DEBUG );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

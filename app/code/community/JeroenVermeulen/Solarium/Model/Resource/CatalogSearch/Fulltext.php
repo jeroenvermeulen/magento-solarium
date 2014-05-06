@@ -90,16 +90,25 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 if ( $engine->isWorking() ) {
                     $searchResult = $engine->query( $query->getStoreId(), $queryText );
                     if ( false !== $searchResult ) {
-                        foreach ( $searchResult as $data ) {
-                            $data[ 'query_id' ] = $query->getId();
-                            $adapter->insertOnDuplicate( $searchResultTable, $data, array( 'relevance' ) );
+                        if ( 0 == count($searchResult) ) {
+                            // No results, we need to check if the index is empty.
+                            if ( ! $engine->isEmpty( $query->getStoreId() ) ) {
+                                $query->setIsProcessed( 1 );
+                            } else {
+                                Mage::Log( sprintf('%s - Warning: index is empty', __CLASS__), Zend_Log::WARN );
+                            }
+                        } else {
+                            foreach ( $searchResult as $data ) {
+                                $data[ 'query_id' ] = $query->getId();
+                                $adapter->insertOnDuplicate( $searchResultTable, $data, array( 'relevance' ) );
+                            }
+                            $query->setIsProcessed( 1 );
                         }
-                        $query->setIsProcessed( 1 );
                     }
                 }
             }
             if ( !$query->getIsProcessed() ) {
-                Mage::log( 'Solr disabled or something went wrong, fallback to MySQL', Zend_Log::WARN );
+                Mage::log( 'Solr disabled or something went wrong, fallback to Magento Fulltext Search', Zend_Log::WARN );
                 return parent::prepareResult( $object, $queryText, $query );
             }
         }
