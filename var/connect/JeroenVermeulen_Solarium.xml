@@ -1,5 +1,5 @@
 <_>
-   <form_key>dzz9Ht0zPFoXgzhF</form_key>
+   <form_key>7ZxAxqVeATbeelTs</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -22,12 +22,16 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.3.2</version>
+   <version>1.4.0</version>
    <stability>beta</stability>
    <notes>Beta version.
 Do not use on a production shop right away.
 
-  * Fix for issue #9: Class not found when using shell/indexer.php in Magento 1.7</notes>
+  * Added posibility to use http authentication in Solr connection. Thanks @toonvd.
+  * Added Solr based auto suggestion. Thanks @toonvd.
+  * Issue #11 Detect empty index, fallback to Magento Fulltext Search.
+
+Please clear your Magento caches after upgrading to this version.</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -56,7 +60,7 @@ Do not use on a production shop right away.
             <max/>
          </max>
          <files>
-            <files>                                </files>
+            <files>                                       </files>
          </files>
       </package>
       <extension>
@@ -78,6 +82,8 @@ Do not use on a production shop right away.
          <target>mageetc</target>
          <target>magelib</target>
          <target>magelib</target>
+         <target>magedesign</target>
+         <target>mageweb</target>
       </target>
       <path>
          <path/>
@@ -85,12 +91,16 @@ Do not use on a production shop right away.
          <path>modules/JeroenVermeulen_Solarium.xml</path>
          <path>Solarium</path>
          <path>Symfony/Component/EventDispatcher</path>
+         <path>frontend/base/default/layout/solarium.xml</path>
+         <path>js/solarium</path>
       </path>
       <type>
          <type>file</type>
          <type>dir</type>
          <type>file</type>
          <type>dir</type>
+         <type>dir</type>
+         <type>file</type>
          <type>dir</type>
       </type>
       <include>
@@ -99,8 +109,12 @@ Do not use on a production shop right away.
          <include/>
          <include/>
          <include/>
+         <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

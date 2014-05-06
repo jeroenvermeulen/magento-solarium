@@ -50,3 +50,9 @@
 ### v1.3.2-beta
 
   * Fix for issue #9: Class not found when using shell/indexer.php in Magento 1.7
+
+### v1.4.0-beta
+
+  * Added possibility to use http authentication in Solr connection. Thanks @toonvd.
+  * Added Solr based auto suggestion. Thanks @toonvd.
+  * Issue #11 Detect empty index, fallback to Magento Fulltext Search.
