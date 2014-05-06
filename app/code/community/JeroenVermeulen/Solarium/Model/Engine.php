@@ -107,31 +107,9 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_working = $this->ping();
         } else {
             // This should not happen, you should not construct this class when it is disabled.
-            $this->_lastError = new Exception( $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
+            $this->_lastError = new Exception(
+                $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
         }
-    }
-
-    /**
-     * @param $queryString
-     * @return null|string
-     */
-    public function getAutoSuggestions($queryString){
-        //create basic query with wildcard
-        $query = $this->_client->createSelect();
-        $query->setFields('text');
-        $query->setQuery($queryString . '*');
-        $query->setRows(0);
-
-        $groupComponent = $query->getGrouping();
-        $groupComponent->addField('product_id');
-        $groupComponent->setFacet(true);
-        $groupComponent->setLimit(1);
-
-        //add facet for completion
-        $facetSet = $query->getFacetSet();
-        $facet = $facetSet->createFacetField('text')->setField('text')->setMincount(1)->setPrefix($queryString);
-        $solariumResult = $this->_client->select($query);
-        return $solariumResult->getFacetSet()->getFacet('text');
     }
 
     /**
@@ -273,7 +251,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             // Default field, needed when it is not specified in solrconfig.xml
             $query->addParam( 'qt', '/select' ); // Needed for Solr < 3.6
             $query->addParam( 'df', 'text' );
-            $query->setTimeAllowed( intval( self::getConf( 'server/search_timeout' ) ) ); // Not 100% sure if this works.
+            // Not 100% sure if this setTimeAllowed works.
+            $query->setTimeAllowed( intval( self::getConf( 'server/search_timeout' ) ) );
             $solariumResult = $this->_client->ping( $query );
             $resultData     = $solariumResult->getData();
             if ( !empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ] ) {
@@ -351,7 +330,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             $readAdapter  = $coreResource->getConnection( 'core_read' );
 
             $select = $readAdapter->select();
-            $select->from( $coreResource->getTableName( 'catalogsearch/fulltext' ), array( 'product_id', 'store_id', 'data_index', 'fulltext_id' ) );
+            $select->from( $coreResource->getTableName( 'catalogsearch/fulltext' ),
+                           array( 'product_id', 'store_id', 'data_index', 'fulltext_id' ) );
 
             if ( empty( $storeId ) ) {
                 $select->where( 'store_id IN (?)', $this->getEnabledStoreIds() );
@@ -377,7 +357,8 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
                 $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
                 $buffer->setEndpoint( 'update' );
-                $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH, array( $this, 'flushListener' ) );
+                $this->_client->getEventDispatcher()->addListener( Solarium\Plugin\BufferedAdd\Event\Events::PRE_FLUSH,
+                                                                   array( $this, 'flushListener' ) );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ( $product = $products->fetch() ) {
                     $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
@@ -449,7 +430,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
             foreach ( $solrResultSet as $solrResult ) {
-                $result[ ] = array( 'relevance' => $solrResult[ 'score' ], 'product_id' => $solrResult[ 'product_id' ] );
+                $result[ ] = array( 'relevance' => $solrResult[ 'score' ],
+                                    'product_id' => $solrResult[ 'product_id' ] );
             }
 
             $correctedQueryString = false;
@@ -485,13 +467,49 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
+     * @param $queryString
+     * @return null|string
+     */
+    public function getAutoSuggestions( $queryString ) {
+        //create basic query with wildcard
+        $query = $this->_client->createSelect();
+        $query->setFields('text');
+        $query->setQuery( $queryString . '*' );
+        $query->setRows(0);
+
+        $groupComponent = $query->getGrouping();
+        $groupComponent->addField('product_id');
+        $groupComponent->setFacet(true);
+        $groupComponent->setLimit(1);
+
+        //add facet for completion
+        $facetSet = $query->getFacetSet();
+        $facetField = $facetSet->createFacetField('text');
+        $facetField->setField('text');
+        $facetField->setMincount(1);
+        $facetField->setLimit( $this->getConf('results/autocomplete_suggestions') );
+        $facetField->setPrefix($queryString);
+
+        $solariumResult = $this->_client->select($query);
+
+        if ( $solariumResult ) {
+            return $solariumResult->getFacetSet()->getFacet('text');
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Callback function for the BufferedAdd Solarium plugin.
      * Later we can use this function to show progress to the user.
      *
      * @param \Solarium\Plugin\BufferedAdd\Event\PreFlush $event
      */
     public function flushListener( Solarium\Plugin\BufferedAdd\Event\PreFlush $event ) {
-        Mage::Log( sprintf( '%s - Flushing buffer, %d docs', __CLASS__, count( $event->getBuffer() ) ), Zend_Log::DEBUG );
+        Mage::Log( sprintf( '%s - Flushing buffer, %d docs',
+                            __CLASS__,
+                            count( $event->getBuffer() ) ),
+                   Zend_Log::DEBUG );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -540,7 +558,11 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_lastQueryTime = $solariumResult->getQueryTime();
             if ( 0 !== $solariumResult->getStatus() ) {
                 $this->_lastError = $solariumResult->getStatus();
-                Mage::getSingleton( 'adminhtml/session' )->addError( $helper->__( 'Solr %s error, status: %d, query time: %d', $helper->__( $actionText ), $solariumResult->getStatus(), $solariumResult->getQueryTime() ) );
+                Mage::getSingleton( 'adminhtml/session' )->addError(
+                    $helper->__( 'Solr %s error, status: %d, query time: %d',
+                                 $helper->__( $actionText ),
+                                 $solariumResult->getStatus(),
+                                 $solariumResult->getQueryTime() ) );
             }
             $result = ( 0 === $solariumResult->getStatus() );
         } else {
@@ -562,7 +584,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $badChars .= chr( $ord );
             }
         }
-        return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', $str );
+        return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', strval($str) );
     }
 
 }

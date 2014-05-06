@@ -90,7 +90,7 @@
         <layout>
             <updates>
                 <jeroenvermeulen_solarium>
-                    <file>jeroenvermeulen/solarium/layout.xml</file>
+                    <file>solarium/layout.xml</file>
                 </jeroenvermeulen_solarium>
             </updates>
         </layout>
@@ -99,7 +99,7 @@
                 <use>standard</use>
                 <args>
                     <module>JeroenVermeulen_Solarium</module>
-                    <frontName>jeroenvermeulen_solarium</frontName>
+                    <frontName>solarium</frontName>
                 </args>
             </jeroenvermeulen_solarium>
         </routers>
@@ -117,12 +117,11 @@
                 <timeout>3600</timeout>
                 <search_timeout>5</search_timeout>
                 <requires_authentication>0</requires_authentication>
-                <username></username>
-                <password></password>
             </server>
             <results>
                 <max>100</max>
                 <autocorrect>1</autocorrect>
+                <autocomplete_suggestions>25</autocomplete_suggestions>
             </results>
             <reindexing>
                 <buffersize>100</buffersize>

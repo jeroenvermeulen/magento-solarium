@@ -1,8 +1,8 @@
 ## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
 
-app/code/community/JeroenVermeulen/Solarium/                                        app/code/community/JeroenVermeulen/Solarium/
-app/design/frontend/base/default/layout/jeroenvermeulen/solarium/layout.xml         app/design/frontend/base/default/layout/jeroenvermeulen/solarium/layout.xml
-app/etc/modules/JeroenVermeulen_Solarium.xml                                        app/etc/modules/JeroenVermeulen_Solarium.xml
-js/jeroenvermeulen/solarium/autocomplete.js                                         js/jeroenvermeulen/solarium/autocomplete.js
-lib/Solarium                                                                        lib/Solarium
-lib/Symfony/Component/EventDispatcher                                               lib/Symfony/Component/EventDispatcher
+app/code/community/JeroenVermeulen/Solarium                   app/code/community/JeroenVermeulen/Solarium
+app/design/frontend/base/default/layout/solarium/layout.xml   app/design/frontend/base/default/layout/solarium/layout.xml
+app/etc/modules/JeroenVermeulen_Solarium.xml                  app/etc/modules/JeroenVermeulen_Solarium.xml
+js/solarium/autocomplete.js                                   js/solarium/autocomplete.js
+lib/Solarium                                                  lib/Solarium
+lib/Symfony/Component/EventDispatcher                         lib/Symfony/Component/EventDispatcher
