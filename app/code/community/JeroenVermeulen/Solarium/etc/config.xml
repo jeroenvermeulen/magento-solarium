@@ -25,7 +25,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>

@@ -56,3 +56,7 @@
   * Added possibility to use http authentication in Solr connection. Thanks @toonvd.
   * Added Solr based auto suggestion. Thanks @toonvd.
   * Issue #11 Detect empty index, fallback to Magento Fulltext Search.
+
+### v1.4.0-beta
+
+  * Fixed issue #13: Autocomplete should filter on store

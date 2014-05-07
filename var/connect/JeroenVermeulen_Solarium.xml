@@ -6,7 +6,7 @@
       <version_ids>2</version_ids>
    </version_ids>
    <summary>Solr based full text search for Magento CE. Uses the Solarium library.</summary>
-   <description>Solr based full text search for Magento CE. Has an option to enable auto correct of search terms. Uses the Solarium library.
+   <description>The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren&apos;t very relevant. Apache&apos;s Solr does a much better job in delivering fast and relevant results. We have used the Solarium PHP library to build Solr into Magento CE. It can do autocorrect of typos and autocomplete search terms.
 
 After installing this extension:
   * Clear the *Configuration* cache
@@ -27,9 +27,7 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
    <notes>Beta version.
 Do not use on a production shop right away.
 
-  * Fixed issue #13 Autocomplete suggests from all shops
-
-Please clear your Magento caches after upgrading to this version.</notes>
+  * Fixed issue #13: Autocomplete suggests from all shops</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -58,7 +56,7 @@ Please clear your Magento caches after upgrading to this version.</notes>
             <max/>
          </max>
          <files>
-            <files>                                        </files>
+            <files>                                           </files>
          </files>
       </package>
       <extension>
@@ -120,4 +118,8 @@ Please clear your Magento caches after upgrading to this version.</notes>
          <ignore/>
       </ignore>
    </contents>
+   <page>1</page>
+   <limit>200</limit>
+   <folder/>
+   <package/>
 </_>
