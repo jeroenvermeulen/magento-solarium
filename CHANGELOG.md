@@ -57,6 +57,6 @@
   * Added Solr based auto suggestion. Thanks @toonvd.
   * Issue #11 Detect empty index, fallback to Magento Fulltext Search.
 
-### v1.4.0-beta
+### v1.4.1-beta
 
   * Fixed issue #13: Autocomplete should filter on store
