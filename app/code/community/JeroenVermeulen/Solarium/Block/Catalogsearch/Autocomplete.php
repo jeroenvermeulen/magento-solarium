@@ -33,8 +33,9 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
             $query = $this->helper('catalogsearch')->getQueryText();
             $counter = 0;
             $data = array();
+            $storeId = Mage::app()->getStore()->getId();
             $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
-            $facet = $engine->getAutoSuggestions($query);
+            $facet = $engine->getAutoSuggestions( $storeId, $query );
 
             foreach ( $facet as $value => $count ) {
                 $_data = array(

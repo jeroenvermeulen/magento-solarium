@@ -500,12 +500,16 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param $queryString
      * @return null|string
      */
-    public function getAutoSuggestions( $queryString ) {
+    public function getAutoSuggestions( $storeId, $queryString ) {
         //create basic query with wildcard
         $query = $this->_client->createSelect();
         $query->setFields('text');
         $query->setQuery( $queryString . '*' );
         $query->setRows(0);
+
+        if ( is_numeric( $storeId ) ) {
+            $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
+        }
 
         $groupComponent = $query->getGrouping();
         $groupComponent->addField('product_id');
