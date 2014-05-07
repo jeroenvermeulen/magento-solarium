@@ -1,5 +1,5 @@
 <_>
-   <form_key>7ZxAxqVeATbeelTs</form_key>
+   <form_key>c6Ux2Rfub7I0wfhN</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -22,14 +22,12 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.4.0</version>
+   <version>1.4.1</version>
    <stability>beta</stability>
    <notes>Beta version.
 Do not use on a production shop right away.
 
-  * Added posibility to use http authentication in Solr connection. Thanks @toonvd.
-  * Added Solr based auto suggestion. Thanks @toonvd.
-  * Issue #11 Detect empty index, fallback to Magento Fulltext Search.
+  * Fixed issue #13 Autocomplete suggests from all shops
 
 Please clear your Magento caches after upgrading to this version.</notes>
    <authors>
@@ -60,7 +58,7 @@ Please clear your Magento caches after upgrading to this version.</notes>
             <max/>
          </max>
          <files>
-            <files>                                       </files>
+            <files>                                        </files>
          </files>
       </package>
       <extension>
@@ -91,7 +89,7 @@ Please clear your Magento caches after upgrading to this version.</notes>
          <path>modules/JeroenVermeulen_Solarium.xml</path>
          <path>Solarium</path>
          <path>Symfony/Component/EventDispatcher</path>
-         <path>frontend/base/default/layout/solarium.xml</path>
+         <path>frontend/base/default/layout/jeroenvermeulen/solarium.xml</path>
          <path>js/solarium</path>
       </path>
       <type>

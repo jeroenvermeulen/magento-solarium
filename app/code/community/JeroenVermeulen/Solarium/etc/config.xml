@@ -90,7 +90,7 @@
         <layout>
             <updates>
                 <jeroenvermeulen_solarium>
-                    <file>solarium.xml</file>
+                    <file>jeroenvermeulen/solarium.xml</file>
                 </jeroenvermeulen_solarium>
             </updates>
         </layout>
