@@ -44,8 +44,8 @@
         <!-- Magento Fulltext Id -->
         <field name="id" type="int" indexed="true" stored="true" required="true"/>
 
-        <!-- Magento Product Id -->
-        <field name="product_id" type="int" indexed="true" stored="true" required="true"/>
+        <!-- Magento Product Id, must be a string to be able to group by in Solr 3.x -->
+        <field name="product_id" type="string" indexed="true" stored="true" required="true"/>
 
         <!-- Magento Store Id -->
         <field name="store_id" type="int" indexed="true" stored="true" required="true"/>
