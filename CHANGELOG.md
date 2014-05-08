@@ -60,3 +60,7 @@
 ### v1.4.1-beta
 
   * Fixed issue #13: Autocomplete should filter on store
+
+### v1.4.2-beta
+
+  * Fixed issue #15: Autocomplete error on Solr3
