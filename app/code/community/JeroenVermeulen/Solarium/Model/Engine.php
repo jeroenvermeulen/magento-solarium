@@ -31,6 +31,8 @@ class JeroenVermeulen_Solarium_Model_Engine
     protected $_lastQueryTime = 0;
     /** @var null|int[] $_enabledStores - Used for caching */
     protected $_enabledStoreIds = null;
+    /** @var array - Override Magento Config */
+    protected $_overrideConfig = array();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,17 +47,17 @@ class JeroenVermeulen_Solarium_Model_Engine
     public static function isEnabled( $storeId = null ) {
         $result = false;
         if ( empty( $storeId ) ) {
-            // Can't use $this->getEnabledStoreIds() here because this is a static method.
+            // Can't use $this->getEnabledStoreIds() or $this->getConf() here because this is a static method.
             $stores = Mage::app()->getStores( false );
             /** @var Mage_Core_Model_Store $store */
             foreach ( $stores as $store ) {
-                $result = (boolean) self::getConf( 'general/enabled', $store->getId() );
+                $result = Mage::getStoreConfigFlag( 'jeroenvermeulen_solarium/general/enabled', $store->getId() );
                 if ( $result ) {
                     break;
                 }
             }
         } else {
-            $result = (boolean) self::getConf( 'general/enabled', $storeId );
+            $result = Mage::getStoreConfigFlag( 'jeroenvermeulen_solarium/general/enabled', $storeId );
         }
         return $result;
     }
@@ -71,23 +73,12 @@ class JeroenVermeulen_Solarium_Model_Engine
             $stores                 = Mage::app()->getStores( false );
             /** @var Mage_Core_Model_Store $store */
             foreach ( $stores as $store ) {
-                if ( self::getConf( 'general/enabled', $store->getId() ) ) {
+                if ( $this->getConf( 'general/enabled', $store->getId() ) ) {
                     array_push( $this->_enabledStoreIds, $store->getId() );
                 }
             }
         }
         return $this->_enabledStoreIds;
-    }
-
-    /**
-     * Shorthand to get a Magento Configuration setting of this extension.
-     *
-     * @param string $setting - Path inside the "jeroenvermeulen_solarium" config section
-     * @param int $storeId - Store View Id
-     * @return mixed
-     */
-    public static function getConf( $setting, $storeId = null ) {
-        return Mage::getStoreConfig( 'jeroenvermeulen_solarium/' . $setting, $storeId );
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,17 +89,37 @@ class JeroenVermeulen_Solarium_Model_Engine
      * The 'admin' core is a workaround used to execute 'non core specific' admin queries.
      * @see https://github.com/basdenooijer/solarium/issues/254
      */
-    public function __construct() {
+    public function __construct( $overrideConfig = array() ) {
         // Make sure the autoloader is registered, because in Magento < 1.8 some events are missing.
         Mage::helper( 'jeroenvermeulen_solarium/autoloader' )->register();
+        if ( !empty( $overrideConfig ) ) {
+            $this->_overrideConfig = $overrideConfig;
+        }
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
-        if ( self::isEnabled() ) {
+        $enabledStoreIds = $this->getEnabledStoreIds();
+        if ( !empty( $enabledStoreIds ) ) {
             $this->_client  = new Solarium\Client( $this->_getSolariumClientConfig() );
             $this->_working = $this->ping();
         } else {
             // This should not happen, you should not construct this class when it is disabled.
             $this->_lastError = new Exception(
                 $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
+        }
+    }
+
+    /**
+     * Get a Magento Configuration setting of this extension.
+     * Possibly this setting can be overridden by supplying a configuration array to this class constructor.
+     *
+     * @param string $setting - Path inside the "jeroenvermeulen_solarium" config section
+     * @param int $storeId - Store View Id
+     * @return mixed
+     */
+    public function getConf( $setting, $storeId = null ) {
+        if ( isset( $this->_overrideConfig[$setting] ) ) {
+            return $this->_overrideConfig[$setting];
+        } else {
+            return Mage::getStoreConfig( 'jeroenvermeulen_solarium/' . $setting, $storeId );
         }
     }
 
@@ -252,7 +263,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query->addParam( 'qt', '/select' ); // Needed for Solr < 3.6
             $query->addParam( 'df', 'text' );
             // Not 100% sure if this setTimeAllowed works.
-            $query->setTimeAllowed( intval( self::getConf( 'server/search_timeout' ) ) );
+            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solariumResult = $this->_client->ping( $query );
             $resultData     = $solariumResult->getData();
             if ( !empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ] ) {
@@ -355,7 +366,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             } else {
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
-                $buffer->setBufferSize( max( 1, self::getConf( 'reindexing/buffersize', $storeId ) ) );
+                $buffer->setBufferSize( max( 1, $this->getConf( 'reindexing/buffersize', $storeId ) ) );
                 $buffer->setEndpoint( 'update' );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ( $product = $products->fetch() ) {
@@ -419,7 +430,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         if ( is_numeric( $storeId ) ) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
         }
-        $query->setTimeAllowed( intval( self::getConf( 'server/timeout' ) ) );
+        $query->setTimeAllowed( intval( $this->getConf( 'server/timeout' ) ) );
         $solrResultSet = $this->_client->select( $query );
         return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
@@ -442,20 +453,20 @@ class JeroenVermeulen_Solarium_Model_Engine
             // Default field, needed when it is not specified in solrconfig.xml
             $query->addParam( 'df', 'text' );
             $query->setQuery( $this->_filterString( $queryString ) );
-            $query->setRows( $this::getConf( 'results/max' ) );
+            $query->setRows( $this->getConf( 'results/max' ) );
             $query->setFields( array( 'product_id', 'score' ) );
             if ( is_numeric( $storeId ) ) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
             $query->addSort( 'score', $query::SORT_DESC );
-            $doAutoCorrect = ( 1 == $try && self::getConf( 'results/autocorrect' ) );
+            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
-            $query->setTimeAllowed( intval( self::getConf( 'server/search_timeout' ) ) );
+            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solrResultSet        = $this->_client->select( $query );
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
@@ -541,26 +552,26 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @return array
      */
     protected function _getSolariumClientConfig() {
-        $host           = trim( self::getConf( 'server/host' ) );
+        $host           = trim( $this->getConf( 'server/host' ) );
         // If the user pasted a URL as hostname, clean it.
         $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
         $endPointConfig = array();
         $endPointConfig['host'] = $host;
-        $endPointConfig['port'] = intval( self::getConf( 'server/port' ) );
-        $endPointConfig['path'] = trim( self::getConf( 'server/path' ) );
-        $endPointConfig['core'] = trim( self::getConf( 'server/core' ) );
-        if( self::getConf('server/requires_authentication') ) {
-            $endPointConfig['username'] = trim( self::getConf('server/username') );
-            $endPointConfig['password'] = Mage::helper('core')->decrypt( self::getConf( 'server/password' ) );
+        $endPointConfig['port'] = intval( $this->getConf( 'server/port' ) );
+        $endPointConfig['path'] = trim( $this->getConf( 'server/path' ) );
+        $endPointConfig['core'] = trim( $this->getConf( 'server/core' ) );
+        if( $this->getConf('server/requires_authentication') ) {
+            $endPointConfig['username'] = trim( $this->getConf('server/username') );
+            $endPointConfig['password'] = Mage::helper('core')->decrypt( $this->getConf( 'server/password' ) );
         }
         $config = array();
         $config['endpoint'] = array();
         $config['endpoint']['default'] = $endPointConfig;
         $config['endpoint']['update']  = $endPointConfig;
         $config['endpoint']['admin']   = $endPointConfig;
-        $config['endpoint']['default']['timeout'] = intval( self::getConf( 'server/search_timeout' ) );
-        $config['endpoint']['update']['timeout']  = intval( self::getConf( 'server/search_timeout' ) );
-        $config['endpoint']['admin']['timeout']   = intval( self::getConf( 'server/search_timeout' ) );
+        $config['endpoint']['default']['timeout'] = intval( $this->getConf( 'server/search_timeout' ) );
+        $config['endpoint']['update']['timeout']  = intval( $this->getConf( 'server/search_timeout' ) );
+        $config['endpoint']['admin']['timeout']   = intval( $this->getConf( 'server/search_timeout' ) );
         $config['endpoint']['admin']['core']      = 'admin';
         return $config;
     }
