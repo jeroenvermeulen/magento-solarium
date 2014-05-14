@@ -45,6 +45,9 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Info
             <?php endforeach; ?>
             </tbody>
         </table>
+
+<a href="<?php echo Mage::helper("adminhtml")->getUrl("adminhtml/solarium/ajax"); ?>">test connection</a>
+
         <?php
         return ob_get_clean();
     }

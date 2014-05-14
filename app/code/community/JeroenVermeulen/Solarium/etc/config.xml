@@ -98,12 +98,25 @@
             <jeroenvermeulen_solarium>
                 <use>standard</use>
                 <args>
+                    <!-- URL:  http://[MAGROOT]/solarium/[ACTION]/key/xxxxxxxxxxx/ -->
                     <module>JeroenVermeulen_Solarium</module>
                     <frontName>solarium</frontName>
                 </args>
             </jeroenvermeulen_solarium>
         </routers>
     </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <!-- URL:  http://[MAGROOT]/admin/[CONTROLLER]/[ACTION]/key/xxxxxxxxxxx/ -->
+                        <JeroenVermeulen_Solarium after="Mage_Adminhtml">JeroenVermeulen_Solarium_Admin</JeroenVermeulen_Solarium>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
     <adminhtml>
         <layout>
             <updates>
