@@ -10,6 +10,9 @@
 /app/code/community/Phoenix
 /app/code/core
 /app/code/local
+/app/design/adminhtml/default/default/layout/*.xml
+/app/design/adminhtml/default/default/locale
+/app/design/adminhtml/default/default/template
 /app/design/frontend/base/default/etc
 /app/design/frontend/base/default/layout/*.xml
 /app/design/frontend/base/default/layout/sales
@@ -63,6 +66,9 @@
 /php.ini.sample
 /pkginfo
 /shell
+/skin/adminhtml/default
+/skin/frontend
+/skin/install
 /var/cache
 /var/connect/package.xml
 /var/export
