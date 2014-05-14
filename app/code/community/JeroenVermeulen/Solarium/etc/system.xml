@@ -25,8 +25,10 @@
 <config>
     <sections>
         <jeroenvermeulen_solarium translate="label" module="jeroenvermeulen_solarium">
-            <label>Solarium Search</label>
+            <label><![CDATA[]]></label>
             <tab>catalog</tab>
+            <class>solarium-tab</class>
+            <header_css>solarium-header</header_css>
             <sort_order>45</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>

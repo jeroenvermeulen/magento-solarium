@@ -104,6 +104,15 @@
             </jeroenvermeulen_solarium>
         </routers>
     </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <jeroenvermeulen_solarium>
+                    <file>jeroenvermeulen/solarium.xml</file>
+                </jeroenvermeulen_solarium>
+            </updates>
+        </layout>
+    </adminhtml>
     <default>
         <jeroenvermeulen_solarium>
             <general>
