@@ -20,5 +20,5 @@
  */
 ul.tabs a.solarium-tab span:after,
 ul.tabs a.solarium-tab:hover span:after{ content:url('../../images/jeroenvermeulen/solarium_small.png'); }
-h3.solarium-header{margin-top:-15px;}
+h3.solarium-header{ margin-top:-15px; }
 .solarium-header:after { content:url('../../images/jeroenvermeulen/solarium_large.png'); }

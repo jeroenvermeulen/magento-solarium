@@ -24,7 +24,9 @@
 /app/etc/modules/Phoenix_*
 /app/etc/config.xml
 /app/etc/local.xml*
-/app/locale
+/app/locale/*/*.csv
+!/app/locale/*/JeroenVermeulen_Solarium.csv
+/app/locale/*/template
 /app/Mage.php
 /cron.php
 /cron.sh

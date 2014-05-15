@@ -26,7 +26,7 @@ class JeroenVermeulen_Solarium_AjaxController extends Mage_Core_Controller_Front
     /**
      * Override default suggestAction to add our own block
      *
-     * URL:  http://[MAGROOT]/solarium/ajax/suggest/?q=comp -->
+     * URL:  http://[MAGE-ROOT]/solarium/ajax/suggest/?q=comp -->
      */
     public function suggestAction()
     {

@@ -212,18 +212,21 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Return an array with version info, to show in backend.
      *
+     * @param bool $extended - When true we will output more information
      * @return array
      */
-    public function getVersionInfo() {
+    public function getVersionInfo( $extended = false ) {
         $helper                         = Mage::helper( 'jeroenvermeulen_solarium' );
         $versions                       = array();
-        $versions[ 'Operating System' ] = php_uname();
-        $versions[ 'PHP' ]              = phpversion();
-        $versions[ 'Magento' ]          = Mage::getVersion();
-        $versions[ 'Extension' ]        = $helper->getExtensionVersion();
-        $versions[ 'Solarium Library' ] = Solarium\Client::VERSION;
-        $versions[ 'Solr' ]             = $helper->__( 'unknown' );
-        $versions[ 'Java' ]             = $helper->__( 'unknown' );
+        if ( $extended ) {
+            $versions[ 'Operating System' ] = php_uname();
+            $versions[ 'PHP' ]              = phpversion();
+            $versions[ 'Magento' ]          = Mage::getVersion();
+            $versions[ 'Extension' ]        = $helper->getExtensionVersion();
+            $versions[ 'Solarium Library' ] = Solarium\Client::VERSION;
+        }
+        $versions[ 'Solr version' ]          = $helper->__( 'unknown' );
+        $versions[ 'Java version' ]          = $helper->__( 'unknown' );
         if ( $this->isWorking() ) {
             try {
                 /**
@@ -234,10 +237,10 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query->setHandler( 'system' );
                 $data = $this->_client->ping( $query, 'admin' )->getData();
                 if ( !empty( $data[ 'lucene' ][ 'solr-impl-version' ] ) ) {
-                    $versions[ 'Solr' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
+                    $versions[ 'Solr version' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
                 }
                 if ( !empty( $data[ 'jvm' ][ 'name' ] ) && !empty( $data[ 'jvm' ][ 'version' ] ) ) {
-                    $versions[ 'Java' ] = $data[ 'jvm' ][ 'name' ] . ' ' . $data[ 'jvm' ][ 'version' ];
+                    $versions[ 'Java version' ] = $data[ 'jvm' ][ 'name' ] . ' ' . $data[ 'jvm' ][ 'version' ];
                 }
             } catch ( Exception $e ) {
                 Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
@@ -508,7 +511,8 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
-     * @param $queryString
+     * @param integer $storeId - Store View Id
+     * @param string $queryString - What the user is typing
      * @return null|string
      */
     public function getAutoSuggestions( $storeId, $queryString ) {

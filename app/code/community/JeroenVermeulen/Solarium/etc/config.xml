@@ -87,6 +87,15 @@
         </events>
     </global>
     <frontend>
+        <translate>
+            <modules>
+                <jeroenvermeulen_solarium>
+                    <files>
+                        <default>JeroenVermeulen_Solarium.csv</default>
+                    </files>
+                </jeroenvermeulen_solarium>
+            </modules>
+        </translate>
         <layout>
             <updates>
                 <jeroenvermeulen_solarium>
@@ -98,7 +107,7 @@
             <jeroenvermeulen_solarium>
                 <use>standard</use>
                 <args>
-                    <!-- URL:  http://[MAGROOT]/solarium/[ACTION]/key/xxxxxxxxxxx/ -->
+                    <!-- URL:  http://[MAGROOT]/solarium/[ACTION]/key/[NONCE]/ -->
                     <module>JeroenVermeulen_Solarium</module>
                     <frontName>solarium</frontName>
                 </args>
@@ -110,7 +119,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <!-- URL:  http://[MAGROOT]/admin/[CONTROLLER]/[ACTION]/key/xxxxxxxxxxx/ -->
+                        <!-- URL:  http://[MAGROOT]/admin/[CONTROLLER]/[ACTION]/key/[NONCE]/ -->
                         <JeroenVermeulen_Solarium after="Mage_Adminhtml">JeroenVermeulen_Solarium_Admin</JeroenVermeulen_Solarium>
                     </modules>
                 </args>
@@ -118,6 +127,15 @@
         </routers>
     </admin>
     <adminhtml>
+        <translate>
+            <modules>
+                <jeroenvermeulen_solarium>
+                    <files>
+                        <default>JeroenVermeulen_Solarium.csv</default>
+                    </files>
+                </jeroenvermeulen_solarium>
+            </modules>
+        </translate>
         <layout>
             <updates>
                 <jeroenvermeulen_solarium>

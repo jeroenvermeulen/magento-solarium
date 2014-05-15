@@ -34,16 +34,7 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
-                <info translate="label" module="jeroenvermeulen_solarium">
-                    <label>Info</label>
-                    <frontend_type>text</frontend_type>
-                    <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_info</frontend_model>
-                    <sort_order>100</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                </info>
-                <general translate="label" module="jeroenvermeulen_solarium">
+                <general translate="label">
                     <label>General Settings</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>200</sort_order>
@@ -63,9 +54,10 @@
                         </enabled>
                     </fields>
                 </general>
-                <server translate="label" module="jeroenvermeulen_solarium">
+                <server translate="label">
                     <label>Solr Server</label>
                     <frontend_type>text</frontend_type>
+                    <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_server</frontend_model>
                     <sort_order>300</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>0</show_in_website>
@@ -97,7 +89,7 @@
                             <show_in_store>0</show_in_store>
                         </path>
                         <core translate="label">
-                            <label>Core</label>
+                            <label>Solr Core</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
@@ -132,7 +124,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </requires_authentication>
                         <username translate="label">
-                            <label>Username</label>
+                            <label>User Name</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>80</sort_order>
                             <validate>required-entry</validate>
@@ -196,7 +188,7 @@
                     </fields>
                 </results>
                 <reindexing>
-                    <label>Reindexing</label>
+                    <label>Reindex Data</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>500</sort_order>
                     <show_in_default>1</show_in_default>
