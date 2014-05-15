@@ -1,5 +1,5 @@
 <_>
-   <form_key>LB001WPAnE44yhSJ</form_key>
+   <form_key>F1ORDmSGZQ9dcoTC</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -22,14 +22,12 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.4.2</version>
-   <stability>beta</stability>
-   <notes>Beta version.
-Do not use on a production shop right away.
-
-  * Fixed issue #15: Autocomplete error on Solr3
-
-You need to update the `schema.xml` on your Solr server to fix the issue.</notes>
+   <version>1.5.0</version>
+   <stability>stable</stability>
+   <notes>  * The first &quot;stable&quot; version
+  * Added &quot;Test Connection&quot; button to configuration
+  * Added logos to configuration - Thanks @toonvd
+  * Added Dutch translations</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -58,7 +56,7 @@ You need to update the `schema.xml` on your Solr server to fix the issue.</notes
             <max/>
          </max>
          <files>
-            <files>                                             </files>
+            <files>                                                  </files>
          </files>
       </package>
       <extension>
@@ -75,31 +73,43 @@ You need to update the `schema.xml` on your Solr server to fix the issue.</notes
    </depends>
    <contents>
       <target>
-         <target>magelocal</target>
          <target>magecommunity</target>
-         <target>mageetc</target>
-         <target>magelib</target>
-         <target>magelib</target>
          <target>magedesign</target>
+         <target>magedesign</target>
+         <target>mageetc</target>
          <target>mageweb</target>
+         <target>magelib</target>
+         <target>magelib</target>
+         <target>mageskin</target>
+         <target>mageskin</target>
+         <target>magecommunity</target>
+         <target>magelocale</target>
       </target>
       <path>
-         <path/>
          <path>JeroenVermeulen/Solarium</path>
+         <path>frontend/base/default/layout/jeroenvermeulen/solarium.xml</path>
+         <path>adminhtml/default/default/layout/jeroenvermeulen/solarium.xml</path>
          <path>modules/JeroenVermeulen_Solarium.xml</path>
+         <path>js/solarium</path>
          <path>Solarium</path>
          <path>Symfony/Component/EventDispatcher</path>
-         <path>frontend/base/default/layout/jeroenvermeulen/solarium.xml</path>
-         <path>js/solarium</path>
+         <path>adminhtml/default/default/css/jeroenvermeulen/solarium.css</path>
+         <path>adminhtml/default/default/images/jeroenvermeulen/solarium</path>
+         <path>JeroenVermeulen/Solarium</path>
+         <path>nl_NL/JeroenVermeulen_Solarium.csv</path>
       </path>
       <type>
-         <type>file</type>
          <type>dir</type>
          <type>file</type>
+         <type>file</type>
+         <type>file</type>
+         <type>dir</type>
          <type>dir</type>
          <type>dir</type>
          <type>file</type>
          <type>dir</type>
+         <type>dir</type>
+         <type>file</type>
       </type>
       <include>
          <include/>
@@ -109,8 +119,16 @@ You need to update the `schema.xml` on your Solr server to fix the issue.</notes
          <include/>
          <include/>
          <include/>
+         <include/>
+         <include/>
+         <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
+         <ignore/>
+         <ignore/>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

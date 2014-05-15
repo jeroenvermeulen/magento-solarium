@@ -64,3 +64,10 @@
 ### v1.4.2-beta
 
   * Fixed issue #15: Autocomplete error on Solr3
+
+### v1.5.0
+
+  * The first "stable" version
+  * Added "Test Connection" button to configuration
+  * Added logos to configuration - Thanks @toonvd
+  * Added Dutch translations

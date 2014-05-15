@@ -68,7 +68,13 @@
 /php.ini.sample
 /pkginfo
 /shell
-/skin/adminhtml/default
+/skin/adminhtml/default/default/images/*
+!/skin/adminhtml/default/default/images/jeroenvermeulen
+/skin/adminhtml/default/default/lib
+/skin/adminhtml/default/default/media
+/skin/adminhtml/default/default/xmlconnect
+/skin/adminhtml/default/default/*.css
+/skin/adminhtml/default/default/*.ico
 /skin/frontend
 /skin/install
 /var/cache

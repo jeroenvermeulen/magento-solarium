@@ -1,11 +1,31 @@
 ## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
 
+# Extension Dir
 app/code/community/JeroenVermeulen/Solarium/                                app/code/community/JeroenVermeulen/Solarium/
+
+# Frontend layout
 app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml        app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml
+
+# Backend layout
 app/design/adminhtml/default/default/layout/jeroenvermeulen/solarium.xml    app/design/adminhtml/base/default/layout/jeroenvermeulen/solarium.xml
+
+# Magento global configuration module XML
 app/etc/modules/JeroenVermeulen_Solarium.xml                                app/etc/modules/JeroenVermeulen_Solarium.xml
-js/solarium/autocomplete.js                                                 js/solarium/autocomplete.js
+
+# Translation
+app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
+
+# JavaScript libraries
+js/solarium/                                                                js/solarium/
+
+# The Solarium Library, by Bas de Nooijer
 lib/Solarium/                                                               lib/Solarium/
+
+# The EventDispatcher component from the Symfony framework
 lib/Symfony/Component/EventDispatcher/                                      lib/Symfony/Component/EventDispatcher/
-skin/adminhtml/base/default/css/jeroenvermeulen/solarium.css                skin/adminhtml/base/default/css/jeroenvermeulen/solarium.css
-skin/adminhtml/base/default/images/jeroenvermeulen/                         skin/adminhtml/base/default/images/jeroenvermeulen/
+
+# Backend CSS File
+skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css             skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css
+
+# Backend Image Files
+skin/adminhtml/default/default/images/jeroenvermeulen/solarium/             skin/adminhtml/default/default/images/jeroenvermeulen/solarium/
