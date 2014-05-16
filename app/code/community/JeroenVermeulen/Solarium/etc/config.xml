@@ -47,11 +47,6 @@
                     <fulltext>JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext</fulltext>
                 </rewrite>
             </catalogsearch_resource>
-            <catalogsearch>
-                <rewrite>
-                    <indexer_fulltext>JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext</indexer_fulltext>
-                </rewrite>
-            </catalogsearch>
         </models>
         <helpers>
             <jeroenvermeulen_solarium>
@@ -69,21 +64,68 @@
         <events>
             <controller_front_init_before>
                 <observers>
-                    <jeroenvermeulen_solarium_controller_front_init_before>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
                         <class>jeroenvermeulen_solarium/observer</class>
                         <method>controllerFrontInitBefore</method>
-                    </jeroenvermeulen_solarium_controller_front_init_before>
+                    </jeroenvermeulen_solarium>
                 </observers>
             </controller_front_init_before>
             <shell_reindex_init_process>
                 <!-- This event only works for Magento >= 1.8 -->
                 <observers>
-                    <jeroenvermeulen_solarium_shell_reindex_init_process>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
                         <class>jeroenvermeulen_solarium/observer</class>
                         <method>shellReindexInitProcess</method>
-                    </jeroenvermeulen_solarium_shell_reindex_init_process>
+                    </jeroenvermeulen_solarium>
                 </observers>
             </shell_reindex_init_process>
+            <after_reindex_process_catalogsearch_fulltext>
+                <observers>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
+                        <class>jeroenvermeulen_solarium/observer</class>
+                        <method>afterReindexProcessCatalogsearchFulltext</method>
+                    </jeroenvermeulen_solarium>
+                </observers>
+            </after_reindex_process_catalogsearch_fulltext>
+            <catalogsearch_index_process_start>
+                <observers>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
+                        <class>jeroenvermeulen_solarium/observer</class>
+                        <method>catalogsearchIndexProcessStart</method>
+                    </jeroenvermeulen_solarium>
+                </observers>
+            </catalogsearch_index_process_start>
+            <catalogsearch_index_process_complete>
+                <observers>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
+                        <class>jeroenvermeulen_solarium/observer</class>
+                        <method>catalogsearchIndexProcessComplete</method>
+                    </jeroenvermeulen_solarium>
+                </observers>
+            </catalogsearch_index_process_complete>
+            <adminhtml_block_html_before>
+                <observers>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
+                        <class>jeroenvermeulen_solarium/observer</class>
+                        <method>adminhtmlBlockHtmlBefore</method>
+                    </jeroenvermeulen_solarium>
+                </observers>
+            </adminhtml_block_html_before>
+            <start_index_events_catalog_product_delete>
+                <observers>
+                    <jeroenvermeulen_solarium>
+                        <type>singleton</type>
+                        <class>jeroenvermeulen_solarium/observer</class>
+                        <method>startIndexEventsCatalogProductDelete</method>
+                    </jeroenvermeulen_solarium>
+                </observers>
+            </start_index_events_catalog_product_delete>
         </events>
     </global>
     <frontend>
