@@ -15,6 +15,7 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
      */
     public function testConnectionAction() {
         $request = $this->getRequest();
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper   = Mage::helper( 'jeroenvermeulen_solarium' );
         $config = array( 'general/enabled' => true,
                          'server/host' => $request->getParam('host', false),
@@ -27,6 +28,7 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
         if ( !preg_match('|^\*+$|', $request->getParam('password', false) ) ) {
             $config['server/password'] =  Mage::helper('core')->encrypt( $request->getParam('password', false) );
         }
+        /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
         $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
         $class  = 'error';
         $state  = 'FAILED';

@@ -35,37 +35,39 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Gener
         $searchIndexerProcess = $helper->getSearchIndexer();
         $urlPath  = '';
         if ( !empty($searchIndexerProcess) ) {
-            $urlPath = 'adminhtml/process/reindexProcess/process/' . $searchIndexerProcess->getProcessId();
+            $urlPath = 'adminhtml/process/reindexProcess/process/' . $searchIndexerProcess->getData( 'process_id' );
         }
         $indexUrl = Mage::helper("adminhtml")->getUrl( $urlPath );
-        $howto = '<ul>';
+        $howTo = '<ul>';
 
-        $howto .= '<li>' . $helper->__('Step %d',1).': ';
-        $howto .= $helper->__('Configure and test your %sSolr Server%s.',
-                              '<a onclick="$(\'jeroenvermeulen_solarium_server-state\').value=0;
-                                            Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_server\');"
+        $howTo .= '<li>' . $helper->__('Step %d',1).': ';
+        $howTo .= $helper->__('Configure and test your %sSolr Server%s.',
+                              '<!--suppress HtmlUnknownAnchorTarget -->
+                               <a onclick="$(\'jeroenvermeulen_solarium_server-state\').value=0;
+                                           Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_server\');"
                                    href="#jeroenvermeulen_solarium_server-head">',
                               '</a>');
-        $howto .= '</li>';
+        $howTo .= '</li>';
 
-        $howto .= '<li>' . $helper->__('Step %d',2).': ';
-        $howto .= $helper->__('Enable %sSolarium Search%s, Save Config.',
-                              '<a onclick="$(\'jeroenvermeulen_solarium_general-state\').value=0;
-                                              Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_general\');"
+        $howTo .= '<li>' . $helper->__('Step %d',2).': ';
+        $howTo .= $helper->__('Enable %sSolarium Search%s, Save Config.',
+                              '<!--suppress HtmlUnknownAnchorTarget -->
+                               <a onclick="$(\'jeroenvermeulen_solarium_general-state\').value=0;
+                                           Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_general\');"
                                    href="#jeroenvermeulen_solarium_general-head">',
                               '</a>');
-        $howto .= '</li>';
+        $howTo .= '</li>';
 
-        $howto .= '<li>' . $helper->__('Step %d',3).': ';
-        $howto .= '<a href="'.$indexUrl.'">';
-        $howto .= $helper->__('Reindex the Catalog Search Index');
-        $howto .= '</a>.</li>';
+        $howTo .= '<li>' . $helper->__('Step %d',3).': ';
+        $howTo .= '<a href="'.$indexUrl.'">';
+        $howTo .= $helper->__('Reindex the Catalog Search Index');
+        $howTo .= '</a>.</li>';
 
-        $howto .= '<li>' . $helper->__('Step %d',4) . ': ';
-        $howto .= $helper->__('Test searching via the frontend.');
-        $howto .= $helper->__('If searching with a small typo works, Solarium search is active.');
-        $howto .= '</ul><br />';
-        return $howto . parent::_getHeaderHtml( $element );
+        $howTo .= '<li>' . $helper->__('Step %d',4) . ': ';
+        $howTo .= $helper->__('Test searching via the frontend.');
+        $howTo .= $helper->__('If searching with a small typo works, Solarium search is active.');
+        $howTo .= '</ul><br />';
+        return $howTo . parent::_getHeaderHtml( $element );
     }
 
 }

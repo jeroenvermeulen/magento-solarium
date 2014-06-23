@@ -91,10 +91,13 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     public function __construct( $overrideConfig = array() ) {
         // Make sure the autoloader is registered, because in Magento < 1.8 some events are missing.
-        Mage::helper( 'jeroenvermeulen_solarium/autoloader' )->register();
+        /** @var JeroenVermeulen_Solarium_Helper_Autoloader $autoLoader */
+        $autoLoader = Mage::helper( 'jeroenvermeulen_solarium/autoloader' );
+        $autoLoader->register();
         if ( !empty( $overrideConfig ) ) {
             $this->_overrideConfig = $overrideConfig;
         }
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         $enabledStoreIds = $this->getEnabledStoreIds();
         if ( !empty( $enabledStoreIds ) ) {
@@ -216,6 +219,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @return array
      */
     public function getVersionInfo( $extended = false ) {
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper                         = Mage::helper( 'jeroenvermeulen_solarium' );
         $versions                       = array();
         if ( $extended ) {
@@ -310,6 +314,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @param int|null $storeId      - Store View Id, null or 0 means all storeViews
      * @param int[]|null $productIds - Product Entity Id(s)
+     * @param bool $cleanFirst       - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
     public function rebuildIndex( $storeId = null, $productIds = null, $cleanFirst = false ) {
@@ -573,6 +578,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     protected function _processResult( $solariumResult, $actionText = 'query' ) {
         $result = false;
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         if ( is_a( $solariumResult, 'Solarium\QueryType\Update\Result' ) ) {
             $this->_lastQueryTime = $solariumResult->getQueryTime();

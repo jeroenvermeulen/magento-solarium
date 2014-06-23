@@ -24,6 +24,7 @@
 $this->startSetup();
 $this->endSetup();
 
+/** @var $helper JeroenVermeulen_Solarium_Helper_Data */
 $helper = Mage::helper( 'jeroenvermeulen_solarium' );
 $configSteps = array( $helper->__('System'),
                       $helper->__('Configuration'),
@@ -38,5 +39,4 @@ $notice .= '&nbsp; &nbsp; &#8226; ' . sprintf( 'Configure via:&nbsp; %s<br />', 
 
 $title = $helper->__('The extension JeroenVermeulen_Solarium has been installed - Setup Instructions');
 
-//Mage::getSingleton( 'adminhtml/session' )->addNotice( $notice );
 Mage::getModel('adminnotification/inbox')->add( Mage_AdminNotification_Model_Inbox::SEVERITY_NOTICE, $title, $notice );

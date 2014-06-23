@@ -37,6 +37,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
                 $adapter           = $this->_getWriteAdapter();
                 $searchResultTable = $this->getTable( 'catalogsearch/result' );
+                /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
                 $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
                 if ( $engine->isWorking() ) {
                     $searchResult = $engine->query( $query->getStoreId(), $queryText );
