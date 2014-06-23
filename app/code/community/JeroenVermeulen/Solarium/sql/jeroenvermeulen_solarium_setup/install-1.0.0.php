@@ -21,17 +21,22 @@
  */
 
 /* @var $this Mage_Core_Model_Resource_Setup */
-$installer = $this;
-$installer->startSetup();
-$notice = 'The extension <strong>JeroenVermeulen_Solarium</strong> has been installed.<br />';
+$this->startSetup();
+$this->endSetup();
+
+$helper = Mage::helper( 'jeroenvermeulen_solarium' );
+$configSteps = array( $helper->__('System'),
+                      $helper->__('Configuration'),
+                      $helper->__('CATALOG'),
+                      $helper->__('Solarium Search') );
+
 $notice .= 'Please follow these steps:<br />';
-$notice .= '&#8226; Clear cache<br />';
-$notice .= '&#8226; Log out<br />';
-$notice .= '&#8226; Log in<br />';
-$notice .= '&#8226; Configure via: <em>System &gt; Configuration &gt; CATALOG &gt; Solarium Search</em><br />';
-$installer->endSetup();
+$notice .= '&nbsp; &nbsp; &#8226; Clear cache<br />';
+$notice .= '&nbsp; &nbsp; &#8226; Log out<br />';
+$notice .= '&nbsp; &nbsp; &#8226; Log in<br />';
+$notice .= '&nbsp; &nbsp; &#8226; ' . sprintf( 'Configure via:&nbsp; %s<br />', htmlentities( implode(' > ',$configSteps) ) );
+
+$title = $helper->__('The extension JeroenVermeulen_Solarium has been installed - Setup Instructions');
 
 //Mage::getSingleton( 'adminhtml/session' )->addNotice( $notice );
-Mage::getModel('adminnotification/inbox')->add( Mage_AdminNotification_Model_Inbox::SEVERITY_NOTICE,
-                                                'The extension <strong>JeroenVermeulen_Solarium</strong> has been installed.<br />',
-                                                $notice );
+Mage::getModel('adminnotification/inbox')->add( Mage_AdminNotification_Model_Inbox::SEVERITY_NOTICE, $title, $notice );
