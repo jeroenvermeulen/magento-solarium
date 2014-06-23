@@ -68,9 +68,14 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
                 }
             } else {
                 $message = $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() );
+                $configUrl = Mage::helper("adminhtml")->getUrl(
+                                 "adminhtml/system_config/edit/section/jeroenvermeulen_solarium/");
                 if ( $engine->isShellScript() ) {
+                    $message .= "\nPlease check the Solr server configuration via the Admin:";
+                    $message .= "\nSystem > Configuration > CATALOG > Solarium search";
                     echo $message . "\n";
                 } else {
+                    $message .= sprintf( '<br />Please check the <a href="%s">Solr server configuration</a>', $configUrl );
                     Mage::getSingleton( 'adminhtml/session' )->addError( $message );
                 }
             }
