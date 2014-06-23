@@ -77,4 +77,5 @@
   * Reindexing is based on events instead of class rewrites
   * Solr is never empty during reindex
   * Added built-in manual to config
-  * Replaced admin message by notification in inbox #18
+  * Replaced install message in admin by notification in inbox #18
+  * Added testing manual
