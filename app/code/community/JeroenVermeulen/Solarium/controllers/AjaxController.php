@@ -34,6 +34,7 @@ class JeroenVermeulen_Solarium_AjaxController extends Mage_Core_Controller_Front
             // No query received
             $this->getResponse()->setRedirect( Mage::getSingleton('core/url')->getBaseUrl() );
         }
+        /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
         $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
         $blockType = 'catalogsearch/autocomplete';
         if ( $engine->isWorking() ) {

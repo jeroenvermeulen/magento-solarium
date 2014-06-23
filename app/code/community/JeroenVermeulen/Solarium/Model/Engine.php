@@ -91,10 +91,13 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     public function __construct( $overrideConfig = array() ) {
         // Make sure the autoloader is registered, because in Magento < 1.8 some events are missing.
-        Mage::helper( 'jeroenvermeulen_solarium/autoloader' )->register();
+        /** @var JeroenVermeulen_Solarium_Helper_Autoloader $autoLoader */
+        $autoLoader = Mage::helper( 'jeroenvermeulen_solarium/autoloader' );
+        $autoLoader->register();
         if ( !empty( $overrideConfig ) ) {
             $this->_overrideConfig = $overrideConfig;
         }
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         $enabledStoreIds = $this->getEnabledStoreIds();
         if ( !empty( $enabledStoreIds ) ) {
@@ -216,6 +219,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @return array
      */
     public function getVersionInfo( $extended = false ) {
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper                         = Mage::helper( 'jeroenvermeulen_solarium' );
         $versions                       = array();
         if ( $extended ) {
@@ -282,40 +286,18 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Clean the Solr index. If a Store ID or Product IDs are specified it is only cleared for those.
      *
-     * @param int $storeId - Store View Id
+     * @param int $storeId               - Store View Id, null or 0 means all storeViews
      * @param null|array|int $productIds - Product Entity Id(s)
      * @return bool                      - True on success
      */
-    public function cleanIndex( $storeId, $productIds = null ) {
+    public function cleanIndex( $storeId=null, $productIds = null ) {
         if ( !$this->_working ) {
             return false;
         }
         $result = false;
         try {
-            $queryText = array();
-
-            if ( !empty( $storeId ) ) {
-                $queryText[ ] .= 'store_id:' . $storeId;
-            }
-
-            if ( is_numeric( $productIds ) ) {
-                $queryText[ ] .= 'product_id:' . $productIds;
-            }
-
-            if ( is_array( $productIds ) ) {
-                $or = array();
-                foreach ( $productIds as $id ) {
-                    $or[ ] = 'product_id:' . $id;
-                }
-                $queryText[ ] .= '(' . implode( ' OR ', $or ) . ')';
-            }
-
-            if ( empty( $queryText ) ) {
-                $queryText[ ] = '*:*'; // Delete all
-            }
-
             $query = $this->_client->createUpdate();
-            $query->addDeleteQuery( implode( ' ', $queryText ) );
+            $query->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
             $query->addCommit();
 
             $solariumResult = $this->_client->update( $query, 'update' );
@@ -330,11 +312,12 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Rebuild the index. If a Store ID or Product IDs are specified it is only rebuilt for those.
      *
-     * @param int|null $storeId - Store View Id
+     * @param int|null $storeId      - Store View Id, null or 0 means all storeViews
      * @param int[]|null $productIds - Product Entity Id(s)
+     * @param bool $cleanFirst       - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
-    public function rebuildIndex( $storeId = null, $productIds = null ) {
+    public function rebuildIndex( $storeId = null, $productIds = null, $cleanFirst = false ) {
         if ( !$this->_working ) {
             return false;
         }
@@ -367,6 +350,12 @@ class JeroenVermeulen_Solarium_Model_Engine
                 // No matching products, nothing to update, consider OK.
                 $result = true;
             } else {
+                if ( $cleanFirst ) {
+                    $deleteQuery = $this->_client->createUpdate();
+                    $deleteQuery->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
+                    // No commit yet, will be done after BufferedAdd
+                    $result = $this->_client->update($deleteQuery);
+                }
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
                 $buffer->setBufferSize( max( 1, $this->getConf( 'reindexing/buffersize', $storeId ) ) );
@@ -379,7 +368,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                                    'text' => $this->_filterString( $product[ 'data_index' ] ) );
                     $buffer->createDocument( $data );
                 }
-                $solariumResult = $buffer->flush();
+                $solariumResult = $buffer->commit();
                 $this->optimize(); // ignore result
                 $result = $this->_processResult( $solariumResult, 'flushing buffered add' );
             }
@@ -589,6 +578,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     protected function _processResult( $solariumResult, $actionText = 'query' ) {
         $result = false;
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         if ( is_a( $solariumResult, 'Solarium\QueryType\Update\Result' ) ) {
             $this->_lastQueryTime = $solariumResult->getQueryTime();
@@ -623,4 +613,31 @@ class JeroenVermeulen_Solarium_Model_Engine
         return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', strval($str) );
     }
 
+    /**
+     * Get delete query string for Solr
+     *
+     * @param int $storeId               - Store View Id, null or 0 means all storeViews
+     * @param null|array|int $productIds - Product Entity Id(s)
+     * @return string
+     */
+    protected function _getDeleteQueryText( $storeId=null, $productIds=null ) {
+        $queryText = array();
+        if ( !empty( $storeId ) ) {
+            $queryText[] .= 'store_id:' . $storeId;
+        }
+        if ( is_numeric( $productIds ) ) {
+            $queryText[] .= 'product_id:' . $productIds;
+        }
+        if ( is_array( $productIds ) ) {
+            $or = array();
+            foreach ( $productIds as $id ) {
+                $or[] = 'product_id:' . $id;
+            }
+            $queryText[] .= '(' . implode( ' OR ', $or ) . ')';
+        }
+        if ( empty( $queryText ) ) {
+            $queryText[] = '*:*'; // Delete all
+        }
+        return implode( ' ', $queryText );
+    }
 }

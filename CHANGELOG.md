@@ -71,3 +71,10 @@
   * Added "Test Connection" button to configuration
   * Added logos to configuration - Thanks @toonvd
   * Added Dutch translations
+
+### v1.6.0-beta WIP
+
+  * Reindexing is based on events instead of class rewrites
+  * Solr is never empty during reindex
+  * Added built-in manual to config
+  * Replaced admin message by notification in inbox #18

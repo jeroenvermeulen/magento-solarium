@@ -37,6 +37,7 @@
                 <general translate="label">
                     <label>General Settings</label>
                     <frontend_type>text</frontend_type>
+                    <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_general</frontend_model>
                     <sort_order>200</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>

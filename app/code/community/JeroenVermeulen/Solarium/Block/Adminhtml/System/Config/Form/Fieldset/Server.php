@@ -30,6 +30,7 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Serve
      * @return string
      */
     protected function _getFooterHtml( $element ) {
+        /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper   = Mage::helper( 'jeroenvermeulen_solarium' );
         ob_start();
         ?>
