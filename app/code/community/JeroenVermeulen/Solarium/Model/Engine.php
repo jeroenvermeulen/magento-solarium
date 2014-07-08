@@ -467,12 +467,13 @@ class JeroenVermeulen_Solarium_Model_Engine
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
-                $spellCheck->setQuery( $queryString );
+                $spellCheck->setQuery( $helper->escapePhrase($queryString) );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solrResultSet        = $this->_client->select( $query );
+
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
             foreach ( $solrResultSet as $solrResult ) {
@@ -484,12 +485,21 @@ class JeroenVermeulen_Solarium_Model_Engine
             if ( $doAutoCorrect ) {
                 $spellCheckResult = $solrResultSet->getSpellcheck();
                 if ( $spellCheckResult && !$spellCheckResult->getCorrectlySpelled() ) {
+                    $suggestions = $spellCheckResult->getSuggestions();
+                    $suggestedWords = array();
+                    foreach($suggestions as $suggestion){
+                        foreach($suggestion->getWords() as $word){
+                            $suggestedWords[] = '<a href="' . Mage::getBaseUrl() . 'catalogsearch/result/?q=' .$word['word'] . '">' . $word['word'] . '</a>';
+                        }
+
+                    }
+                    Mage::register('solarium_suggest', $suggestedWords);
                     $collation = $spellCheckResult->getCollation();
                     if ( $collation ) {
                         $correctedQueryString = $collation->getQuery();
                     }
                     if ( empty( $correctedQueryString ) ) {
-                        $suggestions = $spellCheckResult->getSuggestions();
+
                         if ( !empty( $suggestions ) ) {
                             $words = array();
                             /** @var Solarium\QueryType\Select\Result\Spellcheck\Suggestion $suggestion */

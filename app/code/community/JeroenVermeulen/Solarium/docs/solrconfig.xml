@@ -79,8 +79,8 @@
     <requestHandler name="/select" class="solr.SearchHandler">
         <lst name="defaults">
             <str name="df">text</str>
-            <str name="spellcheck.count">1</str>
-            <str name="spellcheck.maxResultsForSuggest">1</str>
+            <str name="spellcheck.count">5</str>
+            <str name="spellcheck.maxResultsForSuggest">5</str>
             <str name="spellcheck.collate">true</str>
             <str name="spellcheck.maxCollations">1</str>
         </lst>
@@ -116,6 +116,7 @@
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
         <str name="queryAnalyzerFieldType">text_general</str>
         <lst name="spellchecker">
+            <str name="classname">solr.IndexBasedSpellChecker</str>
             <str name="field">text</str>
             <int name="maxEdits">2</int>
             <int name="minPrefix">0</int>

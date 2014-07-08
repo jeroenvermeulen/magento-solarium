@@ -30,4 +30,9 @@
             </action>
         </reference>
     </default>
+    <catalogsearch_result_index>
+        <reference name="content">
+            <block type="core/template" template="solarium/suggest.phtml" before="-" />
+        </reference>
+    </catalogsearch_result_index>
 </layout>
