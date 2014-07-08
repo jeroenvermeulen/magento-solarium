@@ -1,0 +1,6 @@
+
+<?php
+if(Mage::registry('solarium_suggest')): ?>
+    <ul class="messages"><li class="notice-msg"><ul><li><span><?php echo Mage::helper('jeroenvermeulen_solarium')->__('Did you mean: %s ?', implode(' , ',Mage::registry('solarium_suggest'))); ?></span></li></ul></li></ul>
+   <?php Mage::unregister('solarium_suggest'); ?>
+<?php endif; ?>

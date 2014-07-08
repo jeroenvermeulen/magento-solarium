@@ -491,7 +491,6 @@ class JeroenVermeulen_Solarium_Model_Engine
                         foreach($suggestion->getWords() as $word){
                             $suggestedWords[] = '<a href="' . Mage::getBaseUrl() . 'catalogsearch/result/?q=' .$word['word'] . '">' . $word['word'] . '</a>';
                         }
-
                     }
                     Mage::register('solarium_suggest', $suggestedWords);
                     $collation = $spellCheckResult->getCollation();
