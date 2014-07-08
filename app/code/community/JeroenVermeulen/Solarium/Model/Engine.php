@@ -455,7 +455,9 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query = $this->_client->createSelect();
             // Default field, needed when it is not specified in solrconfig.xml
             $query->addParam( 'df', 'text' );
-            $query->setQuery( $this->_filterString( $queryString ) );
+            $helper = $query->getHelper();
+            $escapedQueryString = $helper->escapePhrase($this->_filterString( $queryString ));
+            $query->setQuery($escapedQueryString);
             $query->setRows( $this->getConf( 'results/max' ) );
             $query->setFields( array( 'product_id', 'score' ) );
             if ( is_numeric( $storeId ) ) {
