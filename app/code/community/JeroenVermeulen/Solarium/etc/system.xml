@@ -25,7 +25,7 @@
 <config>
     <sections>
         <jeroenvermeulen_solarium translate="label" module="jeroenvermeulen_solarium">
-            <label><![CDATA[]]></label>
+            <label>Solarium Search</label>
             <tab>catalog</tab>
             <class>solarium-tab</class>
             <header_css>solarium-header</header_css>
