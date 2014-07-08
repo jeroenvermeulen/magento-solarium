@@ -42,9 +42,13 @@ class JeroenVermeulen_Solarium_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSearchIndexer() {
         if ( empty($this->_searchIndexerProcess) ) {
-            $factory = Mage::getSingleton('core/factory');
             /** @var Mage_Index_Model_Indexer $indexer */
-            $indexer = $factory->getSingleton( $factory->getIndexClassAlias() );
+            if ( version_compare( Mage::getVersion(), '1.8.0.0', '<' ) ) {
+                $indexer = Mage::getSingleton('index/indexer');
+            } else {
+                $factory = Mage::getSingleton('core/factory');
+                $indexer = $factory->getSingleton( $factory->getIndexClassAlias() );
+            }
             $this->_searchIndexerProcess = $indexer->getProcessByCode('catalogsearch_fulltext');
         }
         return $this->_searchIndexerProcess;
