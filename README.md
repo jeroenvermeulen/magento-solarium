@@ -13,13 +13,7 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 
 ## Installation & Usage
 
-  * Inside this repository you can find the [solrconfig.xml](https://github.com/jeroenvermeulen/magento-solarium/blob/master/app/code/community/JeroenVermeulen/Solarium/docs/solrconfig.xml) and [schema.xml](https://github.com/jeroenvermeulen/magento-solarium/blob/master/app/code/community/JeroenVermeulen/Solarium/docs/schema.xml)
-  * After installing this extension:
-    * Clear the Configuration cache
-    * Log out of the Admin
-    * Log in on the Admin again
-    * Configure and enable it via: *System > Configuration > CATALOG > Solarium Search*
-    * Reindex the *Catalog Search Index*, this will update Solr (if enabled)
+[The install instructions can be found on this Wiki page](https://github.com/jeroenvermeulen/magento-solarium/wiki/Installation-Instructions)
 
 ## Support
 
