@@ -1,6 +1,17 @@
-
 <?php
-if(Mage::registry('solarium_suggest')): ?>
-    <ul class="messages"><li class="notice-msg"><ul><li><span><?php echo Mage::helper('jeroenvermeulen_solarium')->__('Did you mean: %s ?', implode(' , ',Mage::registry('solarium_suggest'))); ?></span></li></ul></li></ul>
-   <?php Mage::unregister('solarium_suggest'); ?>
+$counter = 0;
+if ($suggestions = Mage::registry('solarium_suggest')): ?>
+    <ul class="messages">
+        <li class="notice-msg">
+            <ul>
+                <li><span>
+                <?php echo Mage::helper('jeroenvermeulen_solarium')->__('Did you mean: '); ?>
+                        <?php foreach ($suggestions as $suggestion): ?>
+                                <a href="<?php echo Mage::getUrl('catalogsearch/result', array('q' => $suggestion)); ?>"><?php echo $suggestion ?></a>
+                        <?php endforeach; ?>
+        </span></li>
+            </ul>
+        </li>
+    </ul>
+    <?php Mage::unregister('solarium_suggest'); ?>
 <?php endif; ?>
