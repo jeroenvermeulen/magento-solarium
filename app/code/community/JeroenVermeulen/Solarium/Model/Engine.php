@@ -453,12 +453,14 @@ class JeroenVermeulen_Solarium_Model_Engine
             $groupComponent->addField('product_id');
             $groupComponent->setLimit(1);
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
-            if ( $doAutoCorrect ) {
+            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean' ) );
+            if ( $doAutoCorrect || $doDidYouMean ) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
                 $spellCheck->setCollate( true );
                 $spellCheck->setCount( 1 );
                 $spellCheck->setMaxCollations( 1 );
+                $spellCheck->setExtendedResults(true);
                 $query->addParam( 'spellcheck.maxResultsForSuggest', 5 );
                 $query->addParam( 'spellcheck.count', 5 );
                 // You need Solr >= 4.0 for this to improve spell correct results.
@@ -471,40 +473,31 @@ class JeroenVermeulen_Solarium_Model_Engine
             $result               = array();
             foreach ( $solrResultSet->getGrouping()->getGroup('product_id') as $valueGroup ) {
                 foreach ( $valueGroup as $solrResult ) {
-                    $result[ ] = array( 'relevance' => $solrResult[ 'score' ],
-                                        'product_id' => $solrResult[ 'product_id' ] );
+                    $key = 'prd' . $solrResult[ 'product_id' ];
+                    $result[ $key ] = array( 'relevance' => $solrResult[ 'score' ],
+                                             'product_id' => $solrResult[ 'product_id' ] );
                 }
             }
-            $correctedQueryString = false;
-            if ( $doAutoCorrect ) {
+            if ( $doAutoCorrect || $doDidYouMean ) {
+                $suggest = array();
                 $spellCheckResult = $solrResultSet->getSpellcheck();
                 if ( $spellCheckResult && !$spellCheckResult->getCorrectlySpelled() ) {
                     $suggestions = $spellCheckResult->getSuggestions();
-                    $suggestedWords = array();
                     foreach($suggestions as $suggestion){
                         foreach($suggestion->getWords() as $word){
-                            $suggestedWords[] = $word['word'];
-                        }
-                    }
-                    Mage::register('solarium_suggest', $suggestedWords);
-                    $collation = $spellCheckResult->getCollation();
-                    if ( $collation ) {
-                        $correctedQueryString = $collation->getQuery();
-                    }
-                    if ( empty( $correctedQueryString ) ) {
-
-                        if ( !empty( $suggestions ) ) {
-                            $words = array();
-                            /** @var Solarium\QueryType\Select\Result\Spellcheck\Suggestion $suggestion */
-                            foreach ( $suggestions as $suggestion ) {
-                                $words[] = $suggestion->getWord();
+                            if ( $word['freq'] > $suggestion->getOriginalFrequency() ) {
+                                $suggest[ $word['word'] ] = $word['freq'];
                             }
-                            $correctedQueryString = implode( ' ', $words );
                         }
                     }
-                    if ( !empty( $correctedQueryString ) ) {
-                        // Add results from auto correct
-                        $result = array_merge( $result, $this->search( $storeId, $correctedQueryString, $try + 1 ) );
+                    arsort( $suggest, SORT_NUMERIC );
+                    if ( $doAutoCorrect && empty($result) && !empty($suggest) ) {
+                        $bestMatch = reset( array_keys($suggest) );
+                        array_shift($suggest);
+                        $result = $this->search( $storeId, $bestMatch, $try+1 );
+                    }
+                    if ( $doDidYouMean ) {
+                        Mage::register('solarium_suggest', $suggest);
                     }
                 }
             }

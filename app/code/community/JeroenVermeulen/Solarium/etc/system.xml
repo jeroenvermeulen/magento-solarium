@@ -159,15 +159,15 @@
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-                        <max translate="label">
-                            <label>Maximum Number of Results</label>
+                        <autocomplete_suggestions translate="label">
+                            <label>Nr of Autocomplete Suggestions</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
-                            <validate>validate-greater-than-zero</validate>
+                            <validate>validate-zero-or-greater</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </max>
+                        </autocomplete_suggestions>
                         <autocorrect translate="label">
                             <label>Auto Correct Search Terms</label>
                             <frontend_type>select</frontend_type>
@@ -177,15 +177,24 @@
                             <show_in_store>1</show_in_store>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </autocorrect>
-                        <autocomplete_suggestions translate="label">
-                            <label>Nr of Autocomplete Suggestions</label>
-                            <frontend_type>text</frontend_type>
+                        <did_you_mean translate="label">
+                            <label>Display "did you mean"</label>
+                            <frontend_type>select</frontend_type>
                             <sort_order>30</sort_order>
-                            <validate>validate-zero-or-greater</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </autocomplete_suggestions>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </did_you_mean>
+                        <max translate="label">
+                            <label>Maximum Number of Results</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <validate>validate-greater-than-zero</validate>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </max>
                     </fields>
                 </results>
                 <reindexing>
