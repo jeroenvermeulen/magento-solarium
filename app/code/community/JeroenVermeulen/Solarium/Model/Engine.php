@@ -412,6 +412,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     public function getDocumentCount( $storeId = null ) {
         $query = $this->_client->createSelect();
+        $query->setQueryDefaultField( 'text' );
         $query->setRows( 0 );
         $query->setFields( array( 'product_id' ) );
         if ( is_numeric( $storeId ) ) {
@@ -439,7 +440,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query = $this->_client->createSelect();
             $queryHelper = $query->getHelper();
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
-            $query->setFields( array('text') );
+            $query->setQueryDefaultField( array('text') );
             $query->setQuery( $escapedQueryString );
             $query->setRows( $this->getConf( 'results/max' ) );
             $query->setFields( array( 'product_id', 'score' ) );
@@ -447,6 +448,10 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
             $query->addSort( 'score', $query::SORT_DESC );
+            // Group by product_id to prevent double results.
+            $groupComponent = $query->getGrouping();
+            $groupComponent->addField('product_id');
+            $groupComponent->setLimit(1);
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
@@ -462,11 +467,12 @@ class JeroenVermeulen_Solarium_Model_Engine
             $solrResultSet        = $this->_client->select( $query );
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
-            foreach ( $solrResultSet as $solrResult ) {
-                $result[ ] = array( 'relevance' => $solrResult[ 'score' ],
-                                    'product_id' => $solrResult[ 'product_id' ] );
+            foreach ( $solrResultSet->getGrouping()->getGroup('product_id') as $valueGroup ) {
+                foreach ( $valueGroup as $solrResult ) {
+                    $result[ ] = array( 'relevance' => $solrResult[ 'score' ],
+                                        'product_id' => $solrResult[ 'product_id' ] );
+                }
             }
-
             $correctedQueryString = false;
             if ( $doAutoCorrect ) {
                 $spellCheckResult = $solrResultSet->getSpellcheck();
@@ -508,9 +514,10 @@ class JeroenVermeulen_Solarium_Model_Engine
         // Create basic query with wildcard
         $query = $this->_client->createSelect();
         $queryHelper = $query->getHelper();
+        $escapedQueryString = $queryHelper->escapeTerm( strtolower($queryString) );
 
-        $query->setFields('text');
-        $query->setQuery( $queryHelper->escapeTerm($queryString).'*' );
+        $query->setQueryDefaultField( 'text' );
+        $query->setQuery( $escapedQueryString.'*' );
         $query->setRows( 0 );
 
         if ( !empty( $storeId ) ) {
@@ -528,7 +535,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField->setField('text');
         $facetField->setMincount(1);
         $facetField->setLimit( $this->getConf('results/autocomplete_suggestions') );
-        $facetField->setPrefix( $queryHelper->escapeTerm($queryString) );
+        $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select($query);
 

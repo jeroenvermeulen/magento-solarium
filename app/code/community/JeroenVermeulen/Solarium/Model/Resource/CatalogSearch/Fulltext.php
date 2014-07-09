@@ -32,37 +32,40 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
     public function prepareResult( $object, $queryText, $query ) {
-        // If the query is already processed, this means Magento has cached the search result already.
-        if ( !$query->getIsProcessed() ) {
-            if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
-                $adapter           = $this->_getWriteAdapter();
-                $searchResultTable = $this->getTable( 'catalogsearch/result' );
-                /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-                $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-                if ( $engine->isWorking() ) {
-                    $searchResult = $engine->search( $query->getStoreId(), $queryText );
-                    if ( false !== $searchResult ) {
-                        if ( 0 == count($searchResult) ) {
-                            // No results, we need to check if the index is empty.
-                            if ( $engine->isEmpty( $query->getStoreId() ) ) {
-                                Mage::Log( sprintf('%s - Warning: index is empty', __CLASS__), Zend_Log::WARN );
-                            } else {
-                                $query->setIsProcessed( 1 );
-                            }
+        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
+            $adapter           = $this->_getWriteAdapter();
+            $searchResultTable = $this->getTable( 'catalogsearch/result' );
+            /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
+            $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            if ( $engine->isWorking() ) {
+                $searchResult = $engine->search( $query->getStoreId(), $queryText );
+                if ( false !== $searchResult ) {
+                    if ( 0 == count($searchResult) ) {
+                        // No results, we need to check if the index is empty.
+                        if ( $engine->isEmpty( $query->getStoreId() ) ) {
+                            Mage::Log( sprintf('%s - Warning: index is empty', __CLASS__), Zend_Log::WARN );
                         } else {
-                            foreach ( $searchResult as $data ) {
-                                $data[ 'query_id' ] = $query->getId();
-                                $adapter->insertOnDuplicate( $searchResultTable, $data, array( 'relevance' ) );
-                            }
                             $query->setIsProcessed( 1 );
                         }
+                    } else {
+                        $columns = array('query_id','product_id','relevance');
+                        $insertRows = array();
+                        $queryId = $query->getId();
+                        foreach ( $searchResult as $data ) {
+                            $insertRows[] = array( $queryId, $data['product_id'], $data['relevance'] );
+                        }
+                        $adapter->beginTransaction();
+                        $adapter->delete( $searchResultTable, 'query_id = '.$queryId );
+                        $adapter->insertArray( $searchResultTable, $columns, $insertRows );
+                        $adapter->commit();
+                        $query->setIsProcessed( 1 );
                     }
                 }
             }
-            if ( !$query->getIsProcessed() ) {
-                Mage::log( 'Solr disabled or something went wrong, fallback to Magento Fulltext Search', Zend_Log::WARN );
-                return parent::prepareResult( $object, $queryText, $query );
-            }
+        }
+        if ( !$query->getIsProcessed() ) {
+            Mage::log( 'Solr disabled or something went wrong, fallback to Magento Fulltext Search', Zend_Log::WARN );
+            return parent::prepareResult( $object, $queryText, $query );
         }
         return $this;
     }
