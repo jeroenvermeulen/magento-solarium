@@ -450,6 +450,12 @@ class JeroenVermeulen_Solarium_Model_Engine
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
             if ( $doAutoCorrect ) {
                 $spellCheck = $query->getSpellcheck();
+                $spellCheck->setQuery( $queryString );
+                $spellCheck->setCollate( true );
+                $spellCheck->setCount( 1 );
+                $spellCheck->setMaxCollations( 1 );
+                $query->addParam( 'spellcheck.maxResultsForSuggest', 5 );
+                $query->addParam( 'spellcheck.count', 5 );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
