@@ -29,20 +29,17 @@
         <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
         <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
         <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
-            <analyzer type="index">
+            <analyzer>
                 <tokenizer class="solr.StandardTokenizerFactory"/>
                 <filter class="solr.LowerCaseFilterFactory"/>
-            </analyzer>
-            <analyzer type="query">
-                <tokenizer class="solr.StandardTokenizerFactory"/>
-                <filter class="solr.LowerCaseFilterFactory"/>
+                <filter class="solr.ShingleFilterFactory" maxShingleSize="3" outputUnigrams="true"/>
             </analyzer>
         </fieldType>
     </types>
 
     <fields>
-        <!-- Magento Fulltext Id -->
-        <field name="id" type="int" indexed="true" stored="true" required="true"/>
+        <!-- Magento Fulltext Id, uniqueKey needs to be a string for QueryElevationComponent  -->
+        <field name="id" type="string" indexed="true" stored="true" required="true"/>
 
         <!-- Magento Product Id, must be a string to be able to group by in Solr 3.x -->
         <field name="product_id" type="string" indexed="true" stored="true" required="true"/>
@@ -51,12 +48,14 @@
         <field name="store_id" type="int" indexed="true" stored="true" required="true"/>
 
         <!-- Magento Product Fulltext -->
-        <field name="text" type="text_general" indexed="true" stored="true"/>
+        <field name="text" type="text_general" indexed="true" stored="false"/>
 
         <field name="_version_" type="long" indexed="true" stored="true"/>
     </fields>
 
     <uniqueKey>id</uniqueKey>
+
+    <defaultSearchField>text</defaultSearchField>
 
     <solrQueryParser defaultOperator="AND"/>
 

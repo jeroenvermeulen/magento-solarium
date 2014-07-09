@@ -20,8 +20,14 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_Helper_Data
+ *
+ * Usage:   $helper = Mage::helper( 'jeroenvermeulen_solarium' );
+ */
 class JeroenVermeulen_Solarium_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    protected $_searchIndexerProcess = false;
 
     /**
      * @return string
@@ -31,4 +37,20 @@ class JeroenVermeulen_Solarium_Helper_Data extends Mage_Core_Helper_Abstract
         return strval( Mage::getConfig()->getNode()->modules->JeroenVermeulen_Solarium->version );
     }
 
+    /**
+     * @return false|Mage_Index_Model_Process
+     */
+    public function getSearchIndexer() {
+        if ( empty($this->_searchIndexerProcess) ) {
+            /** @var Mage_Index_Model_Indexer $indexer */
+            if ( version_compare( Mage::getVersion(), '1.8.0.0', '<' ) ) {
+                $indexer = Mage::getSingleton('index/indexer');
+            } else {
+                $factory = Mage::getSingleton('core/factory');
+                $indexer = $factory->getSingleton( $factory->getIndexClassAlias() );
+            }
+            $this->_searchIndexerProcess = $indexer->getProcessByCode('catalogsearch_fulltext');
+        }
+        return $this->_searchIndexerProcess;
+    }
 }

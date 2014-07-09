@@ -24,71 +24,23 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
 {
 
     /**
-     * @param int $storeId - Store View Id
-     * @param int|array|null $productIds - Product Entity Id(s)
-     * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
-     */
-    public function cleanIndex( $storeId = null, $productIds = null ) {
-        parent::cleanIndex( $storeId, $productIds );
-        /**
-         * If it is enabled for one store, clean for the current store.
-         * This is needed to clean up when you switch Solarium Search from enable to disable for a store.
-         */
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled() ) {
-            Mage::getSingleton( 'jeroenvermeulen_solarium/engine' )->cleanIndex( $storeId, $productIds );
-        }
-        return $this;
-    }
-
-    /**
-     * @param  int|null $storeId - Store View Id
-     * @param  int|array|null $productIds - Product Entity Id(s)
-     * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
-     */
-    public function rebuildIndex( $storeId = null, $productIds = null ) {
-        parent::rebuildIndex( $storeId, $productIds );
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId ) ) {
-            $helper       = Mage::helper( 'jeroenvermeulen_solarium' );
-            $engine       = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            $startTime    = microtime( true );
-            $ok           = $engine->rebuildIndex( $storeId, $productIds );
-            $timeUsed     = microtime( true ) - $startTime;
-            // When product IDs are supplied, it is an automatic update, and we should not show messages.
-            if ( null == $productIds ) {
-                if ( $ok ) {
-                    $message = $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) );
-                    if ( $engine->isShellScript() ) {
-                        echo $message . "\n";
-                    } else {
-                        Mage::getSingleton( 'adminhtml/session' )->addSuccess( $message );
-                    }
-                } else {
-                    $message = $helper->__( 'Error reindexing Solr: %s', $engine->getLastError() );
-                    if ( $engine->isShellScript() ) {
-                        echo $message . "\n";
-                    } else {
-                        Mage::getSingleton( 'adminhtml/session' )->addError( $message );
-                    }
-                }
-            }
-        }
-        return $this;
-    }
-
-    /**
+     * This function is called when a visitor searches
+     *
      * @param Mage_CatalogSearch_Model_Fulltext $object
      * @param string $queryText
      * @param Mage_CatalogSearch_Model_Query $query
      * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
     public function prepareResult( $object, $queryText, $query ) {
+        // If the query is already processed, this means Magento has cached the search result already.
         if ( !$query->getIsProcessed() ) {
             if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
                 $adapter           = $this->_getWriteAdapter();
                 $searchResultTable = $this->getTable( 'catalogsearch/result' );
+                /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
                 $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
                 if ( $engine->isWorking() ) {
-                    $searchResult = $engine->query( $query->getStoreId(), $queryText );
+                    $searchResult = $engine->search( $query->getStoreId(), $queryText );
                     if ( false !== $searchResult ) {
                         if ( 0 == count($searchResult) ) {
                             // No results, we need to check if the index is empty.
