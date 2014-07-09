@@ -40,7 +40,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
                 $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
                 if ( $engine->isWorking() ) {
-                    $searchResult = $engine->query( $query->getStoreId(), $queryText );
+                    $searchResult = $engine->search( $query->getStoreId(), $queryText );
                     if ( false !== $searchResult ) {
                         if ( 0 == count($searchResult) ) {
                             // No results, we need to check if the index is empty.
