@@ -12,10 +12,15 @@ Testing Solarium Search
   * Frontend: Search with small typo
   * The search must return results, correcting the typo
 
-## Auto Suggest
+## Auto Complete
 
   * Frontend: Type the first 3 letters of longer word from a product title
   * It must show a box suggesting the whole word
+
+## Multi Word Auto Complete
+
+  * Frontend: Type a whole word and then one letter from a product title
+  * It must show a box suggesting multiple words
 
 ## Product Save
 
@@ -32,4 +37,9 @@ Testing Solarium Search
   * Delete the product in the backend
   * Search for the title in the frontend again
   * It must no longer return the product
+
+## Searching for words which are apart in the text
+
+  * Search for two words which are in a product title but not next to each other
+  * The Auto Complete will not work, but searching must return results
 
