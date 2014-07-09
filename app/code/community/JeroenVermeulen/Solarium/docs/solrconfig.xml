@@ -114,7 +114,7 @@
     </requestHandler>
 
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
-        <str name="queryAnalyzerFieldType">text_general</str>
+        <str name="queryAnalyzerFieldType">text_search</str>
         <lst name="spellchecker">
             <str name="field">text</str>
             <int name="maxEdits">2</int>
