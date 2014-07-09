@@ -16,7 +16,8 @@
 /app/design/frontend/base/default/etc
 /app/design/frontend/base/default/layout/*.xml
 /app/design/frontend/base/default/layout/sales
-/app/design/frontend/base/default/template
+/app/design/frontend/base/default/template/*
+!/app/design/frontend/base/default/template/solarium
 /app/design/frontend/default
 /app/design/install
 /app/etc/modules/Cm_*
