@@ -30,7 +30,7 @@
 
     <dataDir>${solr.data.dir:}</dataDir>
 
-    <codecFactory class="solr.SchemaCodecFactory"/>
+    <codecFactory  class="solr.SchemaCodecFactory"/>
 
     <schemaFactory class="ClassicIndexSchemaFactory"/>
 
@@ -76,42 +76,25 @@
         <httpCaching never304="true"/>
     </requestDispatcher>
 
-    <requestHandler name="/select" class="solr.SearchHandler">
+    <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
         <lst name="defaults">
-            <str name="df">text</str>
-            <str name="spellcheck.count">1</str>
-            <str name="spellcheck.maxResultsForSuggest">1</str>
-            <str name="spellcheck.collate">true</str>
-            <str name="spellcheck.maxCollations">1</str>
+            <!-- These defaults are required for Solr < 3.6 -->
+            <str name="field">text</str>
+            <str name="qt">/select</str>
+            <str name="q">solrpingquery</str>
         </lst>
+    </requestHandler>
 
+    <requestHandler name="/select" class="solr.SearchHandler">
         <arr name="last-components">
             <str>spellcheck</str>
         </arr>
     </requestHandler>
 
-    <requestHandler name="/update" class="solr.XmlUpdateRequestHandler">
-    </requestHandler>
-
-    <requestHandler name="/analysis/field"
-                    startup="lazy"
-                    class="solr.FieldAnalysisRequestHandler"/>
-
-    <requestHandler name="/analysis/document"
-                    class="solr.DocumentAnalysisRequestHandler"
-                    startup="lazy"/>
-
-    <requestHandler name="/admin/"
-                    class="solr.admin.AdminHandlers"/>
-
-    <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
-        <lst name="invariants">
-            <str name="q">solrpingquery</str>
-        </lst>
-        <lst name="defaults">
-            <str name="echoParams">all</str>
-        </lst>
-    </requestHandler>
+    <requestHandler name="/update"            class="solr.XmlUpdateRequestHandler" />
+    <requestHandler name="/analysis/field"    class="solr.FieldAnalysisRequestHandler"    startup="lazy" />
+    <requestHandler name="/analysis/document" class="solr.DocumentAnalysisRequestHandler" startup="lazy" />
+    <requestHandler name="/admin/"            class="solr.admin.AdminHandlers" />
 
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
         <str name="queryAnalyzerFieldType">text_general</str>
@@ -127,9 +110,5 @@
     <queryResponseWriter name="json" class="solr.JSONResponseWriter">
         <str name="content-type">text/plain; charset=UTF-8</str>
     </queryResponseWriter>
-
-    <admin>
-        <defaultQuery>*:*</defaultQuery>
-    </admin>
 
 </config>

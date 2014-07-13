@@ -201,9 +201,10 @@
                 <requires_authentication>0</requires_authentication>
             </server>
             <results>
-                <max>100</max>
-                <autocorrect>1</autocorrect>
                 <autocomplete_suggestions>25</autocomplete_suggestions>
+                <autocorrect>1</autocorrect>
+                <did_you_mean>1</did_you_mean>
+                <max>100</max>
             </results>
             <reindexing>
                 <buffersize>100</buffersize>

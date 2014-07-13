@@ -18,9 +18,32 @@
  * @copyright   Copyright (c) 2014 Jeroen Vermeulen (http://www.jeroenvermeulen.eu)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-ul.tabs a.solarium-tab span:after, ul.tabs a.solarium-tab:hover span:after {
-    content:url('../../images/jeroenvermeulen/solarium/logo_small.png'); }
 
-h3.solarium-header { margin-top:-15px; }
+ul.tabs a.solarium-tab:after, ul.tabs a.solarium-tab:hover:after {
+    display: block;
+    padding-left: 1.5em;
+    margin-top: -25px;
+    content:url('../../images/jeroenvermeulen/solarium/logo_small.png');
+}
 
-.solarium-header:after { content:url('../../images/jeroenvermeulen/solarium/logo_large.png'); }
+ul.tabs a.solarium-tab span {
+    color: #E7EFEF;
+}
+
+ul.tabs a.solarium-tab:hover span {
+    color: #D8E6E6;
+}
+
+ul.tabs a.solarium-tab.active span, ul.tabs a.solarium-tab.active:hover span {
+    color: #FFFFFF;
+}
+
+h3.solarium-header {
+    margin-top:-15px;
+    font-size: 0;
+}
+
+h3.solarium-header:after {
+    display: block;
+    content:url('../../images/jeroenvermeulen/solarium/logo_large.png');
+}

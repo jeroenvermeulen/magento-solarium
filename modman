@@ -1,31 +1,31 @@
 ## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
 
-# Extension Dir
-app/code/community/JeroenVermeulen/Solarium/                                app/code/community/JeroenVermeulen/Solarium/
-
-# Frontend layout
+# Magento User Interface - File                 == Frontend layout
 app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml        app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml
 
-# Backend layout
+# Magento User Interface - File                 == Backend layout
 app/design/adminhtml/default/default/layout/jeroenvermeulen/solarium.xml    app/design/adminhtml/base/default/layout/jeroenvermeulen/solarium.xml
 
-# Magento global configuration module XML
+# Magento Global Config - File                  == Module enable XML
 app/etc/modules/JeroenVermeulen_Solarium.xml                                app/etc/modules/JeroenVermeulen_Solarium.xml
 
-# Translation
-app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
-
-# JavaScript libraries
+# Magento Other web accessible - Recursive Dir  == JavaScript libraries
 js/solarium/                                                                js/solarium/
 
-# The Solarium Library, by Bas de Nooijer
+# Magento PHP Library file - Recursive Dir      == The Solarium Library, by Bas de Nooijer
 lib/Solarium/                                                               lib/Solarium/
 
-# The EventDispatcher component from the Symfony framework
+# Magento PHP Library file - Recursive Dir      == The EventDispatcher component from the Symfony framework
 lib/Symfony/Component/EventDispatcher/                                      lib/Symfony/Component/EventDispatcher/
 
-# Backend CSS File
+# Magento Theme Skin - File                     == Backend CSS file
 skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css             skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css
 
-# Backend Image Files
+# Magento Theme Skin - Recursive Dir            == Backend image files
 skin/adminhtml/default/default/images/jeroenvermeulen/solarium/             skin/adminhtml/default/default/images/jeroenvermeulen/solarium/
+
+# Magento Community Module - Recursive Dir      == Extension code dir
+app/code/community/JeroenVermeulen/Solarium/                                app/code/community/JeroenVermeulen/Solarium/
+
+# Magento Locale language - File                == Dutch translation
+app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv

@@ -102,7 +102,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $enabledStoreIds = $this->getEnabledStoreIds();
         if ( !empty( $enabledStoreIds ) ) {
             $this->_client  = new Solarium\Client( $this->_getSolariumClientConfig() );
-            $this->_working = $this->ping();
+            $this->setWorking( $this->ping() );
         } else {
             // This should not happen, you should not construct this class when it is disabled.
             $this->_lastError = new Exception(
@@ -265,10 +265,7 @@ class JeroenVermeulen_Solarium_Model_Engine
          */
         $result = false;
         try {
-            $query = $this->_client->createPing();
-            // Default field, needed when it is not specified in solrconfig.xml
-            $query->addParam( 'qt', '/select' ); // Needed for Solr < 3.6
-            $query->addParam( 'df', 'text' );
+            $query          = $this->_client->createPing();
             // Not 100% sure if this setTimeAllowed works.
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solariumResult = $this->_client->ping( $query );
@@ -354,7 +351,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $deleteQuery = $this->_client->createUpdate();
                     $deleteQuery->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
                     // No commit yet, will be done after BufferedAdd
-                    $result = $this->_client->update($deleteQuery);
+                    $this->_client->update($deleteQuery);
                 }
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
@@ -415,8 +412,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     public function getDocumentCount( $storeId = null ) {
         $query = $this->_client->createSelect();
-        // Default field, needed when it is not specified in solrconfig.xml
-        $query->addParam( 'df', 'text' );
+        $query->setQueryDefaultField( 'text' );
         $query->setRows( 0 );
         $query->setFields( array( 'product_id' ) );
         if ( is_numeric( $storeId ) ) {
@@ -435,60 +431,73 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param int $try - Times tried to find result
      * @return array
      */
-    public function query( $storeId, $queryString, $try = 1 ) {
+    public function search( $storeId, $queryString, $try = 1 ) {
         if ( !$this->_working ) {
             return false;
         }
         $result = false;
         try {
             $query = $this->_client->createSelect();
-            // Default field, needed when it is not specified in solrconfig.xml
-            $query->addParam( 'df', 'text' );
-            $query->setQuery( $this->_filterString( $queryString ) );
+            $queryHelper = $query->getHelper();
+            $escapedQueryString = $queryHelper->escapeTerm( $queryString );
+            $query->setQueryDefaultField( array('text') );
+            $query->setQuery( $escapedQueryString );
             $query->setRows( $this->getConf( 'results/max' ) );
             $query->setFields( array( 'product_id', 'score' ) );
             if ( is_numeric( $storeId ) ) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
             $query->addSort( 'score', $query::SORT_DESC );
+            // Group by product_id to prevent double results.
+            $groupComponent = $query->getGrouping();
+            $groupComponent->addField('product_id');
+            $groupComponent->setLimit(1);
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
-            if ( $doAutoCorrect ) {
+            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean' ) );
+            if ( $doAutoCorrect || $doDidYouMean ) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
+                $spellCheck->setCollate( true );
+                $spellCheck->setCount( 1 );
+                $spellCheck->setMaxCollations( 1 );
+                $spellCheck->setExtendedResults(true);
+                $query->addParam( 'spellcheck.maxResultsForSuggest', 5 );
+                $query->addParam( 'spellcheck.count', 5 );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solrResultSet        = $this->_client->select( $query );
+
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
-            foreach ( $solrResultSet as $solrResult ) {
-                $result[ ] = array( 'relevance' => $solrResult[ 'score' ],
-                                    'product_id' => $solrResult[ 'product_id' ] );
+            foreach ( $solrResultSet->getGrouping()->getGroup('product_id') as $valueGroup ) {
+                foreach ( $valueGroup as $solrResult ) {
+                    $key = 'prd' . $solrResult[ 'product_id' ];
+                    $result[ $key ] = array( 'relevance' => $solrResult[ 'score' ],
+                                             'product_id' => $solrResult[ 'product_id' ] );
+                }
             }
-
-            $correctedQueryString = false;
-            if ( $doAutoCorrect ) {
+            if ( $doAutoCorrect || $doDidYouMean ) {
+                $suggest = array();
                 $spellCheckResult = $solrResultSet->getSpellcheck();
                 if ( $spellCheckResult && !$spellCheckResult->getCorrectlySpelled() ) {
-                    $collation = $spellCheckResult->getCollation();
-                    if ( $collation ) {
-                        $correctedQueryString = $collation->getQuery();
-                    }
-                    if ( empty( $correctedQueryString ) ) {
-                        $suggestions = $spellCheckResult->getSuggestions();
-                        if ( !empty( $suggestions ) ) {
-                            $words = array();
-                            /** @var Solarium\QueryType\Select\Result\Spellcheck\Suggestion $suggestion */
-                            foreach ( $suggestions as $suggestion ) {
-                                $words[] = $suggestion->getWord();
+                    $suggestions = $spellCheckResult->getSuggestions();
+                    foreach($suggestions as $suggestion){
+                        foreach($suggestion->getWords() as $word){
+                            if ( $word['freq'] > $suggestion->getOriginalFrequency() ) {
+                                $suggest[ $word['word'] ] = $word['freq'];
                             }
-                            $correctedQueryString = implode( ' ', $words );
                         }
                     }
-                    if ( !empty( $correctedQueryString ) ) {
-                        // Add results from auto correct
-                        $result = array_merge( $result, $this->query( $storeId, $correctedQueryString, $try + 1 ) );
+                    arsort( $suggest, SORT_NUMERIC );
+                    if ( $doAutoCorrect && empty($result) && !empty($suggest) ) {
+                        $bestMatch = reset( array_keys($suggest) );
+                        array_shift($suggest);
+                        $result = $this->search( $storeId, $bestMatch, $try+1 );
+                    }
+                    if ( $doDidYouMean ) {
+                        Mage::register('solarium_suggest', $suggest);
                     }
                 }
             }
@@ -505,13 +514,16 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @return null|string
      */
     public function getAutoSuggestions( $storeId, $queryString ) {
-        //create basic query with wildcard
+        // Create basic query with wildcard
         $query = $this->_client->createSelect();
-        $query->setFields('text');
-        $query->setQuery( $queryString . '*' );
-        $query->setRows(0);
+        $queryHelper = $query->getHelper();
+        $escapedQueryString = $queryHelper->escapeTerm( strtolower($queryString) );
 
-        if ( is_numeric( $storeId ) ) {
+        $query->setQueryDefaultField( 'text' );
+        $query->setQuery( $escapedQueryString.'*' );
+        $query->setRows( 0 );
+
+        if ( !empty( $storeId ) ) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
         }
 
@@ -520,13 +532,13 @@ class JeroenVermeulen_Solarium_Model_Engine
         $groupComponent->setFacet(true);
         $groupComponent->setLimit(1);
 
-        //add facet for completion
+        // Add facet for completion
         $facetSet = $query->getFacetSet();
         $facetField = $facetSet->createFacetField('text');
         $facetField->setField('text');
         $facetField->setMincount(1);
         $facetField->setLimit( $this->getConf('results/autocomplete_suggestions') );
-        $facetField->setPrefix($queryString);
+        $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select($query);
 
