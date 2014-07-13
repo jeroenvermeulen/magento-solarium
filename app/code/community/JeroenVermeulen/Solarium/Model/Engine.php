@@ -492,7 +492,8 @@ class JeroenVermeulen_Solarium_Model_Engine
                     }
                     arsort( $suggest, SORT_NUMERIC );
                     if ( $doAutoCorrect && empty($result) && !empty($suggest) ) {
-                        $bestMatch = reset( array_keys($suggest) );
+                        $suggestKeys = array_keys($suggest);
+                        $bestMatch = reset($suggestKeys);
                         array_shift($suggest);
                         $result = $this->search( $storeId, $bestMatch, $try+1 );
                     }

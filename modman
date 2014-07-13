@@ -1,31 +1,45 @@
 ## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
 
-# Magento User Interface - File                 == Frontend layout
+# ---- Frontend layout
+# Magento User Interface       - File          - frontend/base/default/layout/jeroenvermeulen/solarium.xml
 app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml        app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml
 
-# Magento User Interface - File                 == Backend layout
+# ---- Frontend layout
+# Magento User Interface       - Recursive Dir - frontend/base/default/template/jeroenvermeulen/solarium
+app/design/frontend/base/default/template/jeroenvermeulen/solarium/         app/design/frontend/base/default/template/jeroenvermeulen/solarium/
+
+# ---- Backend layout
+# Magento User Interface       - File          - adminhtml/default/default/layout/jeroenvermeulen/solarium.xml
 app/design/adminhtml/default/default/layout/jeroenvermeulen/solarium.xml    app/design/adminhtml/base/default/layout/jeroenvermeulen/solarium.xml
 
-# Magento Global Config - File                  == Module enable XML
+# ---- Module enable XML
+# Magento Global Config        - File          - modules/JeroenVermeulen_Solarium.xml
 app/etc/modules/JeroenVermeulen_Solarium.xml                                app/etc/modules/JeroenVermeulen_Solarium.xml
 
-# Magento Other web accessible - Recursive Dir  == JavaScript libraries
+# ---- JavaScript libraries
+# Magento Other web accessible - Recursive Dir - js/solarium
 js/solarium/                                                                js/solarium/
 
-# Magento PHP Library file - Recursive Dir      == The Solarium Library, by Bas de Nooijer
+# ---- The Solarium Library, by Bas de Nooijer
+# Magento PHP Library file     - Recursive Dir - Solarium
 lib/Solarium/                                                               lib/Solarium/
 
-# Magento PHP Library file - Recursive Dir      == The EventDispatcher component from the Symfony framework
+# ---- The EventDispatcher component from the Symfony framework
+# Magento PHP Library file     - Recursive Dir - Symfony/Component/EventDispatcher
 lib/Symfony/Component/EventDispatcher/                                      lib/Symfony/Component/EventDispatcher/
 
-# Magento Theme Skin - File                     == Backend CSS file
+# ---- Backend CSS file
+# Magento Theme Skin           - File          - adminhtml/default/default/css/jeroenvermeulen/solarium.css
 skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css             skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css
 
-# Magento Theme Skin - Recursive Dir            == Backend image files
+# ---- Backend image files
+# Magento Theme Skin           - Recursive Dir - adminhtml/default/default/images/jeroenvermeulen/solarium
 skin/adminhtml/default/default/images/jeroenvermeulen/solarium/             skin/adminhtml/default/default/images/jeroenvermeulen/solarium/
 
-# Magento Community Module - Recursive Dir      == Extension code dir
+# ---- Extension code dir
+# Magento Community Module     - Recursive Dir - JeroenVermeulen/Solarium
 app/code/community/JeroenVermeulen/Solarium/                                app/code/community/JeroenVermeulen/Solarium/
 
-# Magento Locale language - File                == Dutch translation
+# ---- Dutch translation
+# Magento Locale language      - File          - nl_NL/JeroenVermeulen_Solarium.csv
 app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
