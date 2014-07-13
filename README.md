@@ -8,6 +8,16 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 
 This extension is also on [Magento Connect](http://www.magentocommerce.com/magento-connect/solr-search-based-on-solarium.html).
 
+## Features
+
+  * Free and Open Source
+  * Fast results
+  * Can handle high number of products
+  * Autocomplete search query while typing
+  * Autocorrect typos in search terms
+  * Solr 3 & 4 support
+  * Solr HTTP authentication support
+
 ## Requirements
 
   * Magento Community Edition 1.6+
