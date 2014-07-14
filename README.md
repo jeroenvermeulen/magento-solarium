@@ -15,6 +15,7 @@ This extension is also on [Magento Connect](http://www.magentocommerce.com/magen
   * Can handle high number of products
   * Autocomplete search query while typing
   * Autocorrect typos in search terms
+  * "Did you mean..." suggestions
   * Solr 3 & 4 support
   * Solr HTTP authentication support
 
