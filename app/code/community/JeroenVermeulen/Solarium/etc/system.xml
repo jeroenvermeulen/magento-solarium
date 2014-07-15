@@ -169,7 +169,7 @@
                             <show_in_store>1</show_in_store>
                         </autocomplete_suggestions>
                         <autocorrect translate="label">
-                            <label>Auto Correct Search Terms</label>
+                            <label>Correct Search Terms Typos</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
@@ -178,7 +178,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </autocorrect>
                         <did_you_mean translate="label">
-                            <label>Display "did you mean"</label>
+                            <label>Display "Did you mean..."</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
@@ -186,10 +186,22 @@
                             <show_in_store>1</show_in_store>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </did_you_mean>
+                        <did_you_mean_suggestions translate="label">
+                            <label>"Did you mean..." Suggestions</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <validate>validate-zero-or-greater</validate>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <did_you_mean>1</did_you_mean>
+                            </depends>
+                        </did_you_mean_suggestions>
                         <max translate="label">
                             <label>Maximum Number of Results</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
+                            <sort_order>50</sort_order>
                             <validate>validate-greater-than-zero</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

@@ -205,6 +205,7 @@
                 <autocomplete_suggestions>25</autocomplete_suggestions>
                 <autocorrect>1</autocorrect>
                 <did_you_mean>1</did_you_mean>
+                <did_you_mean_suggestions>5</did_you_mean_suggestions>
                 <max>100</max>
             </results>
             <reindexing>

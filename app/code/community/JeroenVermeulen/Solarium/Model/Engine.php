@@ -503,7 +503,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
-            $query->setRows( $this->getConf( 'results/max' ) );
+            $query->setRows( $this->getConf( 'results/max', $storeId ) );
             $query->setFields( array( 'product_id', 'score' ) );
             if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
@@ -513,8 +513,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             $groupComponent = $query->getGrouping();
             $groupComponent->addField( 'product_id' );
             $groupComponent->setLimit( 1 );
-            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
-            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean' ) );
+            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect', $storeId ) );
+            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean', $storeId ) );
             if ($doAutoCorrect || $doDidYouMean) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
@@ -522,12 +522,13 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $spellCheck->setCount( 1 );
                 $spellCheck->setMaxCollations( 1 );
                 $spellCheck->setExtendedResults( true );
-                $query->addParam( 'spellcheck.maxResultsForSuggest', 5 );
-                $query->addParam( 'spellcheck.count', 5 );
+                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
+                $query->addParam( 'spellcheck.maxResultsForSuggest', $numSuggestions );
+                $query->addParam( 'spellcheck.count', $numSuggestions );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
-            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
+            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
             $solrResultSet = $this->_client->select( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
@@ -560,6 +561,8 @@ class JeroenVermeulen_Solarium_Model_Engine
                         array_shift( $suggest );
                         $result = $this->search( $storeId, $bestMatch, $try + 1 );
                     }
+                    $suggest =
+                        array_slice( $suggest, 0, $this->getConf( 'results/did_you_mean_suggestions', $storeId ) );
                     if ($doDidYouMean) {
                         Mage::register( 'solarium_suggest', $suggest );
                     }
