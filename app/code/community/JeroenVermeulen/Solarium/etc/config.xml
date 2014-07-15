@@ -162,8 +162,7 @@
                 <args>
                     <modules>
                         <!-- URL:  http://[MAGROOT]/admin/[CONTROLLER]/[ACTION]/key/[NONCE]/ -->
-                        <JeroenVermeulen_Solarium after="Mage_Adminhtml">JeroenVermeulen_Solarium_Admin
-                        </JeroenVermeulen_Solarium>
+                        <JeroenVermeulen_Solarium after="Mage_Adminhtml">JeroenVermeulen_Solarium_Admin</JeroenVermeulen_Solarium>
                     </modules>
                 </args>
             </adminhtml>
