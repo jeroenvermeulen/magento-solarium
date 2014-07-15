@@ -26,7 +26,8 @@
 class JeroenVermeulen_Solarium_Model_SelfTest
 {
     protected $message;
-    const WIKI_URL = 'https://github.com/jeroenvermeulen/magento-solarium/wiki';
+    const WIKI_URL     = 'https://github.com/jeroenvermeulen/magento-solarium/wiki';
+    const TEST_STOREID = 999999;
 
     /**
      * @param array $param - Connection parameters
@@ -40,7 +41,6 @@ class JeroenVermeulen_Solarium_Model_SelfTest
         try {
             $testProductId = intval( time() . getmypid() );
             $testProduct   = 'SELF TEST ENTRY ' . $testProductId;
-            $testStoreId   = 999999;
             $defaultParam  = array(
                 'host'     => '',
                 'port'     => '',
@@ -84,7 +84,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $data = array(
                     'id'         => 'test' . $testProductId,
                     'product_id' => $testProductId,
-                    'store_id'   => $testStoreId,
+                    'store_id'   => $this::TEST_STOREID,
                     'text'       => $testProduct
                 );
                 $buffer->createDocument( $data );
@@ -99,7 +99,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 );
             }
             if ($ok) {
-                $resultDocs = $engine->search( $testStoreId, $testProduct );
+                $resultDocs = $engine->search( $this::TEST_STOREID, $testProduct );
                 $ok         = false;
                 foreach ($resultDocs as $resultDoc) {
                     if ($testProductId == $resultDoc[ 'product_id' ]) {
@@ -109,7 +109,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $this->addMessage( 'Search for test entry', $ok );
             }
             if ($ok) {
-                $ok = $engine->cleanIndex( $testStoreId, array( $testProductId ) );
+                $ok = $engine->cleanIndex( $this::TEST_STOREID, array( $testProductId ) );
                 $this->addMessage( 'Deleting test entry from Solr', $ok );
             }
         } catch ( Exception $e ) {

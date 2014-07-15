@@ -135,6 +135,9 @@ class JeroenVermeulen_Solarium_Model_Engine
         $setting,
         $storeId = null
     ) {
+        if ( JeroenVermeulen_Solarium_Model_SelfTest::TEST_STOREID == $storeId ) {
+            $storeId = null;
+        }
         if (isset( $this->_overrideConfig[ $setting ] )) {
             return $this->_overrideConfig[ $setting ];
         } else {
