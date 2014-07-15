@@ -9,8 +9,6 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
 {
 
     /**
-     *
-     *
      * Example URL:  http://[MAGE-ROOT]/admin/solarium/testConnection/key/###########/
      */
     public function testConnectionAction() {
@@ -62,6 +60,15 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
         endforeach;
         $result = ob_get_clean();
         $this->getResponse()->setBody( $result );
+    }
+
+    /**
+     * Example URL:  http://[MAGE-ROOT]/admin/solarium/selfTest/key/###########/
+     */
+    public function selfTestAction() {
+        $request = $this->getRequest();
+        $message = Mage::getModel('jeroenvermeulen_solarium/selfTest')->test( $request->getParams() );
+        $this->getResponse()->setBody( $message );
     }
 
 }

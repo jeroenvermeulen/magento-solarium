@@ -22,7 +22,7 @@
  */
 -->
 <!--suppress XmlUnboundNsPrefix -->
-<schema name="magento_fulltext" version="100">
+<schema name="magento_fulltext" version="101">
 
     <types>
         <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
