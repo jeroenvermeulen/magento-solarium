@@ -474,7 +474,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         if (is_numeric( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
         }
-        $query->setTimeAllowed( intval( $this->getConf( 'server/timeout' ) ) );
+        $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
         $solrResultSet = $this->_client->select( $query );
         return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
@@ -683,8 +683,8 @@ class JeroenVermeulen_Solarium_Model_Engine
         $config[ 'endpoint' ][ 'update' ]               = $endPointConfig;
         $config[ 'endpoint' ][ 'admin' ]                = $endPointConfig;
         $config[ 'endpoint' ][ 'default' ][ 'timeout' ] = intval( $this->getConf( 'server/search_timeout' ) );
-        $config[ 'endpoint' ][ 'update' ][ 'timeout' ]  = intval( $this->getConf( 'server/search_timeout' ) );
-        $config[ 'endpoint' ][ 'admin' ][ 'timeout' ]   = intval( $this->getConf( 'server/search_timeout' ) );
+        $config[ 'endpoint' ][ 'update' ][ 'timeout' ]  = intval( $this->getConf( 'server/timeout' ) );
+        $config[ 'endpoint' ][ 'admin' ][ 'timeout' ]   = intval( $this->getConf( 'server/timeout' ) );
         $config[ 'endpoint' ][ 'admin' ][ 'core' ]      = 'admin';
         return $config;
     }
