@@ -25,20 +25,24 @@ $this->startSetup();
 $this->endSetup();
 
 /** @var $helper JeroenVermeulen_Solarium_Helper_Data */
-$helper = Mage::helper( 'jeroenvermeulen_solarium' );
-$configSteps = array( $helper->__('System'),
-                      $helper->__('Configuration'),
-                      $helper->__('CATALOG'),
-                      $helper->__('Solarium Search') );
+$helper      = Mage::helper( 'jeroenvermeulen_solarium' );
+$configSteps = array(
+    $helper->__( 'System' ),
+    $helper->__( 'Configuration' ),
+    $helper->__( 'CATALOG' ),
+    $helper->__( 'Solarium Search' )
+);
 
 $notice .= 'Please follow these steps:<br />';
 $notice .= '&nbsp; &nbsp; &#8226; Flush Cache Storage<br />';
 $notice .= '&nbsp; &nbsp; &#8226; Log out<br />';
 $notice .= '&nbsp; &nbsp; &#8226; Log in<br />';
-$notice .= '&nbsp; &nbsp; &#8226; ' . sprintf( 'Configure via:&nbsp; %s<br />',
-                                               htmlentities( implode(' > ',$configSteps) ) );
+$notice .= '&nbsp; &nbsp; &#8226; ' . sprintf(
+        'Configure via:&nbsp; %s<br />',
+        htmlentities( implode( ' > ', $configSteps ) )
+    );
 
-$title = $helper->__('The extension JeroenVermeulen_Solarium has been installed - Setup Instructions');
+$title = $helper->__( 'The extension JeroenVermeulen_Solarium has been installed - Setup Instructions' );
 
 $inboxRecord = array(
     'severity'    => Mage_AdminNotification_Model_Inbox::SEVERITY_NOTICE,
@@ -47,4 +51,4 @@ $inboxRecord = array(
     'internal'    => true
 );
 // Not using "Mage::getModel('adminnotification/inbox')->add()" because it does not work in Magento 1.6
-Mage::getModel('adminnotification/inbox')->parse( array($inboxRecord) );
+Mage::getModel( 'adminnotification/inbox' )->parse( array( $inboxRecord ) );

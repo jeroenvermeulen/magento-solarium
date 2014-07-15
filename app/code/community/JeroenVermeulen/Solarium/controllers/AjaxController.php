@@ -20,6 +20,9 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_AjaxController
+ */
 class JeroenVermeulen_Solarium_AjaxController extends Mage_Core_Controller_Front_Action
 {
 
@@ -28,20 +31,21 @@ class JeroenVermeulen_Solarium_AjaxController extends Mage_Core_Controller_Front
      *
      * URL:  http://[MAGE-ROOT]/solarium/ajax/suggest/?q=comp -->
      */
-    public function suggestAction()
+    public
+    function suggestAction()
     {
-        if ( !$this->getRequest()->getParam('q', false) ) {
+        if (!$this->getRequest()->getParam( 'q', false )) {
             // No query received
-            $this->getResponse()->setRedirect( Mage::getSingleton('core/url')->getBaseUrl() );
+            $this->getResponse()->setRedirect( Mage::getSingleton( 'core/url' )->getBaseUrl() );
         }
         /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-        $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+        $engine    = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
         $blockType = 'catalogsearch/autocomplete';
-        if ( $engine->isWorking() ) {
+        if ($engine->isWorking()) {
             $blockType = 'jeroenvermeulen_solarium/catalogsearch_autocomplete';
         }
         /** @var Mage_CatalogSearch_Block_Autocomplete $block */
-        $block = $this->getLayout()->createBlock($blockType);
+        $block = $this->getLayout()->createBlock( $blockType );
         $this->getResponse()->setBody( $block->toHtml() );
     }
 

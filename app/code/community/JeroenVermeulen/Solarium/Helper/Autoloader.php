@@ -20,15 +20,20 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_Helper_Autoloader
+ */
 class JeroenVermeulen_Solarium_Helper_Autoloader extends Mage_Core_Helper_Abstract
 {
 
     /**
      * Prepends our autoloader, so we can load the extra library classes when they are needed.
      */
-    public function register() {
+    public
+    function register()
+    {
         $registryKey = 'JeroenVermeulen_Solarium_Autoloader_registered';
-        if ( ! Mage::registry( $registryKey ) ) {
+        if (!Mage::registry( $registryKey )) {
             Mage::register( $registryKey, true );
             spl_autoload_register( array( $this, 'load' ), true, true );
         }
@@ -41,10 +46,16 @@ class JeroenVermeulen_Solarium_Helper_Autoloader extends Mage_Core_Helper_Abstra
      *
      * @param string $class
      */
-    public static function load( $class ) {
-        if ( preg_match( '#^(Solarium|Symfony\\\\Component\\\\EventDispatcher)\b#', $class ) ) {
-            $phpFile = Mage::getBaseDir( 'lib' ) . DIRECTORY_SEPARATOR
-                       . str_replace( '\\', DIRECTORY_SEPARATOR, $class ) . '.php';
+    public static
+    function load(
+        $class
+    ) {
+        if (preg_match( '#^(Solarium|Symfony\\\\Component\\\\EventDispatcher)\b#', $class )) {
+            $phpFile = Mage::getBaseDir( 'lib' ) . DIRECTORY_SEPARATOR . str_replace(
+                    '\\',
+                    DIRECTORY_SEPARATOR,
+                    $class
+                ) . '.php';
             /** @noinspection PhpIncludeInspection */
             require_once( $phpFile );
         }

@@ -20,6 +20,9 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete
+ */
 class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete
 {
 
@@ -27,24 +30,25 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
      * Sanitize result to standard core functionality
      * @return array|null
      */
-    public function getSuggestData()
+    public
+    function getSuggestData()
     {
-        if ( ! $this->_suggestData ) {
-            $query = $this->helper('catalogsearch')->getQueryText();
+        if (!$this->_suggestData) {
+            $query   = $this->helper( 'catalogsearch' )->getQueryText();
             $counter = 0;
-            $data = array();
+            $data    = array();
             $storeId = Mage::app()->getStore()->getId();
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-            $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
-            $facet = $engine->getAutoSuggestions( $storeId, $query );
+            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            $facet  = $engine->getAutoSuggestions( $storeId, $query );
 
-            foreach ( $facet as $value => $count ) {
-                $_data = array(
-                    'title' => $value,
-                    'row_class' => ( ++$counter ) % 2 ? 'odd' : 'even',
+            foreach ($facet as $value => $count) {
+                $_data   = array(
+                    'title'          => $value,
+                    'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
                     'num_of_results' => $count
                 );
-                $data[] = $_data;
+                $data[ ] = $_data;
             }
             $this->_suggestData = $data;
         }

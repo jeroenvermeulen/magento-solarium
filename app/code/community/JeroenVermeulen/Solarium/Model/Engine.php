@@ -19,6 +19,10 @@
  * @copyright   Copyright (c) 2014 Jeroen Vermeulen (http://www.jeroenvermeulen.eu)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
+/**
+ * Class JeroenVermeulen_Solarium_Model_Engine
+ */
 class JeroenVermeulen_Solarium_Model_Engine
 {
     /** @var \Solarium\Client */
@@ -44,15 +48,18 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param int $storeId - Store View Id
      * @return bool
      */
-    public static function isEnabled( $storeId = null ) {
+    public static
+    function isEnabled(
+        $storeId = null
+    ) {
         $result = false;
-        if ( empty( $storeId ) ) {
+        if (empty( $storeId )) {
             // Can't use $this->getEnabledStoreIds() or $this->getConf() here because this is a static method.
             $stores = Mage::app()->getStores( false );
             /** @var Mage_Core_Model_Store $store */
-            foreach ( $stores as $store ) {
+            foreach ($stores as $store) {
                 $result = Mage::getStoreConfigFlag( 'jeroenvermeulen_solarium/general/enabled', $store->getId() );
-                if ( $result ) {
+                if ($result) {
                     break;
                 }
             }
@@ -67,13 +74,15 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return int[]
      */
-    public function getEnabledStoreIds() {
-        if ( is_null( $this->_enabledStoreIds ) ) {
+    public
+    function getEnabledStoreIds()
+    {
+        if (is_null( $this->_enabledStoreIds )) {
             $this->_enabledStoreIds = array();
             $stores                 = Mage::app()->getStores( false );
             /** @var Mage_Core_Model_Store $store */
-            foreach ( $stores as $store ) {
-                if ( $this->getConf( 'general/enabled', $store->getId() ) ) {
+            foreach ($stores as $store) {
+                if ($this->getConf( 'general/enabled', $store->getId() )) {
                     array_push( $this->_enabledStoreIds, $store->getId() );
                 }
             }
@@ -89,24 +98,27 @@ class JeroenVermeulen_Solarium_Model_Engine
      * The 'admin' core is a workaround used to execute 'non core specific' admin queries.
      * @see https://github.com/basdenooijer/solarium/issues/254
      */
-    public function __construct( $overrideConfig = array() ) {
+    public
+    function __construct(
+        $overrideConfig = array()
+    ) {
         // Make sure the autoloader is registered, because in Magento < 1.8 some events are missing.
         /** @var JeroenVermeulen_Solarium_Helper_Autoloader $autoLoader */
         $autoLoader = Mage::helper( 'jeroenvermeulen_solarium/autoloader' );
         $autoLoader->register();
-        if ( !empty( $overrideConfig ) ) {
+        if (!empty( $overrideConfig )) {
             $this->_overrideConfig = $overrideConfig;
         }
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
-        $helper = Mage::helper( 'jeroenvermeulen_solarium' );
+        $helper          = Mage::helper( 'jeroenvermeulen_solarium' );
         $enabledStoreIds = $this->getEnabledStoreIds();
-        if ( !empty( $enabledStoreIds ) ) {
-            $this->_client  = new Solarium\Client( $this->_getSolariumClientConfig() );
+        if (!empty( $enabledStoreIds )) {
+            $this->_client = new Solarium\Client( $this->_getSolariumClientConfig() );
             $this->setWorking( $this->ping() );
         } else {
             // This should not happen, you should not construct this class when it is disabled.
-            $this->_lastError = new Exception(
-                $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
+            $this->_lastError =
+                new Exception( $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
         }
     }
 
@@ -118,9 +130,16 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param int $storeId - Store View Id
      * @return mixed
      */
-    public function getConf( $setting, $storeId = null ) {
-        if ( isset( $this->_overrideConfig[$setting] ) ) {
-            return $this->_overrideConfig[$setting];
+    public
+    function getConf(
+        $setting,
+        $storeId = null
+    ) {
+        if ( JeroenVermeulen_Solarium_Model_SelfTest::TEST_STOREID == $storeId ) {
+            $storeId = null;
+        }
+        if (isset( $this->_overrideConfig[ $setting ] )) {
+            return $this->_overrideConfig[ $setting ];
         } else {
             return Mage::getStoreConfig( 'jeroenvermeulen_solarium/' . $setting, $storeId );
         }
@@ -129,15 +148,18 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * @param \Solarium\Client $client
      */
-    public function setClient($client)
-    {
+    public
+    function setClient(
+        $client
+    ) {
         $this->_client = $client;
     }
 
     /**
      * @return \Solarium\Client
      */
-    public function getClient()
+    public
+    function getClient()
     {
         return $this->_client;
     }
@@ -145,15 +167,18 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * @param boolean $working
      */
-    public function setWorking($working)
-    {
+    public
+    function setWorking(
+        $working
+    ) {
         $this->_working = $working;
     }
 
     /**
      * @return boolean
      */
-    public function getWorking()
+    public
+    function getWorking()
     {
         return $this->_working;
     }
@@ -163,7 +188,9 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return bool - True if engine is working
      */
-    public function isWorking() {
+    public
+    function isWorking()
+    {
         return (boolean) $this->_working;
     }
 
@@ -172,7 +199,9 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return bool - True = shell script
      */
-    public function isShellScript() {
+    public
+    function isShellScript()
+    {
         return ( null === Mage::app()->getRequest()->getControllerName() );
     }
 
@@ -181,23 +210,25 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return string - Last occurred error
      */
-    public function getLastError() {
+    public
+    function getLastError()
+    {
         $result = '';
-        if ( is_a( $this->_lastError, 'Solarium\\Exception\\HttpException' ) ) {
-            if ( $this->_lastError->getBody() ) {
+        if (is_a( $this->_lastError, 'Solarium\\Exception\\HttpException' )) {
+            if ($this->_lastError->getBody()) {
                 $data = json_decode( $this->_lastError->getBody(), true );
-                if ( !empty( $data[ 'error' ][ 'msg' ] ) ) {
+                if (!empty( $data[ 'error' ][ 'msg' ] )) {
                     $result = $data[ 'error' ][ 'msg' ];
                 }
             }
         }
-        if ( empty( $result ) && is_a( $this->_lastError, 'Exception' ) ) {
+        if (empty( $result ) && is_a( $this->_lastError, 'Exception' )) {
             $result = $this->_lastError->getMessage();
         }
-        if ( empty( $result ) && is_string( $this->_lastError ) ) {
+        if (empty( $result ) && is_string( $this->_lastError )) {
             $result = $this->_lastError;
         }
-        if ( !empty( $result ) && preg_match( '#<pre>(.+)</pre>#', $result, $matches ) ) {
+        if (!empty( $result ) && preg_match( '#<pre>(.+)</pre>#', $result, $matches )) {
             $result = trim( $matches[ 1 ] );
         }
         return strval( $result );
@@ -208,7 +239,9 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return float - in in milliseconds
      */
-    public function getLastQueryTime() {
+    public
+    function getLastQueryTime()
+    {
         return intval( $this->_lastQueryTime ) / 1000;
     }
 
@@ -218,20 +251,23 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param bool $extended - When true we will output more information
      * @return array
      */
-    public function getVersionInfo( $extended = false ) {
+    public
+    function getVersionInfo(
+        $extended = false
+    ) {
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
-        $helper                         = Mage::helper( 'jeroenvermeulen_solarium' );
-        $versions                       = array();
-        if ( $extended ) {
+        $helper   = Mage::helper( 'jeroenvermeulen_solarium' );
+        $versions = array();
+        if ($extended) {
             $versions[ 'Operating System' ] = php_uname();
             $versions[ 'PHP' ]              = phpversion();
             $versions[ 'Magento' ]          = Mage::getVersion();
             $versions[ 'Extension' ]        = $helper->getExtensionVersion();
             $versions[ 'Solarium Library' ] = Solarium\Client::VERSION;
         }
-        $versions[ 'Solr version' ]          = $helper->__( 'unknown' );
-        $versions[ 'Java version' ]          = $helper->__( 'unknown' );
-        if ( $this->isWorking() ) {
+        $versions[ 'Solr version' ] = $helper->__( 'unknown' );
+        $versions[ 'Java version' ] = $helper->__( 'unknown' );
+        if ($this->isWorking()) {
             try {
                 /**
                  * Abusing ping query to get system info
@@ -240,10 +276,10 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query = $this->_client->createPing();
                 $query->setHandler( 'system' );
                 $data = $this->_client->ping( $query, 'admin' )->getData();
-                if ( !empty( $data[ 'lucene' ][ 'solr-impl-version' ] ) ) {
+                if (!empty( $data[ 'lucene' ][ 'solr-impl-version' ] )) {
                     $versions[ 'Solr version' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
                 }
-                if ( !empty( $data[ 'jvm' ][ 'name' ] ) && !empty( $data[ 'jvm' ][ 'version' ] ) ) {
+                if (!empty( $data[ 'jvm' ][ 'name' ] ) && !empty( $data[ 'jvm' ][ 'version' ] )) {
                     $versions[ 'Java version' ] = $data[ 'jvm' ][ 'name' ] . ' ' . $data[ 'jvm' ][ 'version' ];
                 }
             } catch ( Exception $e ) {
@@ -258,19 +294,21 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return bool - True on success
      */
-    public function ping() {
+    public
+    function ping()
+    {
         /**
          * This function should not check the $this->_working variable,
          * because it is used to check if everything is working.
          */
         $result = false;
         try {
-            $query          = $this->_client->createPing();
+            $query = $this->_client->createPing();
             // Not 100% sure if this setTimeAllowed works.
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solariumResult = $this->_client->ping( $query );
             $resultData     = $solariumResult->getData();
-            if ( !empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ] ) {
+            if (!empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ]) {
                 $result = true;
             }
         } catch ( Exception $e ) {
@@ -283,12 +321,16 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Clean the Solr index. If a Store ID or Product IDs are specified it is only cleared for those.
      *
-     * @param int $storeId               - Store View Id, null or 0 means all storeViews
+     * @param int $storeId - Store View Id, null or 0 means all storeViews
      * @param null|array|int $productIds - Product Entity Id(s)
      * @return bool                      - True on success
      */
-    public function cleanIndex( $storeId=null, $productIds = null ) {
-        if ( !$this->_working ) {
+    public
+    function cleanIndex(
+        $storeId = null,
+        $productIds = null
+    ) {
+        if (!$this->_working) {
             return false;
         }
         $result = false;
@@ -298,7 +340,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query->addCommit();
 
             $solariumResult = $this->_client->update( $query, 'update' );
-            $result         = $this->_processResult( $solariumResult, 'clean' );
+            $result         = $this->processResult( $solariumResult, 'clean' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
@@ -309,13 +351,18 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Rebuild the index. If a Store ID or Product IDs are specified it is only rebuilt for those.
      *
-     * @param int|null $storeId      - Store View Id, null or 0 means all storeViews
+     * @param int|null $storeId - Store View Id, null or 0 means all storeViews
      * @param int[]|null $productIds - Product Entity Id(s)
-     * @param bool $cleanFirst       - If set to true the index will be cleared first
+     * @param bool $cleanFirst - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
-    public function rebuildIndex( $storeId = null, $productIds = null, $cleanFirst = false ) {
-        if ( !$this->_working ) {
+    public
+    function rebuildIndex(
+        $storeId = null,
+        $productIds = null,
+        $cleanFirst = false
+    ) {
+        if (!$this->_working) {
             return false;
         }
         $result = false;
@@ -324,50 +371,54 @@ class JeroenVermeulen_Solarium_Model_Engine
             $readAdapter  = $coreResource->getConnection( 'core_read' );
 
             $select = $readAdapter->select();
-            $select->from( $coreResource->getTableName( 'catalogsearch/fulltext' ),
-                           array( 'product_id', 'store_id', 'data_index', 'fulltext_id' ) );
+            $select->from(
+                   $coreResource->getTableName( 'catalogsearch/fulltext' ),
+                       array( 'product_id', 'store_id', 'data_index', 'fulltext_id' )
+            );
 
-            if ( empty( $storeId ) ) {
+            if (empty( $storeId )) {
                 $select->where( 'store_id IN (?)', $this->getEnabledStoreIds() );
             } else {
                 $select->where( 'store_id', $storeId );
             }
-            if ( !empty( $productIds ) ) {
-                if ( is_numeric( $productIds ) ) {
+            if (!empty( $productIds )) {
+                if (is_numeric( $productIds )) {
                     $select->where( 'product_id = ?', $productIds );
                 } else {
-                    if ( is_array( $productIds ) ) {
+                    if (is_array( $productIds )) {
                         $select->where( 'product_id IN (?)', $productIds );
                     }
                 }
             }
             $products = $readAdapter->query( $select );
 
-            if ( !$products->rowCount() ) {
+            if (!$products->rowCount()) {
                 // No matching products, nothing to update, consider OK.
                 $result = true;
             } else {
-                if ( $cleanFirst ) {
+                if ($cleanFirst) {
                     $deleteQuery = $this->_client->createUpdate();
                     $deleteQuery->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
                     // No commit yet, will be done after BufferedAdd
-                    $this->_client->update($deleteQuery);
+                    $this->_client->update( $deleteQuery );
                 }
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
                 $buffer->setBufferSize( max( 1, $this->getConf( 'reindexing/buffersize', $storeId ) ) );
                 $buffer->setEndpoint( 'update' );
                 /** @noinspection PhpAssignmentInConditionInspection */
-                while ( $product = $products->fetch() ) {
-                    $data = array( 'id' => intval( $product[ 'fulltext_id' ] ),
-                                   'product_id' => intval( $product[ 'product_id' ] ),
-                                   'store_id' => intval( $product[ 'store_id' ] ),
-                                   'text' => $this->_filterString( $product[ 'data_index' ] ) );
+                while ($product = $products->fetch()) {
+                    $data = array(
+                        'id'         => intval( $product[ 'fulltext_id' ] ),
+                        'product_id' => intval( $product[ 'product_id' ] ),
+                        'store_id'   => intval( $product[ 'store_id' ] ),
+                        'text'       => $this->_filterString( $product[ 'data_index' ] )
+                    );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->commit();
                 $this->optimize(); // ignore result
-                $result = $this->_processResult( $solariumResult, 'flushing buffered add' );
+                $result = $this->processResult( $solariumResult, 'flushing buffered add' );
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
@@ -381,15 +432,17 @@ class JeroenVermeulen_Solarium_Model_Engine
      *
      * @return bool - True on success
      */
-    public function optimize() {
-        if ( !$this->_working ) {
+    public
+    function optimize()
+    {
+        if (!$this->_working) {
             return false;
         }
         // get an update query instance
         $update = $this->_client->createUpdate();
         $update->addOptimize();
         $solariumResult = $this->_client->update( $update, 'update' );
-        return $this->_processResult( $solariumResult, 'optimize' );
+        return $this->processResult( $solariumResult, 'optimize' );
     }
 
     /**
@@ -399,8 +452,11 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param null|int $storeId
      * @return int
      */
-    public function isEmpty( $storeId = null ) {
-        return ( 0 == $this->getDocumentCount($storeId) );
+    public
+    function isEmpty(
+        $storeId = null
+    ) {
+        return ( 0 == $this->getDocumentCount( $storeId ) );
     }
 
     /**
@@ -410,15 +466,18 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param null|int $storeId
      * @return int
      */
-    public function getDocumentCount( $storeId = null ) {
+    public
+    function getDocumentCount(
+        $storeId = null
+    ) {
         $query = $this->_client->createSelect();
         $query->setQueryDefaultField( 'text' );
         $query->setRows( 0 );
         $query->setFields( array( 'product_id' ) );
-        if ( is_numeric( $storeId ) ) {
+        if (is_numeric( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
         }
-        $query->setTimeAllowed( intval( $this->getConf( 'server/timeout' ) ) );
+        $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
         $solrResultSet = $this->_client->select( $query );
         return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
@@ -431,74 +490,84 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param int $try - Times tried to find result
      * @return array
      */
-    public function search( $storeId, $queryString, $try = 1 ) {
-        if ( !$this->_working ) {
+    public
+    function search(
+        $storeId,
+        $queryString,
+        $try = 1
+    ) {
+        if (!$this->_working) {
             return false;
         }
         $result = false;
         try {
-            $query = $this->_client->createSelect();
-            $queryHelper = $query->getHelper();
+            $query              = $this->_client->createSelect();
+            $queryHelper        = $query->getHelper();
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
-            $query->setQueryDefaultField( array('text') );
+            $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
-            $query->setRows( $this->getConf( 'results/max' ) );
+            $query->setRows( $this->getConf( 'results/max', $storeId ) );
             $query->setFields( array( 'product_id', 'score' ) );
-            if ( is_numeric( $storeId ) ) {
+            if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
             $query->addSort( 'score', $query::SORT_DESC );
             // Group by product_id to prevent double results.
             $groupComponent = $query->getGrouping();
-            $groupComponent->addField('product_id');
-            $groupComponent->setLimit(1);
-            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect' ) );
-            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean' ) );
-            if ( $doAutoCorrect || $doDidYouMean ) {
+            $groupComponent->addField( 'product_id' );
+            $groupComponent->setLimit( 1 );
+            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect', $storeId ) );
+            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean', $storeId ) );
+            if ($doAutoCorrect || $doDidYouMean) {
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
                 $spellCheck->setCollate( true );
                 $spellCheck->setCount( 1 );
                 $spellCheck->setMaxCollations( 1 );
-                $spellCheck->setExtendedResults(true);
-                $query->addParam( 'spellcheck.maxResultsForSuggest', 5 );
-                $query->addParam( 'spellcheck.count', 5 );
+                $spellCheck->setExtendedResults( true );
+                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
+                $query->addParam( 'spellcheck.maxResultsForSuggest', $numSuggestions );
+                $query->addParam( 'spellcheck.count', $numSuggestions );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
-            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
-            $solrResultSet        = $this->_client->select( $query );
+            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
+            $solrResultSet = $this->_client->select( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $result               = array();
-            foreach ( $solrResultSet->getGrouping()->getGroup('product_id') as $valueGroup ) {
-                foreach ( $valueGroup as $solrResult ) {
-                    $key = 'prd' . $solrResult[ 'product_id' ];
-                    $result[ $key ] = array( 'relevance' => $solrResult[ 'score' ],
-                                             'product_id' => $solrResult[ 'product_id' ] );
+            foreach ($solrResultSet->getGrouping()->getGroup( 'product_id' ) as $valueGroup) {
+                foreach ($valueGroup as $solrResult) {
+                    $key            = 'prd' . $solrResult[ 'product_id' ];
+                    $result[ $key ] = array(
+                        'relevance'  => $solrResult[ 'score' ],
+                        'product_id' => $solrResult[ 'product_id' ]
+                    );
                 }
             }
-            if ( $doAutoCorrect || $doDidYouMean ) {
-                $suggest = array();
+            if ($doAutoCorrect || $doDidYouMean) {
+                $suggest          = array();
                 $spellCheckResult = $solrResultSet->getSpellcheck();
-                if ( $spellCheckResult && !$spellCheckResult->getCorrectlySpelled() ) {
+                if ($spellCheckResult && !$spellCheckResult->getCorrectlySpelled()) {
                     $suggestions = $spellCheckResult->getSuggestions();
-                    foreach($suggestions as $suggestion){
-                        foreach($suggestion->getWords() as $word){
-                            if ( $word['freq'] > $suggestion->getOriginalFrequency() ) {
-                                $suggest[ $word['word'] ] = $word['freq'];
+                    foreach ($suggestions as $suggestion) {
+                        foreach ($suggestion->getWords() as $word) {
+                            if ($word[ 'freq' ] > $suggestion->getOriginalFrequency()) {
+                                $suggest[ $word[ 'word' ] ] = $word[ 'freq' ];
                             }
                         }
                     }
                     arsort( $suggest, SORT_NUMERIC );
-                    if ( $doAutoCorrect && empty($result) && !empty($suggest) ) {
-                        $suggestKeys = array_keys($suggest);
-                        $bestMatch = reset($suggestKeys);
-                        array_shift($suggest);
-                        $result = $this->search( $storeId, $bestMatch, $try+1 );
+                    if ($doAutoCorrect && empty( $result ) && !empty( $suggest )) {
+                        $suggestKeys = array_keys( $suggest );
+                        $bestMatch   = reset( $suggestKeys );
+                        array_shift( $suggest );
+                        $result = $this->search( $storeId, $bestMatch, $try + 1 );
                     }
-                    if ( $doDidYouMean ) {
-                        Mage::register('solarium_suggest', $suggest);
+                    $suggest =
+                        array_slice( $suggest, 0, $this->getConf( 'results/did_you_mean_suggestions', $storeId ) );
+                    if ($doDidYouMean) {
+                        Mage::register( 'solarium_suggest', $suggest );
                     }
                 }
             }
@@ -514,72 +583,44 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param string $queryString - What the user is typing
      * @return null|string
      */
-    public function getAutoSuggestions( $storeId, $queryString ) {
+    public
+    function getAutoSuggestions(
+        $storeId,
+        $queryString
+    ) {
         // Create basic query with wildcard
-        $query = $this->_client->createSelect();
-        $queryHelper = $query->getHelper();
-        $escapedQueryString = $queryHelper->escapeTerm( strtolower($queryString) );
+        $query              = $this->_client->createSelect();
+        $queryHelper        = $query->getHelper();
+        $escapedQueryString = $queryHelper->escapeTerm( strtolower( $queryString ) );
 
         $query->setQueryDefaultField( 'text' );
-        $query->setQuery( $escapedQueryString.'*' );
+        $query->setQuery( $escapedQueryString . '*' );
         $query->setRows( 0 );
 
-        if ( !empty( $storeId ) ) {
+        if (!empty( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
         }
 
         $groupComponent = $query->getGrouping();
-        $groupComponent->addField('product_id');
-        $groupComponent->setFacet(true);
-        $groupComponent->setLimit(1);
+        $groupComponent->addField( 'product_id' );
+        $groupComponent->setFacet( true );
+        $groupComponent->setLimit( 1 );
 
         // Add facet for completion
-        $facetSet = $query->getFacetSet();
-        $facetField = $facetSet->createFacetField('text');
-        $facetField->setField('text');
-        $facetField->setMincount(1);
-        $facetField->setLimit( $this->getConf('results/autocomplete_suggestions') );
+        $facetSet   = $query->getFacetSet();
+        $facetField = $facetSet->createFacetField( 'text' );
+        $facetField->setField( 'text' );
+        $facetField->setMincount( 1 );
+        $facetField->setLimit( $this->getConf( 'results/autocomplete_suggestions' ) );
         $facetField->setPrefix( $escapedQueryString );
 
-        $solariumResult = $this->_client->select($query);
+        $solariumResult = $this->_client->select( $query );
 
-        if ( $solariumResult ) {
-            return $solariumResult->getFacetSet()->getFacet('text');
+        if ($solariumResult) {
+            return $solariumResult->getFacetSet()->getFacet( 'text' );
         } else {
             return null;
         }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Get configuration for Solarium, based on this extension's settings in the Magento Configuration
-     *
-     * @return array
-     */
-    protected function _getSolariumClientConfig() {
-        $host           = trim( $this->getConf( 'server/host' ) );
-        // If the user pasted a URL as hostname, clean it.
-        $host           = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
-        $endPointConfig = array();
-        $endPointConfig['host'] = $host;
-        $endPointConfig['port'] = intval( $this->getConf( 'server/port' ) );
-        $endPointConfig['path'] = trim( $this->getConf( 'server/path' ) );
-        $endPointConfig['core'] = trim( $this->getConf( 'server/core' ) );
-        if( $this->getConf('server/requires_authentication') ) {
-            $endPointConfig['username'] = trim( $this->getConf('server/username') );
-            $endPointConfig['password'] = Mage::helper('core')->decrypt( $this->getConf( 'server/password' ) );
-        }
-        $config = array();
-        $config['endpoint'] = array();
-        $config['endpoint']['default'] = $endPointConfig;
-        $config['endpoint']['update']  = $endPointConfig;
-        $config['endpoint']['admin']   = $endPointConfig;
-        $config['endpoint']['default']['timeout'] = intval( $this->getConf( 'server/search_timeout' ) );
-        $config['endpoint']['update']['timeout']  = intval( $this->getConf( 'server/search_timeout' ) );
-        $config['endpoint']['admin']['timeout']   = intval( $this->getConf( 'server/search_timeout' ) );
-        $config['endpoint']['admin']['core']      = 'admin';
-        return $config;
     }
 
     /**
@@ -589,19 +630,26 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param string $actionText
      * @return bool
      */
-    protected function _processResult( $solariumResult, $actionText = 'query' ) {
+    public
+    function processResult(
+        $solariumResult,
+        $actionText = 'query'
+    ) {
         $result = false;
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
-        if ( is_a( $solariumResult, 'Solarium\QueryType\Update\Result' ) ) {
+        if (is_a( $solariumResult, 'Solarium\QueryType\Update\Result' )) {
             $this->_lastQueryTime = $solariumResult->getQueryTime();
-            if ( 0 !== $solariumResult->getStatus() ) {
+            if (0 !== $solariumResult->getStatus()) {
                 $this->_lastError = $solariumResult->getStatus();
                 Mage::getSingleton( 'adminhtml/session' )->addError(
-                    $helper->__( 'Solr %s error, status: %d, query time: %d',
-                                 $helper->__( $actionText ),
-                                 $solariumResult->getStatus(),
-                                 $solariumResult->getQueryTime() ) );
+                    $helper->__(
+                           'Solr %s error, status: %d, query time: %d',
+                               $helper->__( $actionText ),
+                               $solariumResult->getStatus(),
+                               $solariumResult->getQueryTime()
+                    )
+                );
             }
             $result = ( 0 === $solariumResult->getStatus() );
         } else {
@@ -610,46 +658,87 @@ class JeroenVermeulen_Solarium_Model_Engine
         return $result;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Get configuration for Solarium, based on this extension's settings in the Magento Configuration
+     *
+     * @return array
+     */
+    protected
+    function _getSolariumClientConfig()
+    {
+        $host = trim( $this->getConf( 'server/host' ) );
+        // If the user pasted a URL as hostname, clean it.
+        $host                     = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
+        $endPointConfig           = array();
+        $endPointConfig[ 'host' ] = $host;
+        $endPointConfig[ 'port' ] = intval( $this->getConf( 'server/port' ) );
+        $endPointConfig[ 'path' ] = trim( $this->getConf( 'server/path' ) );
+        $endPointConfig[ 'core' ] = trim( $this->getConf( 'server/core' ) );
+        if ($this->getConf( 'server/requires_authentication' )) {
+            $endPointConfig[ 'username' ] = trim( $this->getConf( 'server/username' ) );
+            $endPointConfig[ 'password' ] = Mage::helper( 'core' )->decrypt( $this->getConf( 'server/password' ) );
+        }
+        $config                                         = array();
+        $config[ 'endpoint' ]                           = array();
+        $config[ 'endpoint' ][ 'default' ]              = $endPointConfig;
+        $config[ 'endpoint' ][ 'update' ]               = $endPointConfig;
+        $config[ 'endpoint' ][ 'admin' ]                = $endPointConfig;
+        $config[ 'endpoint' ][ 'default' ][ 'timeout' ] = intval( $this->getConf( 'server/search_timeout' ) );
+        $config[ 'endpoint' ][ 'update' ][ 'timeout' ]  = intval( $this->getConf( 'server/timeout' ) );
+        $config[ 'endpoint' ][ 'admin' ][ 'timeout' ]   = intval( $this->getConf( 'server/timeout' ) );
+        $config[ 'endpoint' ][ 'admin' ][ 'core' ]      = 'admin';
+        return $config;
+    }
+
     /**
      * Filter a string to be safe to add to Solr.
      *
      * @param string $str
      * @return string
      */
-    protected function _filterString( $str ) {
+    protected
+    function _filterString(
+        $str
+    ) {
         static $badChars; // This variable is saved inside this function.
-        if ( !isset($badChars) ) {
-            for ( $ord = 0; $ord < 32; $ord++ ) {
+        if (!isset( $badChars )) {
+            for ($ord = 0; $ord < 32; $ord++) {
                 $badChars .= chr( $ord );
             }
         }
-        return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', strval($str) );
+        return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', strval( $str ) );
     }
 
     /**
      * Get delete query string for Solr
      *
-     * @param int $storeId               - Store View Id, null or 0 means all storeViews
+     * @param int $storeId - Store View Id, null or 0 means all storeViews
      * @param null|array|int $productIds - Product Entity Id(s)
      * @return string
      */
-    protected function _getDeleteQueryText( $storeId=null, $productIds=null ) {
+    protected
+    function _getDeleteQueryText(
+        $storeId = null,
+        $productIds = null
+    ) {
         $queryText = array();
-        if ( !empty( $storeId ) ) {
-            $queryText[] .= 'store_id:' . $storeId;
+        if (!empty( $storeId )) {
+            $queryText[ ] .= 'store_id:' . $storeId;
         }
-        if ( is_numeric( $productIds ) ) {
-            $queryText[] .= 'product_id:' . $productIds;
+        if (is_numeric( $productIds )) {
+            $queryText[ ] .= 'product_id:' . $productIds;
         }
-        if ( is_array( $productIds ) ) {
+        if (is_array( $productIds )) {
             $or = array();
-            foreach ( $productIds as $id ) {
-                $or[] = 'product_id:' . $id;
+            foreach ($productIds as $id) {
+                $or[ ] = 'product_id:' . $id;
             }
-            $queryText[] .= '(' . implode( ' OR ', $or ) . ')';
+            $queryText[ ] .= '(' . implode( ' OR ', $or ) . ')';
         }
-        if ( empty( $queryText ) ) {
-            $queryText[] = '*:*'; // Delete all
+        if (empty( $queryText )) {
+            $queryText[ ] = '*:*'; // Delete all
         }
         return implode( ' ', $queryText );
     }
