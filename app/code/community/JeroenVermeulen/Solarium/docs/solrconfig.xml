@@ -30,7 +30,7 @@
 
     <dataDir>${solr.data.dir:}</dataDir>
 
-    <codecFactory  class="solr.SchemaCodecFactory"/>
+    <codecFactory class="solr.SchemaCodecFactory"/>
 
     <schemaFactory class="ClassicIndexSchemaFactory"/>
 
@@ -91,10 +91,10 @@
         </arr>
     </requestHandler>
 
-    <requestHandler name="/update"            class="solr.XmlUpdateRequestHandler" />
-    <requestHandler name="/analysis/field"    class="solr.FieldAnalysisRequestHandler"    startup="lazy" />
-    <requestHandler name="/analysis/document" class="solr.DocumentAnalysisRequestHandler" startup="lazy" />
-    <requestHandler name="/admin/"            class="solr.admin.AdminHandlers" />
+    <requestHandler name="/update" class="solr.XmlUpdateRequestHandler"/>
+    <requestHandler name="/analysis/field" class="solr.FieldAnalysisRequestHandler" startup="lazy"/>
+    <requestHandler name="/analysis/document" class="solr.DocumentAnalysisRequestHandler" startup="lazy"/>
+    <requestHandler name="/admin/" class="solr.admin.AdminHandlers"/>
 
     <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
         <str name="queryAnalyzerFieldType">text_general</str>

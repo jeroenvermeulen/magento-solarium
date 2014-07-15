@@ -20,6 +20,9 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
+ */
 class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mage_CatalogSearch_Model_Resource_Fulltext
 {
 
@@ -31,31 +34,36 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      * @param Mage_CatalogSearch_Model_Query $query
      * @return JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext
      */
-    public function prepareResult( $object, $queryText, $query ) {
-        if ( JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() ) ) {
+    public
+    function prepareResult(
+        $object,
+        $queryText,
+        $query
+    ) {
+        if (JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() )) {
             $adapter           = $this->_getWriteAdapter();
             $searchResultTable = $this->getTable( 'catalogsearch/result' );
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-            $engine            = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            if ( $engine->isWorking() ) {
+            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            if ($engine->isWorking()) {
                 $searchResult = $engine->search( $query->getStoreId(), $queryText );
-                if ( false !== $searchResult ) {
-                    if ( 0 == count($searchResult) ) {
+                if (false !== $searchResult) {
+                    if (0 == count( $searchResult )) {
                         // No results, we need to check if the index is empty.
-                        if ( $engine->isEmpty( $query->getStoreId() ) ) {
-                            Mage::Log( sprintf('%s - Warning: index is empty', __CLASS__), Zend_Log::WARN );
+                        if ($engine->isEmpty( $query->getStoreId() )) {
+                            Mage::Log( sprintf( '%s - Warning: index is empty', __CLASS__ ), Zend_Log::WARN );
                         } else {
                             $query->setIsProcessed( 1 );
                         }
                     } else {
-                        $columns = array('query_id','product_id','relevance');
+                        $columns    = array( 'query_id', 'product_id', 'relevance' );
                         $insertRows = array();
-                        $queryId = $query->getId();
-                        foreach ( $searchResult as $data ) {
-                            $insertRows[] = array( $queryId, $data['product_id'], $data['relevance'] );
+                        $queryId    = $query->getId();
+                        foreach ($searchResult as $data) {
+                            $insertRows[ ] = array( $queryId, $data[ 'product_id' ], $data[ 'relevance' ] );
                         }
                         $adapter->beginTransaction();
-                        $adapter->delete( $searchResultTable, 'query_id = '.$queryId );
+                        $adapter->delete( $searchResultTable, 'query_id = ' . $queryId );
                         $adapter->insertArray( $searchResultTable, $columns, $insertRows );
                         $adapter->commit();
                         $query->setIsProcessed( 1 );
@@ -63,7 +71,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 }
             }
         }
-        if ( !$query->getIsProcessed() ) {
+        if (!$query->getIsProcessed()) {
             Mage::log( 'Solr disabled or something went wrong, fallback to Magento Fulltext Search', Zend_Log::WARN );
             return parent::prepareResult( $object, $queryText, $query );
         }

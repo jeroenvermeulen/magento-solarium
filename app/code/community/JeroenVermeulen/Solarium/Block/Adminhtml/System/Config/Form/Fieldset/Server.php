@@ -20,6 +20,9 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * Class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Server
+ */
 class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Server
     extends Mage_Adminhtml_Block_System_Config_Form_Fieldset
 {
@@ -29,38 +32,41 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Serve
      * @param Varien_Data_Form_Element_Abstract $element
      * @return string
      */
-    protected function _getFooterHtml( $element ) {
+    protected
+    function _getFooterHtml(
+        $element
+    ) {
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
-        $helper   = Mage::helper( 'jeroenvermeulen_solarium' );
+        $helper = Mage::helper( 'jeroenvermeulen_solarium' );
         ob_start();
         ?>
         <table class="form-list">
             <tbody>
-                <tr>
-                    <td class="label">&nbsp;</td>
-                    <td>
-                        <button type="button" onclick="solariumTestConnection();">
-                            <?php echo htmlspecialchars( $helper->__('Test Connection') ); ?>
-                        </button>
-                        &nbsp;&nbsp;
-                        <button type="button" onclick="solariumSelfTest();">
-                            <?php echo htmlspecialchars( $helper->__('Self Test') ); ?>
-                        </button>
-                    </td>
-                </tr>
+            <tr>
+                <td class="label">&nbsp;</td>
+                <td>
+                    <button type="button" onclick="solariumTestConnection();">
+                        <?php echo htmlspecialchars( $helper->__( 'Test Connection' ) ); ?>
+                    </button>
+                    &nbsp;&nbsp;
+                    <button type="button" onclick="solariumSelfTest();">
+                        <?php echo htmlspecialchars( $helper->__( 'Self Test' ) ); ?>
+                    </button>
+                </td>
+            </tr>
             </tbody>
         </table>
         <table class="form-list">
-            <tbody id="solarium_test_connection_result" style="display: none;" >
-                <tr >
-                    <td class="label">&nbsp;</td>
-                    <td>&nbsp;</td>
-                </tr>
+            <tbody id="solarium_test_connection_result" style="display: none;">
+            <tr>
+                <td class="label">&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
             </tbody>
         </table>
         <script type="text/javascript">
-            function solariumTestMessage( action, message, setClass ) {
-                if ( !setClass ) {
+            function solariumTestMessage(action, message, setClass) {
+                if (!setClass) {
                     setClass = '';
                 }
                 var resultRow = '';
@@ -68,7 +74,7 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Serve
                 resultRow += '<td class="label">' + action + '</td>';
                 resultRow += '<td class="value ' + setClass + '">' + message + '</td>';
                 resultRow += '</tr>';
-                $('solarium_test_connection_result').update( resultRow ).show();
+                $('solarium_test_connection_result').update(resultRow).show();
             }
             function solariumGetParams() {
                 return {
@@ -84,27 +90,27 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Serve
             }
             function solariumTestConnection() {
                 var action = '' + <?php echo json_encode( $helper->__('Connection Test') ); ?>;
-                solariumTestMessage( action, <?php echo json_encode( $helper->__('Connecting...') ); ?> );
-                new Ajax.Request( <?php echo json_encode( Mage::helper("adminhtml")->getUrl("adminhtml/solarium/testConnection") ); ?>, {
+                solariumTestMessage(action, <?php echo json_encode( $helper->__('Connecting...') ); ?>);
+                new Ajax.Request(<?php echo json_encode( Mage::helper("adminhtml")->getUrl("adminhtml/solarium/testConnection") ); ?>, {
                     'parameters': solariumGetParams(),
-                    'onComplete': function( $response ) {
-                        $('solarium_test_connection_result').update( $response.responseText ).show();
+                    'onComplete': function ($response) {
+                        $('solarium_test_connection_result').update($response.responseText).show();
                     },
-                    'onFailure': function( $response ) {
-                        solariumTestMessage( action, <?php echo json_encode( $helper->__('ERROR') ); ?> + ' ' + response.status + ': ' + $response.responseText, 'not-available' );
+                    'onFailure': function ($response) {
+                        solariumTestMessage(action, <?php echo json_encode( $helper->__('ERROR') ); ?> +' ' + response.status + ': ' + $response.responseText, 'not-available');
                     }
                 });
             }
             function solariumSelfTest() {
                 var action = '' + <?php echo json_encode( $helper->__('Self Test') ); ?>;
-                solariumTestMessage( action, <?php echo json_encode( $helper->__('Testing...') ); ?> );
-                new Ajax.Request( <?php echo json_encode( Mage::helper("adminhtml")->getUrl("adminhtml/solarium/selfTest") ); ?>, {
+                solariumTestMessage(action, <?php echo json_encode( $helper->__('Testing...') ); ?>);
+                new Ajax.Request(<?php echo json_encode( Mage::helper("adminhtml")->getUrl("adminhtml/solarium/selfTest") ); ?>, {
                     'parameters': solariumGetParams(),
-                    'onComplete': function( $response ) {
-                        $('solarium_test_connection_result').update( $response.responseText ).show();
+                    'onComplete': function ($response) {
+                        $('solarium_test_connection_result').update($response.responseText).show();
                     },
-                    'onFailure': function( $response ) {
-                        solariumTestMessage( <?php echo json_encode( $helper->__('ERROR') ); ?> + ' ' + response.status + ': ' + $response.responseText, 'not-available' );
+                    'onFailure': function ($response) {
+                        solariumTestMessage(<?php echo json_encode( $helper->__('ERROR') ); ?> +' ' + response.status + ': ' + $response.responseText, 'not-available');
                     }
                 });
             }
