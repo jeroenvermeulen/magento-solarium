@@ -1,5 +1,5 @@
 <_>
-   <form_key>mvNLLfGbn8YS6sdV</form_key>
+   <form_key>CeVtjj9CCOPlud4U</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -19,14 +19,18 @@ GitHub repo: https://github.com/jeroenvermeulen/magento-solarium
 
 Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
 
+Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
+
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.1</version>
+   <version>1.6.2</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-  * Bugfix for &quot;Did you mean&quot; html</notes>
+  * Added self test to configuration
+  * Made nr of &quot;did you mean&quot; suggestions configurable
+  * Bugfix for issue #32: Error reindexing Solr - timeout</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -58,7 +62,7 @@ Report bugs: https://github.com/jeroenvermeulen/magento-solarium/issues
             <max/>
          </max>
          <files>
-            <files>                                                                </files>
+            <files>                                                                    </files>
          </files>
       </package>
       <extension>
