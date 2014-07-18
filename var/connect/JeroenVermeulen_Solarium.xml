@@ -1,5 +1,5 @@
 <_>
-   <form_key>gJ1tCgKJqp8ak2Az</form_key>
+   <form_key>tVTySPZM8Hvl0KfW</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -24,14 +24,13 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.3</version>
+   <version>1.6.4</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-* Added &quot;Searching for ## instead&quot; notice
-* Improved &quot;Did you mean&quot; to use native search notice.
-* Extended Self Test with Autocomplete and Suggest
-* Search results are saved in registry as an object, can be used in templates.</notes>
+* Bugfix for self test when using authentication
+
+Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; after upgrading.</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -63,7 +62,7 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
             <max/>
          </max>
          <files>
-            <files>                                                                       </files>
+            <files>                                                                        </files>
          </files>
       </package>
       <extension>
