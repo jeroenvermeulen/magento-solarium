@@ -52,7 +52,6 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 'core'     => '',
                 'auth'     => false,
                 'username' => '',
-                'password' => ''
             );
             $param         = array_merge( $defaultParam, $param );
             $config        = array(
@@ -64,14 +63,15 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 'server/requires_authentication'   => $param[ 'auth' ],
                 'server/username'                  => $param[ 'username' ],
                 'server/search_timeout'            => $param[ 'timeout' ],
-                'server/password'                  => $param[ 'password' ],
                 'results/autocomplete_suggestions' => 25,
                 'results/autocorrect'              => 1,
                 'results/did_you_mean'             => 1,
                 'results/did_you_mean_suggestions' => 5,
                 'results/max'                      => 100
             );
-
+            if (!preg_match( '|^\*+$|', $param['password'] )) {
+                $config[ 'server/password' ] = Mage::helper( 'core' )->encrypt( $param['password'] );
+            }
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
             if ($ok) {
                 $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
