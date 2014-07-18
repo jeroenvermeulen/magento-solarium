@@ -36,21 +36,19 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
         if (!$this->_suggestData) {
             $query   = $this->helper( 'catalogsearch' )->getQueryText();
             $counter = 0;
-            $data    = array();
             $storeId = Mage::app()->getStore()->getId();
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
             $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            $facet  = $engine->getAutoSuggestions( $storeId, $query );
+            $suggestions  = $engine->getAutoSuggestions( $storeId, $query );
 
-            foreach ($facet as $value => $count) {
-                $_data   = array(
+            $this->_suggestData = array();
+            foreach ($suggestions as $value => $count) {
+                $this->_suggestData[] = array(
                     'title'          => $value,
                     'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
                     'num_of_results' => $count
                 );
-                $data[ ] = $_data;
             }
-            $this->_suggestData = $data;
         }
         return $this->_suggestData;
     }
