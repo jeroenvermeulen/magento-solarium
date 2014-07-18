@@ -4,10 +4,6 @@
 # Magento User Interface       - File          - frontend/base/default/layout/jeroenvermeulen/solarium.xml
 app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml        app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml
 
-# ---- Frontend layout
-# Magento User Interface       - Recursive Dir - frontend/base/default/template/jeroenvermeulen/solarium
-app/design/frontend/base/default/template/jeroenvermeulen/solarium/         app/design/frontend/base/default/template/jeroenvermeulen/solarium/
-
 # ---- Backend layout
 # Magento User Interface       - File          - adminhtml/default/default/layout/jeroenvermeulen/solarium.xml
 app/design/adminhtml/default/default/layout/jeroenvermeulen/solarium.xml    app/design/adminhtml/base/default/layout/jeroenvermeulen/solarium.xml

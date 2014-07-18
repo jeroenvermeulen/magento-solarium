@@ -1,5 +1,5 @@
 <_>
-   <form_key>CeVtjj9CCOPlud4U</form_key>
+   <form_key>gJ1tCgKJqp8ak2Az</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -24,13 +24,14 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.2</version>
+   <version>1.6.3</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-  * Added self test to configuration
-  * Made nr of &quot;did you mean&quot; suggestions configurable
-  * Bugfix for issue #32: Error reindexing Solr - timeout</notes>
+* Added &quot;Searching for ## instead&quot; notice
+* Improved &quot;Did you mean&quot; to use native search notice.
+* Extended Self Test with Autocomplete and Suggest
+* Search results are saved in registry as an object, can be used in templates.</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -62,7 +63,7 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
             <max/>
          </max>
          <files>
-            <files>                                                                    </files>
+            <files>                                                                       </files>
          </files>
       </package>
       <extension>
@@ -82,7 +83,6 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
          <target>magecommunity</target>
          <target>magedesign</target>
          <target>magedesign</target>
-         <target>magedesign</target>
          <target>mageetc</target>
          <target>mageweb</target>
          <target>magelib</target>
@@ -95,7 +95,6 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
       <path>
          <path>JeroenVermeulen/Solarium</path>
          <path>frontend/base/default/layout/jeroenvermeulen/solarium.xml</path>
-         <path>frontend/base/default/template/jeroenvermeulen/solarium</path>
          <path>adminhtml/default/default/layout/jeroenvermeulen/solarium.xml</path>
          <path>modules/JeroenVermeulen_Solarium.xml</path>
          <path>js/solarium</path>
@@ -109,7 +108,6 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
       <type>
          <type>dir</type>
          <type>file</type>
-         <type>dir</type>
          <type>file</type>
          <type>file</type>
          <type>dir</type>
@@ -132,10 +130,8 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
          <include/>
          <include/>
          <include/>
-         <include/>
       </include>
       <ignore>
-         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

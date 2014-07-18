@@ -485,10 +485,10 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Query the Solr server to search for a string.
      *
-     * @param int $storeId - Store View Id
+     * @param int $storeId        - Store View Id
      * @param string $queryString - Text to search for
-     * @param int $try - Times tried to find result
-     * @return array
+     * @param int $try            - Times tried to find result
+     * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public
     function search(
@@ -496,10 +496,12 @@ class JeroenVermeulen_Solarium_Model_Engine
         $queryString,
         $try = 1
     ) {
+        $result = Mage::getModel('jeroenvermeulen_solarium/searchResult');
+        $result->setStoreId( $storeId );
+        $result->setUserQuery( $queryString );
         if (!$this->_working) {
-            return false;
+            return $result;
         }
-        $result = false;
         try {
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
@@ -535,16 +537,17 @@ class JeroenVermeulen_Solarium_Model_Engine
             $solrResultSet = $this->_client->select( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
-            $result               = array();
+            $resultProducts = array();
             foreach ($solrResultSet->getGrouping()->getGroup( 'product_id' ) as $valueGroup) {
                 foreach ($valueGroup as $solrResult) {
                     $key            = 'prd' . $solrResult[ 'product_id' ];
-                    $result[ $key ] = array(
+                    $resultProducts[ $key ] = array(
                         'relevance'  => $solrResult[ 'score' ],
                         'product_id' => $solrResult[ 'product_id' ]
                     );
                 }
             }
+            $result->setResultProducts( $resultProducts );
             if ($doAutoCorrect || $doDidYouMean) {
                 $suggest          = array();
                 $spellCheckResult = $solrResultSet->getSpellcheck();
@@ -558,16 +561,18 @@ class JeroenVermeulen_Solarium_Model_Engine
                         }
                     }
                     arsort( $suggest, SORT_NUMERIC );
-                    if ($doAutoCorrect && empty( $result ) && !empty( $suggest )) {
+                    if ($doAutoCorrect && empty( $resultProducts ) && !empty( $suggest )) {
                         $suggestKeys = array_keys( $suggest );
                         $bestMatch   = reset( $suggestKeys );
                         array_shift( $suggest );
-                        $result = $this->search( $storeId, $bestMatch, $try + 1 );
+                        $secondSearch = $this->search( $storeId, $bestMatch, $try + 1 );
+                        $result->setResultQuery( $bestMatch );
+                        $result->setResultProducts( $secondSearch->getResultProducts() );
                     }
                     $suggest =
                         array_slice( $suggest, 0, $this->getConf( 'results/did_you_mean_suggestions', $storeId ) );
                     if ($doDidYouMean) {
-                        Mage::register( 'solarium_suggest', $suggest );
+                        $result->setSuggestions( $suggest );
                     }
                 }
             }
@@ -579,15 +584,16 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
-     * @param integer $storeId - Store View Id
+     * @param integer $storeId    - Store View Id
      * @param string $queryString - What the user is typing
-     * @return null|string
+     * @return array              - key = suggested term,  value = result count
      */
     public
     function getAutoSuggestions(
         $storeId,
         $queryString
     ) {
+        $result = null;
         // Create basic query with wildcard
         $query              = $this->_client->createSelect();
         $queryHelper        = $query->getHelper();
@@ -608,19 +614,23 @@ class JeroenVermeulen_Solarium_Model_Engine
 
         // Add facet for completion
         $facetSet   = $query->getFacetSet();
-        $facetField = $facetSet->createFacetField( 'text' );
+        $facetField = $facetSet->createFacetField( 'auto_complete' );
         $facetField->setField( 'text' );
         $facetField->setMincount( 1 );
         $facetField->setLimit( $this->getConf( 'results/autocomplete_suggestions' ) );
         $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select( $query );
-
         if ($solariumResult) {
-            return $solariumResult->getFacetSet()->getFacet( 'text' );
-        } else {
-            return null;
+            $result = array();
+            foreach ( $solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches ) {
+                if ( $matches ) {
+                    $result[ $term ] = $matches;
+                }
+            };
         }
+
+        return $result;
     }
 
     /**
