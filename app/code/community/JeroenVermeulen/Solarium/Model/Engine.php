@@ -598,10 +598,12 @@ class JeroenVermeulen_Solarium_Model_Engine
         $query              = $this->_client->createSelect();
         $queryHelper        = $query->getHelper();
         $escapedQueryString = $queryHelper->escapeTerm( strtolower( $queryString ) );
-
-        $query->setQueryDefaultField( 'text' );
         $query->setQuery( $escapedQueryString . '*' );
-        $query->setRows( 0 );
+
+        if(!Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')){
+            $query->setRows( 0 );
+        }
+
 
         if (!empty( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
@@ -621,13 +623,25 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select( $query );
-        if ($solariumResult) {
+
+        if ($solariumResult && !Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
             $result = array();
             foreach ( $solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches ) {
                 if ( $matches ) {
                     $result[ $term ] = $matches;
                 }
             };
+        }
+        elseif($solariumResult){
+            $result = array();
+            $groups = $solariumResult->getGrouping();
+            foreach($groups as $groupKey => $fieldGroup) {
+                foreach($fieldGroup as $valueGroup) {
+                    foreach($valueGroup as $document) {
+                        $result [] = $document->product_id;
+                    }
+                }
+            }
         }
 
         return $result;
