@@ -26,6 +26,29 @@
 class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete
 {
 
+    protected function _toHtml()
+    {
+        if (!Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
+            return parent::_toHtml();
+        }
+
+        $html = '<ul><li style="display:none"></li>';
+        $suggestData = $this->getSuggestData();
+        $productCollection = $products = Mage::getModel('catalog/product')->getCollection()
+            ->addAttributeToFilter('entity_id', array('in' => $suggestData))
+            ->addAttributeToSelect(array('name', 'thumbnail', 'special_price'));
+
+        foreach ($productCollection as $product) {
+            $html .= '<li title="' . $product->getName() . '" class="odd">'
+                . '<span class="suggestions-productimage"><img src="' . Mage::helper('catalog/image')->init($product, 'thumbnail')->resize("50") . '"/></span>
+                   <span class="suggestions-productname"><strong>' . Mage::helper('core/string')->truncate($product->getName() ,30) . '</strong></span>';
+        }
+        $html .= '</ul>';
+
+        return $html;
+
+    }
+
     /**
      * Sanitize result to standard core functionality
      * @return array|null
@@ -34,22 +57,27 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
     function getSuggestData()
     {
         if (!$this->_suggestData) {
-            $query   = $this->helper( 'catalogsearch' )->getQueryText();
+            $query = $this->helper('catalogsearch')->getQueryText();
             $counter = 0;
             $storeId = Mage::app()->getStore()->getId();
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            $suggestions  = $engine->getAutoSuggestions( $storeId, $query );
+            $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
+            $suggestions = $engine->getAutoSuggestions($storeId, $query);
 
+
+            if (Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
+                return $suggestions;
+            }
             $this->_suggestData = array();
             foreach ($suggestions as $value => $count) {
                 $this->_suggestData[] = array(
-                    'title'          => $value,
-                    'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
+                    'title' => $value,
+                    'row_class' => (++$counter) % 2 ? 'odd' : 'even',
                     'num_of_results' => $count
                 );
             }
         }
+
         return $this->_suggestData;
     }
 }

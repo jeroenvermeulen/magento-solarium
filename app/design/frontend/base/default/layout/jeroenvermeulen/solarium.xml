@@ -28,6 +28,9 @@
             <action method="addJs" ifconfig="jeroenvermeulen_solarium/general/enabled">
                 <script>solarium/autocomplete.js</script>
             </action>
+            <action method="addCss" ifconfig="jeroenvermeulen_solarium/general/enabled">
+                <stylesheet>css/solarium/autocomplete.css</stylesheet>
+            </action>
         </reference>
     </default>
 </layout>
