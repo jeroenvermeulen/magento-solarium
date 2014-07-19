@@ -216,6 +216,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </max>
+                        <search_type translate="label">
+                            <label>Search type</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>jeroenvermeulen_solarium/adminhtml_system_config_source_searchtype</source_model>
+                        </search_type>
                     </fields>
                 </results>
                 <reindexing>

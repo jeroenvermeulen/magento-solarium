@@ -506,6 +506,9 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
+            if($this->getConf('results/search_type')){
+                $escapedQueryString = $escapedQueryString . '*';
+            }
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
             $query->setRows( $this->getConf( 'results/max', $storeId ) );
