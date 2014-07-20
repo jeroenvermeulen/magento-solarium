@@ -1,2 +1,10 @@
-.quick-access .form-search .suggestions-productimage{float:left;}
-.quick-access .form-search .suggestions-productname{width:145px; float:right; clear:right;text-align: right;}
+.quick-access .form-search .suggestions-productimage {
+    float: left;
+}
+
+.quick-access .form-search .suggestions-productname {
+    width: 145px;
+    float: right;
+    clear: right;
+    text-align: right;
+}

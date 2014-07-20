@@ -23,30 +23,22 @@
 /**
  * Class JeroenVermeulen_Solarium_Model_Adminhtml_System_Config_Source_Searchtype
  */
-class JeroenVermeulen_Solarium_Model_Adminhtml_System_Config_Source_Searchtype{
+class JeroenVermeulen_Solarium_Model_Adminhtml_System_Config_Source_Searchtype
+{
     /**
      * Options getter
      *
      * @return array
      */
-    public function toOptionArray()
+    public
+    function toOptionArray()
     {
         return array(
-            array('value' => 1, 'label'=>Mage::helper('jeroenvermeulen_solarium')->__('String Completion')),
-            array('value' => 0, 'label'=>Mage::helper('jeroenvermeulen_solarium')->__('Literal Search')),
+            array( 'value' => JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_LITERAL,
+                   'label' => Mage::helper( 'jeroenvermeulen_solarium' )->__( 'Literal Search' ) ),
+            array( 'value' => JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_STRING_COMPLETION,
+                   'label' => Mage::helper( 'jeroenvermeulen_solarium' )->__( 'String Completion' ) ),
         );
     }
 
-    /**
-     * Get options in "key-value" format
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return array(
-            0 => Mage::helper('jeroenvermeulen_solarium')->__('Literal Search'),
-            1 => Mage::helper('jeroenvermeulen_solarium')->__('String Completion'),
-        );
-    }
 }

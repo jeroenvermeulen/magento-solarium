@@ -25,6 +25,9 @@
  */
 class JeroenVermeulen_Solarium_Model_Engine
 {
+    const SEARCH_TYPE_LITERAL           = 0;
+    const SEARCH_TYPE_STRING_COMPLETION = 1;
+
     /** @var \Solarium\Client */
     protected $_client;
     /** @var bool */
@@ -135,7 +138,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $setting,
         $storeId = null
     ) {
-        if ( JeroenVermeulen_Solarium_Model_SelfTest::TEST_STOREID == $storeId ) {
+        if (JeroenVermeulen_Solarium_Model_SelfTest::TEST_STOREID == $storeId) {
             $storeId = null;
         }
         if (isset( $this->_overrideConfig[ $setting ] )) {
@@ -485,9 +488,9 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Query the Solr server to search for a string.
      *
-     * @param int $storeId        - Store View Id
+     * @param int $storeId - Store View Id
      * @param string $queryString - Text to search for
-     * @param int $try            - Times tried to find result
+     * @param int $try - Times tried to find result
      * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public
@@ -496,7 +499,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $queryString,
         $try = 1
     ) {
-        $result = Mage::getModel('jeroenvermeulen_solarium/searchResult');
+        $result = Mage::getModel( 'jeroenvermeulen_solarium/searchResult' );
         $result->setStoreId( $storeId );
         $result->setUserQuery( $queryString );
         if (!$this->_working) {
@@ -506,7 +509,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
-            if($this->getConf('results/search_type')){
+            if ($this::SEARCH_TYPE_STRING_COMPLETION == $this->getConf( 'results/search_type' )) {
                 $escapedQueryString = $escapedQueryString . '*';
             }
             $query->setQueryDefaultField( array( 'text' ) );
@@ -540,10 +543,10 @@ class JeroenVermeulen_Solarium_Model_Engine
             $solrResultSet = $this->_client->select( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
-            $resultProducts = array();
+            $resultProducts       = array();
             foreach ($solrResultSet->getGrouping()->getGroup( 'product_id' ) as $valueGroup) {
                 foreach ($valueGroup as $solrResult) {
-                    $key            = 'prd' . $solrResult[ 'product_id' ];
+                    $key                    = 'prd' . $solrResult[ 'product_id' ];
                     $resultProducts[ $key ] = array(
                         'relevance'  => $solrResult[ 'score' ],
                         'product_id' => $solrResult[ 'product_id' ]
@@ -587,7 +590,7 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
-     * @param integer $storeId    - Store View Id
+     * @param integer $storeId - Store View Id
      * @param string $queryString - What the user is typing
      * @return array              - key = suggested term,  value = result count
      */
@@ -603,10 +606,9 @@ class JeroenVermeulen_Solarium_Model_Engine
         $escapedQueryString = $queryHelper->escapeTerm( strtolower( $queryString ) );
         $query->setQuery( $escapedQueryString . '*' );
 
-        if(!Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')){
+        if (!Mage::getStoreConfig( 'jeroenvermeulen_solarium/results/autocomplete_product_suggestions' )) {
             $query->setRows( 0 );
         }
-
 
         if (!empty( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
@@ -627,21 +629,23 @@ class JeroenVermeulen_Solarium_Model_Engine
 
         $solariumResult = $this->_client->select( $query );
 
-        if ($solariumResult && !Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
+        if ($solariumResult && !Mage::getStoreConfig(
+                                    'jeroenvermeulen_solarium/results/autocomplete_product_suggestions'
+            )
+        ) {
             $result = array();
-            foreach ( $solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches ) {
-                if ( $matches ) {
+            foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
+                if ($matches) {
                     $result[ $term ] = $matches;
                 }
             };
-        }
-        elseif($solariumResult){
+        } elseif ($solariumResult) {
             $result = array();
             $groups = $solariumResult->getGrouping();
-            foreach($groups as $groupKey => $fieldGroup) {
-                foreach($fieldGroup as $valueGroup) {
-                    foreach($valueGroup as $document) {
-                        $result [] = $document->product_id;
+            foreach ($groups as $groupKey => $fieldGroup) {
+                foreach ($fieldGroup as $valueGroup) {
+                    foreach ($valueGroup as $document) {
+                        $result [ ] = $document->product_id;
                     }
                 }
             }
