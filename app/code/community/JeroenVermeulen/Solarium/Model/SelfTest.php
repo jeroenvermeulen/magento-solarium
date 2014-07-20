@@ -112,7 +112,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 );
             }
             if ($insertOk) {
-                $searchResult = $engine->search( $this::TEST_STOREID, $testProduct );
+                $searchResult = $engine->search( $this::TEST_STOREID, $testProduct, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
                 $allOk        = $allOk and $ok;
@@ -132,7 +132,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 }
                 $this->addMessage( 'Test Autocomplete', $ok );
 
-                $searchResult = $engine->search( $this::TEST_STOREID, $testAutoCorrect );
+                $searchResult = $engine->search( $this::TEST_STOREID, $testAutoCorrect, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
                 $allOk        = $allOk and $ok;

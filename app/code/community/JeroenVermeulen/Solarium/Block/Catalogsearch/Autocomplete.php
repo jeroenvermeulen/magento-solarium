@@ -25,26 +25,42 @@
  */
 class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_CatalogSearch_Block_Autocomplete
 {
+    protected $_suggestData;
+    protected $_suggestProductIds;
 
-    protected function _toHtml()
+    protected
+    function _toHtml()
     {
-        if (!Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
+        if (!Mage::getStoreConfig( 'jeroenvermeulen_solarium/results/autocomplete_product_suggestions' )) {
             return parent::_toHtml();
         }
-
-        $html = '<ul><li style="display:none"></li>';
-        $suggestData = $this->getSuggestData();
-        $productCollection = $products = Mage::getModel('catalog/product')->getCollection()
-            ->addAttributeToFilter('entity_id', array('in' => $suggestData))
-            ->addAttributeToSelect(array('name', 'thumbnail', 'special_price'));
-
-        foreach ($productCollection as $product) {
-            $html .= '<li title="' . $product->getName() . '" class="odd">'
-                . '<span class="suggestions-productimage"><img src="' . Mage::helper('catalog/image')->init($product, 'thumbnail')->resize("50") . '"/></span>
-                   <span class="suggestions-productname"><strong>' . Mage::helper('core/string')->truncate($product->getName() ,30) . '</strong></span>';
+        $productIds = $this->getSuggestProductIds();
+        if (empty( $productIds )) {
+            return parent::_toHtml();
+        } else {
+            $html              =
+                '<ul class="product_suggest"><li style="display: none"></li>'; // Magento by default starts with a hidden <li>, don't know why.
+            $productCollection = $products = Mage::getModel( 'catalog/product' )->getCollection()->addAttributeToFilter(
+                                                 'entity_id',
+                                                     array( 'in' => $productIds )
+                )->addAttributeToSelect( array( 'name', 'thumbnail', 'special_price' ) );
+            $counter           = 0;
+            foreach ($productCollection as $product) {
+                $rowClass = ( ++$counter ) % 2 ? 'odd' : 'even';
+                $html .= sprintf( '<li title="%s" class="%s">', $product->getName(), $rowClass );
+                $html .= '<span class="suggestions-productimage">';
+                $html .= sprintf(
+                    '<img src="%s" />',
+                    htmlentities( Mage::helper( 'catalog/image' )->init( $product, 'thumbnail' )->resize( '50' ) )
+                );
+                $html .= '</span>';
+                $html .= '<span class="suggestions-productname">';
+                $html .= htmlentities( Mage::helper( 'core/string' )->truncate( $product->getName(), 100 ) );
+                $html .= '</span>';
+                $html .= '</li>';
+            }
+            $html .= '</ul>';
         }
-        $html .= '</ul>';
-
         return $html;
 
     }
@@ -57,27 +73,36 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
     function getSuggestData()
     {
         if (!$this->_suggestData) {
-            $query = $this->helper('catalogsearch')->getQueryText();
+            $query   = $this->helper( 'catalogsearch' )->getQueryText();
             $counter = 0;
             $storeId = Mage::app()->getStore()->getId();
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-            $engine = Mage::getSingleton('jeroenvermeulen_solarium/engine');
-            $suggestions = $engine->getAutoSuggestions($storeId, $query);
+            $engine      = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            $suggestions = $engine->getAutoSuggestions( $storeId, $query );
 
-
-            if (Mage::getStoreConfig('jeroenvermeulen_solarium/results/autocomplete_product_suggestions')) {
-                return $suggestions;
-            }
             $this->_suggestData = array();
             foreach ($suggestions as $value => $count) {
-                $this->_suggestData[] = array(
-                    'title' => $value,
-                    'row_class' => (++$counter) % 2 ? 'odd' : 'even',
+                $this->_suggestData[ ] = array(
+                    'title'          => $value,
+                    'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
                     'num_of_results' => $count
                 );
             }
         }
-
         return $this->_suggestData;
+    }
+
+    public
+    function getSuggestProductIds()
+    {
+        /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
+        $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+        if (empty( $this->_suggestProductIds ) && $engine->isWorking()) {
+            $query                    = $this->helper( 'catalogsearch' )->getQueryText();
+            $storeId                  = Mage::app()->getStore()->getId();
+            $searchResult             = $engine->search( $storeId, $query, $engine::SEARCH_TYPE_STRING_COMPLETION );
+            $this->_suggestProductIds = $searchResult->getResultProductIds();
+        }
+        return $this->_suggestProductIds;
     }
 }

@@ -46,4 +46,13 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
     public function didAutoCorrect() {
         return( $this->getUserQuery() && $this->getResultQuery() && $this->getUserQuery() != $this->getResultQuery() );
     }
+
+    public function getResultProductIds() {
+        $result = array();
+        $resultProducts = $this->getResultProducts();
+        foreach ( $resultProducts as $resultProduct ) {
+            $result[] = $resultProduct['product_id'];
+        }
+        return $result;
+    }
 }

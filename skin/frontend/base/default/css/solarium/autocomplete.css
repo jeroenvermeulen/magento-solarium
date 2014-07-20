@@ -2,9 +2,22 @@
     float: left;
 }
 
+.quick-access .form-search img {
+    width: 50px;
+}
+
 .quick-access .form-search .suggestions-productname {
-    width: 145px;
+    width: 141px;
+    height: 33px;
     float: right;
     clear: right;
-    text-align: right;
+    text-align: left;
+    overflow: hidden;
+    margin-top: 8px;
+    margin-left: 4px;
+}
+
+.form-search .product_suggest li.even {
+    /* Override grey color on even rows, because it doen't look so nice with the product images. */
+    background-color: #fffefb;
 }

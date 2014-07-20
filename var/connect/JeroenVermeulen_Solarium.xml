@@ -1,5 +1,6 @@
 <_>
-   <form_key>tVTySPZM8Hvl0KfW</form_key>
+   <form_key>MdpLw20BEdE5OPvc</form_key>
+   <_create/>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -62,7 +63,7 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
             <max/>
          </max>
          <files>
-            <files>                                                                        </files>
+            <files>                                                                         </files>
          </files>
       </package>
       <extension>
@@ -90,6 +91,7 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <target>mageskin</target>
          <target>magecommunity</target>
          <target>magelocale</target>
+         <target>mageskin</target>
       </target>
       <path>
          <path>JeroenVermeulen/Solarium</path>
@@ -103,6 +105,7 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <path>adminhtml/default/default/images/jeroenvermeulen/solarium</path>
          <path>JeroenVermeulen/Solarium</path>
          <path>nl_NL/JeroenVermeulen_Solarium.csv</path>
+         <path>frontend/base/default/css/solarium</path>
       </path>
       <type>
          <type>dir</type>
@@ -116,6 +119,7 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <type>dir</type>
          <type>dir</type>
          <type>file</type>
+         <type>dir</type>
       </type>
       <include>
          <include/>
@@ -129,8 +133,10 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

@@ -39,3 +39,7 @@ app/code/community/JeroenVermeulen/Solarium/                                app/
 # ---- Dutch translation
 # Magento Locale language      - File          - nl_NL/JeroenVermeulen_Solarium.csv
 app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
+
+# ---- Frontend CSS files
+# Magento Theme Skin           - Recursive Dir - frontend/base/default/css/solarium
+skin/frontend/base/default/css/solarium                                    skin/frontend/base/default/css/solarium

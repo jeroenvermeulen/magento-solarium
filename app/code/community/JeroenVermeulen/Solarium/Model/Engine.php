@@ -25,8 +25,9 @@
  */
 class JeroenVermeulen_Solarium_Model_Engine
 {
-    const SEARCH_TYPE_LITERAL           = 0;
-    const SEARCH_TYPE_STRING_COMPLETION = 1;
+    const SEARCH_TYPE_USE_CONFIG        = 0;
+    const SEARCH_TYPE_LITERAL           = 1;
+    const SEARCH_TYPE_STRING_COMPLETION = 2;
 
     /** @var \Solarium\Client */
     protected $_client;
@@ -488,20 +489,25 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Query the Solr server to search for a string.
      *
-     * @param int $storeId - Store View Id
+     * @param int $storeId        - Store View Id
      * @param string $queryString - Text to search for
-     * @param int $try - Times tried to find result
+     * @param int $searchType     - 0 = Literal, 1 = Search completion
+     * @param int $try            - Times tried to find result
      * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public
     function search(
         $storeId,
         $queryString,
+        $searchType = JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_USE_CONFIG,
         $try = 1
     ) {
         $result = Mage::getModel( 'jeroenvermeulen_solarium/searchResult' );
         $result->setStoreId( $storeId );
         $result->setUserQuery( $queryString );
+        if ( $this::SEARCH_TYPE_USE_CONFIG == $searchType ) {
+            $searchType = $this->getConf( 'results/search_type' );
+        }
         if (!$this->_working) {
             return $result;
         }
@@ -509,7 +515,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
             $escapedQueryString = $queryHelper->escapeTerm( $queryString );
-            if ($this::SEARCH_TYPE_STRING_COMPLETION == $this->getConf( 'results/search_type' )) {
+            if ( $this::SEARCH_TYPE_STRING_COMPLETION == $searchType ) {
                 $escapedQueryString = $escapedQueryString . '*';
             }
             $query->setQueryDefaultField( array( 'text' ) );
@@ -571,7 +577,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                         $suggestKeys = array_keys( $suggest );
                         $bestMatch   = reset( $suggestKeys );
                         array_shift( $suggest );
-                        $secondSearch = $this->search( $storeId, $bestMatch, $try + 1 );
+                        $secondSearch = $this->search( $storeId, $bestMatch, $searchType, $try + 1 );
                         $result->setResultQuery( $bestMatch );
                         $result->setResultProducts( $secondSearch->getResultProducts() );
                     }
@@ -604,11 +610,10 @@ class JeroenVermeulen_Solarium_Model_Engine
         $query              = $this->_client->createSelect();
         $queryHelper        = $query->getHelper();
         $escapedQueryString = $queryHelper->escapeTerm( strtolower( $queryString ) );
-        $query->setQuery( $escapedQueryString . '*' );
 
-        if (!Mage::getStoreConfig( 'jeroenvermeulen_solarium/results/autocomplete_product_suggestions' )) {
-            $query->setRows( 0 );
-        }
+        $query->setQueryDefaultField( 'text' );
+        $query->setQuery( $escapedQueryString . '*' );
+        $query->setRows( 0 );
 
         if (!empty( $storeId )) {
             $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
@@ -628,27 +633,13 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select( $query );
-
-        if ($solariumResult && !Mage::getStoreConfig(
-                                    'jeroenvermeulen_solarium/results/autocomplete_product_suggestions'
-            )
-        ) {
+        if ($solariumResult) {
             $result = array();
             foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
                 if ($matches) {
                     $result[ $term ] = $matches;
                 }
             };
-        } elseif ($solariumResult) {
-            $result = array();
-            $groups = $solariumResult->getGrouping();
-            foreach ($groups as $groupKey => $fieldGroup) {
-                foreach ($fieldGroup as $valueGroup) {
-                    foreach ($valueGroup as $document) {
-                        $result [ ] = $document->product_id;
-                    }
-                }
-            }
         }
 
         return $result;
