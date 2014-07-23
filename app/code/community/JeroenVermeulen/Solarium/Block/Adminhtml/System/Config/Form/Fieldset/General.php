@@ -47,25 +47,23 @@ class JeroenVermeulen_Solarium_Block_Adminhtml_System_Config_Form_Fieldset_Gener
         $howTo    = '<ul>';
 
         $howTo .= '<li>' . $helper->__( 'Step %d', 1 ) . ': ';
-        $howTo .= $helper->__(
-                         'Configure and test your %sSolr Server%s.',
-                             '<!--suppress HtmlUnknownAnchorTarget -->
-                              <a onclick="$(\'jeroenvermeulen_solarium_server-state\').value=0;
-                                          Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_server\');"
-                                  href="#jeroenvermeulen_solarium_server-head">',
-                             '</a>'
-        );
+        $text = $helper->__( 'Configure and test your [Solr Server].' );
+        $text = str_replace( '[', '<!--suppress HtmlUnknownAnchorTarget -->
+                                   <a onclick="$(\'jeroenvermeulen_solarium_server-state\').value=0;
+                                               Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_server\');"
+                                  href="#jeroenvermeulen_solarium_server-head">', $text );
+        $text = str_replace( ']', '</a>', $text );
+        $howTo .= $text;
         $howTo .= '</li>';
 
         $howTo .= '<li>' . $helper->__( 'Step %d', 2 ) . ': ';
-        $howTo .= $helper->__(
-                         'Enable %sSolarium Search%s, Save Config.',
-                             '<!--suppress HtmlUnknownAnchorTarget -->
-                              <a onclick="$(\'jeroenvermeulen_solarium_general-state\').value=0;
-                                          Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_general\');"
-                                  href="#jeroenvermeulen_solarium_general-head">',
-                             '</a>'
-        );
+        $text = $helper->__( 'Enable Solarium Search in [General Settings] below, Save Config.' );
+        $text = str_replace( '[', '<!--suppress HtmlUnknownAnchorTarget -->
+                                   <a onclick="$(\'jeroenvermeulen_solarium_general-state\').value=0;
+                                               Fieldset.toggleCollapse(\'jeroenvermeulen_solarium_general\');"
+                                  href="#jeroenvermeulen_solarium_general-head">', $text );
+        $text = str_replace( ']', '</a>', $text );
+        $howTo .= $text;
         $howTo .= '</li>';
 
         $howTo .= '<li>' . $helper->__( 'Step %d', 3 ) . ': ';
