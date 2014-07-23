@@ -18,6 +18,7 @@
  * @copyright   Copyright (c) 2014 Jeroen Vermeulen (http://www.jeroenvermeulen.eu)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 Varien.searchForm.addMethods({
     initAutocomplete: function (url, destinationElement) {
         var newUrl = url.replace('catalogsearch', 'solarium');
@@ -43,5 +44,18 @@ Varien.searchForm.addMethods({
 
             }
         );
+    },
+
+    _selectAutocompleteItem : function(element){
+        var url = element.readAttribute('data-url');
+        if ( url ) {
+            window.location = url;
+        } else {
+            if ( element.title ) {
+                this.field.value = element.title;
+            }
+            this.form.submit();
+        }
     }
+
 });

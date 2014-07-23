@@ -31,7 +31,7 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
     protected
     function _toHtml()
     {
-        if (!Mage::getStoreConfig( 'jeroenvermeulen_solarium/results/autocomplete_product_suggestions' )) {
+        if ( ! Mage::getStoreConfig( 'jeroenvermeulen_solarium/results/autocomplete_product_suggestions' )) {
             return parent::_toHtml();
         }
         $productIds = $this->getSuggestProductIds();
@@ -47,8 +47,10 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
             $counter           = 0;
             foreach ($productCollection as $product) {
                 $rowClass = ( ++$counter ) % 2 ? 'odd' : 'even';
-                $html .= sprintf( '<li title="%s" class="%s">', $product->getName(), $rowClass );
-                $html .= sprintf( '<a href="%s">',$product->getProductUrl());
+                $html .= sprintf( '<li title="%s" class="%s" data-url="%s">',
+                                  htmlentities( $product->getName() ),
+                                  $rowClass,
+                                  htmlentities( $product->getProductUrl() ) );
                 $html .= '<span class="suggestions-productimage">';
                 $html .= sprintf(
                     '<img src="%s" />',
@@ -58,7 +60,6 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
                 $html .= '<span class="suggestions-productname">';
                 $html .= htmlentities( Mage::helper( 'core/string' )->truncate( $product->getName(), 100 ) );
                 $html .= '</span>';
-                $html .= '</a>';
                 $html .= '</li>';
             }
             $html .= '</ul>';
