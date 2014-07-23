@@ -38,9 +38,15 @@
  * @method JeroenVermeulen_Solarium_Model_SearchResult setSuggestions($data)
  * @method array getSuggestions()
  */
+
+/**
+ * Most of the work is done by Magento's Mage_Core_Model_Abstract.
+ *
+ * Class JeroenVermeulen_Solarium_Model_SearchResult
+ */
 class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstract
 {
-    // Most of the work is done by Magento's Mage_Core_Model_Abstract.
+    protected $betterSuggestions = null;
 
     /**
      * @return bool - True if autocorrect changed the the string to search for.
@@ -79,16 +85,20 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
      * @return array - with key = term, value = result count.
      */
     public function getBetterSuggestions() {
-        $betterSuggestions = array();
-        $suggestions = $this->getSuggestions();
-        $resultCount = $this->getResultCount();
-        if ( is_array($suggestions) ) {
-            foreach ( $suggestions as $term => $termResultCount ) {
-                if ( $termResultCount > $resultCount ) {
-                    $betterSuggestions[ $term ] = $termResultCount;
+        if ( is_null($this->betterSuggestions) ) {
+            $this->betterSuggestions = array();
+            $suggestions = $this->getSuggestions();
+            $resultCount = $this->getResultCount();
+            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            if ( is_array($suggestions) ) {
+                foreach ( $suggestions as $term => $freq ) {
+                    $termResult = $engine->search( $this->getStoreId(), $term, JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_LITERAL, 2 );
+                    if ( $termResult->getResultCount() > $resultCount ) {
+                        $this->betterSuggestions[ $term ] = $termResult->getResultCount();
+                    }
                 }
             }
         }
-        return $betterSuggestions;
+        return $this->betterSuggestions;
     }
 }

@@ -535,15 +535,15 @@ class JeroenVermeulen_Solarium_Model_Engine
             $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect', $storeId ) );
             $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean', $storeId ) );
             if ($doAutoCorrect || $doDidYouMean) {
+                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
                 $spellCheck->setCollate( true );
-                $spellCheck->setCount( 1 );
+                $spellCheck->setCount( $numSuggestions );
                 $spellCheck->setMaxCollations( 1 );
                 $spellCheck->setExtendedResults( true );
-                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
+                $spellCheck->setOnlyMorePopular( true );
                 $query->addParam( 'spellcheck.maxResultsForSuggest', $numSuggestions );
-                $query->addParam( 'spellcheck.count', $numSuggestions );
                 // You need Solr >= 4.0 for this to improve spell correct results.
                 $query->addParam( 'spellcheck.alternativeTermCount', 1 );
             }
@@ -568,7 +568,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $spellCheckResult = $solrResultSet->getSpellcheck();
                 if ($spellCheckResult && !$spellCheckResult->getCorrectlySpelled()) {
                     $suggestions = $spellCheckResult->getSuggestions();
-                    foreach ($suggestions as $suggestion) {
+                    foreach ( $suggestions as $suggestion ) {
                         foreach ($suggestion->getWords() as $word) {
                             if ($word[ 'freq' ] > $suggestion->getOriginalFrequency()) {
                                 $suggest[ $word[ 'word' ] ] = $word[ 'freq' ];
