@@ -85,7 +85,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 if ( $suggestions ) {
                     $suggestHtml = '';
                     foreach ($suggestions as $searchTerm => $result_count)  {
-                        $title = $helper->__('Results').':'.$result_count;
+                        $title = $helper->__('Results').': '.$result_count;
                         $href = Mage::getUrl('catalogsearch/result', array('q' => $searchTerm));
                         $suggestHtml .= sprintf('&nbsp; <a title="%s" href="%s">%s</a>', $title, $href, $searchTerm);
                     }
