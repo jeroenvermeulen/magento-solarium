@@ -26,7 +26,7 @@
 "Literal Search","Letterlijk Zoeken"
 "Make sure you install the ""schema.xml"" and ""solrconfig.xml"" provided by this extension, and restart Solr.","Zorg dat de ""schema.xml"" en ""solrconfig.xml"" die bij deze extensie geleverd worden geïnstalleerd zijn, en herstart Solr."
 "Maximum Number of Results","Maximum Aantal Zoekresultaten"
-"Nr of ""Did you mean..."" Suggestions","Aantal ""Bedoelde u..."" Suggesties"
+""Did you mean..."" Suggestions","Aantal ""Bedoelde u..."" Suggesties"
 "Nr of Autocomplete Suggestions","Aantal Suggesties Auto Aanvullen"
 "Password","Wachtwoord"
 "Path","Pad"

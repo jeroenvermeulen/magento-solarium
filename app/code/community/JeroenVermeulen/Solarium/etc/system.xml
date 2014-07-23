@@ -196,7 +196,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </did_you_mean>
                         <did_you_mean_suggestions translate="label">
-                            <label>Nr of "Did you mean..." Suggestions</label>
+                            <label>"Did you mean..." Suggestions</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <validate>validate-zero-or-greater</validate>

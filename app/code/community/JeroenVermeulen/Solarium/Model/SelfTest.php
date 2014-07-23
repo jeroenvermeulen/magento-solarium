@@ -44,7 +44,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             $testProductId    = intval( time() . getmypid() );
             $testProduct      = 'SELF TEST ENTRY ' . $testProductId;
             $testAutoComplete = substr( $testProductId, 0, -3 );
-            $testAutoCorrect  = 'SELF T3ST ENTRY ' . $testProductId;
+            $testAutoCorrect  = 'X'.substr( $testProductId, 1 );
             $defaultParam     = array(
                 'host'     => '',
                 'port'     => '',
@@ -112,6 +112,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 );
             }
             if ($insertOk) {
+
                 $searchResult = $engine->search( $this::TEST_STOREID, $testProduct, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
@@ -122,6 +123,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                     }
                 }
                 $this->addMessage( 'Search for test entry', $ok );
+
                 $autoSuggest = $engine->getAutoSuggestions( $this::TEST_STOREID, $testAutoComplete );
                 $ok          = false;
                 $allOk       = $allOk and $ok;
@@ -146,6 +148,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $ok     = $engine->cleanIndex( $this::TEST_STOREID, array( $testProductId ) );
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Deleting test entry from Solr', $ok );
+
             }
         } catch ( Exception $e ) {
             $allOk = false;
