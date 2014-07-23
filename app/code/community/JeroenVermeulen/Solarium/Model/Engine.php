@@ -777,7 +777,9 @@ class JeroenVermeulen_Solarium_Model_Engine
         if ( !empty($query) && Mage::getIsDeveloperMode() ) {
             $url = $this->getClient()->getEndpoint()->getBaseUri();
             $url .= $query->getRequestBuilder()->build( $query )->getUri();
-            $url .= '&indent=true'; // For easier debugging
+            // Modify URL for easier debugging
+            $url = str_replace( 'omitHeader=true&', '', $url );
+            $url .= '&indent=true&echoParams=all';
             Mage::log( 'Solr request: ' . $url , Zend_Log::DEBUG );
         }
     }
