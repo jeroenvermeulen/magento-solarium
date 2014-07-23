@@ -1,45 +1,45 @@
 ## JeroenVermeulen_Solarium Extension - Solr search for Magento CE
 
-# ---- Frontend layout
+# 1--- Frontend layout
 # Magento User Interface       - File          - frontend/base/default/layout/jeroenvermeulen/solarium.xml
 app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml        app/design/frontend/base/default/layout/jeroenvermeulen/solarium.xml
 
-# ---- Backend layout
+# 2--- Backend layout
 # Magento User Interface       - File          - adminhtml/default/default/layout/jeroenvermeulen/solarium.xml
 app/design/adminhtml/default/default/layout/jeroenvermeulen/solarium.xml    app/design/adminhtml/base/default/layout/jeroenvermeulen/solarium.xml
 
-# ---- Module enable XML
+# 3--- Module enable XML
 # Magento Global Config        - File          - modules/JeroenVermeulen_Solarium.xml
 app/etc/modules/JeroenVermeulen_Solarium.xml                                app/etc/modules/JeroenVermeulen_Solarium.xml
 
-# ---- JavaScript libraries
+# 4--- JavaScript libraries
 # Magento Other web accessible - Recursive Dir - js/solarium
 js/solarium/                                                                js/solarium/
 
-# ---- The Solarium Library, by Bas de Nooijer
+# 5--- The Solarium Library, by Bas de Nooijer
 # Magento PHP Library file     - Recursive Dir - Solarium
 lib/Solarium/                                                               lib/Solarium/
 
-# ---- The EventDispatcher component from the Symfony framework
+# 6--- The EventDispatcher component from the Symfony framework
 # Magento PHP Library file     - Recursive Dir - Symfony/Component/EventDispatcher
 lib/Symfony/Component/EventDispatcher/                                      lib/Symfony/Component/EventDispatcher/
 
-# ---- Backend CSS file
+# 7--- Backend CSS file
 # Magento Theme Skin           - File          - adminhtml/default/default/css/jeroenvermeulen/solarium.css
 skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css             skin/adminhtml/default/default/css/jeroenvermeulen/solarium.css
 
-# ---- Backend image files
+# 8--- Backend image files
 # Magento Theme Skin           - Recursive Dir - adminhtml/default/default/images/jeroenvermeulen/solarium
 skin/adminhtml/default/default/images/jeroenvermeulen/solarium/             skin/adminhtml/default/default/images/jeroenvermeulen/solarium/
 
-# ---- Extension code dir
+# 9--- Frontend CSS files
+# Magento Theme Skin           - Recursive Dir - frontend/base/default/css/solarium
+skin/frontend/base/default/css/solarium                                    skin/frontend/base/default/css/solarium
+
+# 10-- Extension code dir
 # Magento Community Module     - Recursive Dir - JeroenVermeulen/Solarium
 app/code/community/JeroenVermeulen/Solarium/                                app/code/community/JeroenVermeulen/Solarium/
 
-# ---- Dutch translation
+# 11-- Dutch translation
 # Magento Locale language      - File          - nl_NL/JeroenVermeulen_Solarium.csv
 app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
-
-# ---- Frontend CSS files
-# Magento Theme Skin           - Recursive Dir - frontend/base/default/css/solarium
-skin/frontend/base/default/css/solarium                                    skin/frontend/base/default/css/solarium

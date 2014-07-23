@@ -1,6 +1,5 @@
 <_>
-   <form_key>MdpLw20BEdE5OPvc</form_key>
-   <_create/>
+   <form_key>XkHK6cnQbZ7gq0io</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -25,13 +24,17 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.4</version>
+   <version>1.6.5</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-* Bugfix for self test when using authentication
+* Added Products as Suggestions, with images
+* Added Search Type: String Completion
+* Improved &quot;Did you mean...&quot;
+* Improved Self Test
+* Updated nl_NL translations
 
-Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; after upgrading.</notes>
+Please clear Magento cache after upgrading.</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -63,7 +66,7 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
             <max/>
          </max>
          <files>
-            <files>                                                                         </files>
+            <files>                                                                           </files>
          </files>
       </package>
       <extension>
@@ -89,9 +92,9 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <target>magelib</target>
          <target>mageskin</target>
          <target>mageskin</target>
+         <target>mageskin</target>
          <target>magecommunity</target>
          <target>magelocale</target>
-         <target>mageskin</target>
       </target>
       <path>
          <path>JeroenVermeulen/Solarium</path>
@@ -103,9 +106,9 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <path>Symfony/Component/EventDispatcher</path>
          <path>adminhtml/default/default/css/jeroenvermeulen/solarium.css</path>
          <path>adminhtml/default/default/images/jeroenvermeulen/solarium</path>
+         <path>frontend/base/default/css/solarium</path>
          <path>JeroenVermeulen/Solarium</path>
          <path>nl_NL/JeroenVermeulen_Solarium.csv</path>
-         <path>frontend/base/default/css/solarium</path>
       </path>
       <type>
          <type>dir</type>
@@ -118,8 +121,8 @@ Please clear Magento cache and reindex the &quot;Catalog Search Index&quot; afte
          <type>file</type>
          <type>dir</type>
          <type>dir</type>
-         <type>file</type>
          <type>dir</type>
+         <type>file</type>
       </type>
       <include>
          <include/>
