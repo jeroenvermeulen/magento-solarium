@@ -42,17 +42,53 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
 {
     // Most of the work is done by Magento's Mage_Core_Model_Abstract.
 
-    /** @return bool - True if autocorrect changed the the string to search for. */
+    /**
+     * @return bool - True if autocorrect changed the the string to search for.
+     */
     public function didAutoCorrect() {
         return( $this->getUserQuery() && $this->getResultQuery() && $this->getUserQuery() != $this->getResultQuery() );
     }
 
+    /**
+     * @return int[] - Array of product id's
+     */
     public function getResultProductIds() {
         $result = array();
         $resultProducts = $this->getResultProducts();
-        foreach ( $resultProducts as $resultProduct ) {
-            $result[] = $resultProduct['product_id'];
+        if ( is_array($resultProducts) ) {
+            foreach ( $resultProducts as $resultProduct ) {
+                $result[] = $resultProduct['product_id'];
+            }
         }
         return $result;
+    }
+
+    /**
+     * @return int
+     */
+    public function getResultCount() {
+        $result = 0;
+        $resultProducts = $this->getResultProducts();
+        if ( is_array($resultProducts) ) {
+            $result = count( $resultProducts );
+        }
+        return $result;
+    }
+
+    /**
+     * @return array - with key = term, value = result count.
+     */
+    public function getBetterSuggestions() {
+        $betterSuggestions = array();
+        $suggestions = $this->getSuggestions();
+        $resultCount = $this->getResultCount();
+        if ( is_array($suggestions) ) {
+            foreach ( $suggestions as $term => $termResultCount ) {
+                if ( $termResultCount > $resultCount ) {
+                    $betterSuggestions[ $term ] = $termResultCount;
+                }
+            }
+        }
+        return $betterSuggestions;
     }
 }

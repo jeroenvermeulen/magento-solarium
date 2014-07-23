@@ -51,7 +51,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 $searchResult = $engine->search( $query->getStoreId(), $queryText );
                 Mage::register( 'solarium_search_result', $searchResult );
                 /** @deprecated The registry key 'solarium_suggest' is deprecated, it was used in 1.6.0 till 1.6.2 */
-                Mage::register( 'solarium_suggest', $searchResult->getSuggestions() );
+                Mage::register( 'solarium_suggest', $searchResult->getBetterSuggestions() );
                 $resultProducts = $searchResult->getResultProducts();
                 if ( is_array($resultProducts) ) {
                     if (0 == count( $resultProducts )) {
@@ -81,14 +81,13 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                         $helper->__( "Showing results for '%s' instead.", $searchResult->getResultQuery() ) );
                 }
                 // "Did you mean" suggestions
-                $suggestions = $searchResult->getSuggestions();
+                $suggestions = $searchResult->getBetterSuggestions();
                 if ( $suggestions ) {
                     $suggestHtml = '';
-                    foreach ($suggestions as $suggestion => $result_count)  {
+                    foreach ($suggestions as $searchTerm => $result_count)  {
                         $title = $helper->__('Results').':'.$result_count;
-                        $href = Mage::getUrl('catalogsearch/result', array('q' => $suggestion));
-                        $suggestHtml .= sprintf('&nbsp; <a title="%s" href="%s">', $title, $href);
-                        $suggestHtml .= $suggestion . '</a>';
+                        $href = Mage::getUrl('catalogsearch/result', array('q' => $searchTerm));
+                        $suggestHtml .= sprintf('&nbsp; <a title="%s" href="%s">%s</a>', $title, $href, $searchTerm);
                     }
                     $catSearchHelper->addNoteMessage( $helper->__('Did you mean:') . $suggestHtml );
                 }

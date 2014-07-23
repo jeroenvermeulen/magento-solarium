@@ -96,14 +96,12 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
                     $message .= "\nSystem > Configuration > CATALOG > Solarium search";
                     echo $message . "\n";
                 } else {
-                    $message .= '<br />' . $helper->__(
-                                                  'Please check the %sSolr server configuration%s.',
-                                                      sprintf(
-                                                          '<!--suppress HtmlUnknownTarget --><a href="%s">',
-                                                          $configUrl
-                                                      ),
-                                                      '</a>'
-                        );
+                    $notice = $helper->__( 'Please check the [Solr server configuration].');
+                    $notice = str_replace( '[',
+                                           sprintf('<!--suppress HtmlUnknownTarget --><a href="%s">', $configUrl),
+                                           $notice );
+                    $notice = str_replace( ']', '</a>', $notice );
+                    $message .= '<br />' . $notice;
                     Mage::getSingleton( 'adminhtml/session' )->addError( $message );
                 }
             }

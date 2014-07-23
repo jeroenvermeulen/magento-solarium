@@ -34,7 +34,7 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
             <groups>
-                <general translate="label">
+                <general translate="label" module="jeroenvermeulen_solarium">
                     <label>General Settings</label>
                     <frontend_type>text</frontend_type>
                     <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_general</frontend_model>
@@ -55,7 +55,7 @@
                         </enabled>
                     </fields>
                 </general>
-                <server translate="label">
+                <server translate="label" module="jeroenvermeulen_solarium">
                     <label>Solr Server</label>
                     <frontend_type>text</frontend_type>
                     <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_server</frontend_model>
@@ -151,7 +151,7 @@
                         </password>
                     </fields>
                 </server>
-                <results>
+                <results translate="label" module="jeroenvermeulen_solarium">
                     <label>Search Results</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>400</sort_order>
@@ -160,7 +160,7 @@
                     <show_in_store>0</show_in_store>
                     <fields>
                         <autocomplete_product_suggestions translate="label">
-                            <label>Use products as suggestions</label>
+                            <label>Show Products as Autocomplete</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>0</sort_order>
                             <show_in_default>1</show_in_default>
@@ -196,7 +196,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </did_you_mean>
                         <did_you_mean_suggestions translate="label">
-                            <label>"Did you mean..." Suggestions</label>
+                            <label>Nr of "Did you mean..." Suggestions</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <validate>validate-zero-or-greater</validate>
@@ -217,7 +217,7 @@
                             <show_in_store>1</show_in_store>
                         </max>
                         <search_type translate="label">
-                            <label>Search type</label>
+                            <label>Search Type</label>
                             <frontend_type>select</frontend_type>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
@@ -227,7 +227,7 @@
                         </search_type>
                     </fields>
                 </results>
-                <reindexing>
+                <reindexing translate="label" module="jeroenvermeulen_solarium">
                     <label>Reindex Data</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>500</sort_order>

@@ -20,6 +20,10 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
+/**
+ * @TODO Somehow translations are not working here. Maybe it's not possible?
+ */
+
 /* @var $this Mage_Core_Model_Resource_Setup */
 $this->startSetup();
 $this->endSetup();
@@ -33,14 +37,12 @@ $configSteps = array(
     $helper->__( 'Solarium Search' )
 );
 
-$notice .= 'Please follow these steps:<br />';
-$notice .= '&nbsp; &nbsp; &#8226; Flush Cache Storage<br />';
-$notice .= '&nbsp; &nbsp; &#8226; Log out<br />';
-$notice .= '&nbsp; &nbsp; &#8226; Log in<br />';
-$notice .= '&nbsp; &nbsp; &#8226; ' . sprintf(
-        'Configure via:&nbsp; %s<br />',
-        htmlentities( implode( ' > ', $configSteps ) )
-    );
+$notice .= $helper->__('Please follow these steps:').'<br />';
+$notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Flush Magento's Cache Storage").'<br />';
+$notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Log out").'<br />';
+$notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Log in").'<br />';
+$notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Configure via:") . '&nbsp;' .
+           htmlentities( implode( ' > ', $configSteps ) ).'<br />';
 
 $title = $helper->__( 'The extension JeroenVermeulen_Solarium has been installed - Setup Instructions' );
 

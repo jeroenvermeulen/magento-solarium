@@ -77,12 +77,12 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
                 $ok     = $engine->isWorking();
                 $allOk  = $allOk and $ok;
-                $this->addMessage( 'Connection to Solr', $ok, 'Please check the connection settings.' );
+                $this->addMessage( 'Connection to Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
             if ($ok) {
                 $ok     = $engine->ping();
                 $allOk  = $allOk and $ok;
-                $this->addMessage( 'Ping Solr', $ok, 'Please check the connection settings.' );
+                $this->addMessage( 'Ping Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
             if ($ok) {
                 $ok     = $engine->getClient()->checkMinimal( '3.0' );
@@ -107,8 +107,8 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $this->addMessage(
                      'Inserting test entry in Solr',
                          $insertOk,
-                         'Make sure you install the "schema.xml" and "solrconfig.xml"
-                          provided by this extension, and restart Solr.'
+                         'Make sure you install the "schema.xml" and "solrconfig.xml" provided by this extension,'
+                         . ' and restart Solr.'
                 );
             }
             if ($insertOk) {
@@ -188,9 +188,8 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             $this->message .= '<td>&nbsp;</td>';
         } else {
             $this->message .= '<td class="value error">' . $helper->__( 'FAILED' ) . '</td>';
-            $this->message .= '<td><strong>' . ( empty( $solveInfo ) ? '&nbsp;' : $helper->__(
-                                                                                         $solveInfo
-                ) ) . '</strong></td>';
+            $solveHtml = ( empty( $solveInfo ) ? '&nbsp;' : $helper->__( $solveInfo ) );
+            $this->message .= '<td><strong>' . $solveHtml . '</strong></td>';
         }
         $this->message .= '</tr>' . "\n";
     }
