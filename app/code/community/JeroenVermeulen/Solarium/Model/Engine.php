@@ -311,6 +311,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             // Not 100% sure if this setTimeAllowed works.
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
             $solariumResult = $this->_client->ping( $query );
+            $this->debugQuery( $query );
             $resultData     = $solariumResult->getData();
             if (!empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ]) {
                 $result = true;
@@ -483,6 +484,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         }
         $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
         $solrResultSet = $this->_client->select( $query );
+        $this->debugQuery( $query );
         return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
 
@@ -547,6 +549,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             }
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
             $solrResultSet = $this->_client->select( $query );
+            $this->debugQuery( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
             $resultProducts       = array();
@@ -633,6 +636,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField->setPrefix( $escapedQueryString );
 
         $solariumResult = $this->_client->select( $query );
+        $this->debugQuery( $query );
         if ($solariumResult) {
             $result = array();
             foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
@@ -763,5 +767,18 @@ class JeroenVermeulen_Solarium_Model_Engine
             $queryText[ ] = '*:*'; // Delete all
         }
         return implode( ' ', $queryText );
+    }
+
+    /**
+     * @param Solarium\Core\Query\Query $query
+     */
+    protected
+    function debugQuery( $query ) {
+        if ( !empty($query) && Mage::getIsDeveloperMode() ) {
+            $url = $this->getClient()->getEndpoint()->getBaseUri();
+            $url .= $query->getRequestBuilder()->build( $query )->getUri();
+            $url .= '&indent=true'; // For easier debugging
+            Mage::log( 'Solr request: ' . $url , Zend_Log::DEBUG );
+        }
     }
 }
