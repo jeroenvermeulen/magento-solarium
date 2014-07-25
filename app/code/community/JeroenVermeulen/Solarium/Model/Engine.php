@@ -491,10 +491,10 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Query the Solr server to search for a string.
      *
-     * @param int $storeId        - Store View Id
-     * @param string $queryString - Text to search for
-     * @param int $searchType     - 0 = Literal, 1 = Search completion
-     * @param int $try            - Times tried to find result
+     * @param int $storeId                                            - Store View Id
+     * @param string $queryString                                     - Text to search for
+     * @param int $searchType                                         - 0 = Literal, 1 = Search completion
+     * @param JeroenVermeulen_Solarium_Model_SearchResult $prevResult - Result from previous try
      * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public
@@ -502,11 +502,14 @@ class JeroenVermeulen_Solarium_Model_Engine
         $storeId,
         $queryString,
         $searchType = JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_USE_CONFIG,
-        $try = 1
+        $doDidYouMean = null
     ) {
+        if ( is_null($doDidYouMean) ) {
+            $doDidYouMean = $this->getConf( 'results/did_you_mean', $storeId );
+        }
         $result = Mage::getModel( 'jeroenvermeulen_solarium/searchResult' );
         $result->setStoreId( $storeId );
-        $result->setUserQuery( $queryString );
+        $result->setResultQuery( $queryString );
         if ( $this::SEARCH_TYPE_USE_CONFIG == $searchType ) {
             $searchType = $this->getConf( 'results/search_type' );
         }
@@ -532,21 +535,19 @@ class JeroenVermeulen_Solarium_Model_Engine
             $groupComponent = $query->getGrouping();
             $groupComponent->addField( 'product_id' );
             $groupComponent->setLimit( 1 );
-            $doAutoCorrect = ( 1 == $try && $this->getConf( 'results/autocorrect', $storeId ) );
-            $doDidYouMean  = ( 1 == $try && $this->getConf( 'results/did_you_mean', $storeId ) );
-            if ($doAutoCorrect || $doDidYouMean) {
-                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
+
+            if ( $doDidYouMean ) {
+                $numSuggestions = $this->getConf( 'results/did_you_mean_suggestions', $storeId );
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
-                $spellCheck->setCollate( true );
-                $spellCheck->setCount( $numSuggestions );
-                $spellCheck->setMaxCollations( 1 );
+                $spellCheck->setCount( 10 * $numSuggestions );
                 $spellCheck->setExtendedResults( true );
                 $spellCheck->setOnlyMorePopular( true );
-                $query->addParam( 'spellcheck.maxResultsForSuggest', $numSuggestions );
+                $spellCheck->setAccuracy( $this->getConf( 'results/suggestions_accuracy', $storeId ) / 100 );
                 // You need Solr >= 4.0 for this to improve spell correct results.
-                $query->addParam( 'spellcheck.alternativeTermCount', 1 );
+                $query->addParam( 'spellcheck.alternativeTermCount', 10 * $numSuggestions );
             }
+
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
             $solrResultSet = $this->_client->select( $query );
             $this->debugQuery( $query );
@@ -563,10 +564,11 @@ class JeroenVermeulen_Solarium_Model_Engine
                 }
             }
             $result->setResultProducts( $resultProducts );
-            if ($doAutoCorrect || $doDidYouMean) {
+
+            if ( $doDidYouMean) {
                 $suggest          = array();
                 $spellCheckResult = $solrResultSet->getSpellcheck();
-                if ($spellCheckResult && !$spellCheckResult->getCorrectlySpelled()) {
+                if ( $spellCheckResult ) {
                     $suggestions = $spellCheckResult->getSuggestions();
                     foreach ( $suggestions as $suggestion ) {
                         foreach ($suggestion->getWords() as $word) {
@@ -576,14 +578,6 @@ class JeroenVermeulen_Solarium_Model_Engine
                         }
                     }
                     arsort( $suggest, SORT_NUMERIC );
-                    if ($doAutoCorrect && empty( $resultProducts ) && !empty( $suggest )) {
-                        $suggestKeys = array_keys( $suggest );
-                        $bestMatch   = reset( $suggestKeys );
-                        array_shift( $suggest );
-                        $secondSearch = $this->search( $storeId, $bestMatch, $searchType, $try + 1 );
-                        $result->setResultQuery( $bestMatch );
-                        $result->setResultProducts( $secondSearch->getResultProducts() );
-                    }
                     $suggest =
                         array_slice( $suggest, 0, $this->getConf( 'results/did_you_mean_suggestions', $storeId ) );
                     if ($doDidYouMean) {
@@ -595,6 +589,38 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
+        return $result;
+    }
+
+    /**
+     * @param JeroenVermeulen_Solarium_Model_SearchResult $prevResult - Result from previous try
+     * @return string|null
+     */
+    public function autoCorrect( $queryString ) {
+        $result = null;
+
+        $query = $this->_client->createSelect();
+        $query->setRows(0);
+
+        $spellcheck = $query->getSpellcheck();
+        $spellcheck->setQuery( $queryString );
+        $spellcheck->setCount(1);
+        $spellcheck->setMaxCollations(1);
+        $spellcheck->setCollate(true);
+        $query->addParam( 'spellcheck.alternativeTermCount', 1 );
+
+        $resultSet = $this->_client->select($query);
+        $this->debugQuery( $query );
+        $spellCheckResult = $resultSet->getSpellcheck();
+
+        if ( $spellCheckResult ) {
+            $result = $spellCheckResult->getCollation()->getQuery();
+            $result = trim( $result, '()' );
+            if ( $result == $queryString ) {
+                $result = null;
+            }
+        }
+
         return $result;
     }
 

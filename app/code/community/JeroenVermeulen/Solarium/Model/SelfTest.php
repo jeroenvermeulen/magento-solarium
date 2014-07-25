@@ -42,7 +42,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
         $helper        = Mage::helper( 'jeroenvermeulen_solarium' );
         try {
             $testProductId    = intval( time() . getmypid() );
-            $testProduct      = 'SELF TEST ENTRY ' . $testProductId;
+            $testProductText  = 'SELF TEST ENTRY ' . $testProductId;
             $testAutoComplete = substr( $testProductId, 0, -3 );
             $testAutoCorrect  = 'X'.substr( $testProductId, 1 );
             $defaultParam     = array(
@@ -97,7 +97,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                     'id'         => 'test' . $testProductId,
                     'product_id' => $testProductId,
                     'store_id'   => $this::TEST_STOREID,
-                    'text'       => $testProduct
+                    'text'       => $testProductText
                 );
                 $buffer->createDocument( $data );
                 $solariumResult = $buffer->commit();
@@ -113,36 +113,41 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             }
             if ($insertOk) {
 
-                $searchResult = $engine->search( $this::TEST_STOREID, $testProduct, $engine::SEARCH_TYPE_LITERAL );
+                $searchResult = $engine->search( $this::TEST_STOREID, $testProductText, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
-                $allOk        = $allOk and $ok;
                 foreach ($resultDocs as $resultDoc) {
                     if ($testProductId == $resultDoc[ 'product_id' ]) {
                         $ok = true;
                     }
                 }
+                $allOk        = $allOk and $ok;
                 $this->addMessage( 'Search for test entry', $ok );
 
                 $autoSuggest = $engine->getAutoSuggestions( $this::TEST_STOREID, $testAutoComplete );
                 $ok          = false;
-                $allOk       = $allOk and $ok;
                 foreach ($autoSuggest as $term => $count) {
                     if ( $testProductId == $term && 0 < $count ) {
                         $ok = true;
                     }
                 }
+                $allOk       = $allOk and $ok;
                 $this->addMessage( 'Test Autocomplete', $ok );
+
+                $correctResult = $engine->autoCorrect( $testAutoCorrect );
+                $ok           = ( $correctResult == $testProductId );
+                $allOk        = $allOk and $ok;
+                $this->addMessage( 'Test Correction of Typos', $ok );
 
                 $searchResult = $engine->search( $this::TEST_STOREID, $testAutoCorrect, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
-                $allOk        = $allOk and $ok;
                 foreach ($resultDocs as $resultDoc) {
                     if ($testProductId == $resultDoc[ 'product_id' ]) {
                         $ok = true;
                     }
                 }
+                $allOk        = $allOk and $ok;
                 $this->addMessage( 'Test Suggest + Correct Typos', $ok );
 
                 $ok     = $engine->cleanIndex( $this::TEST_STOREID, array( $testProductId ) );

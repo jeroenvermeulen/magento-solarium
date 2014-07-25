@@ -205,6 +205,7 @@
                 <autocorrect>1</autocorrect>
                 <did_you_mean>1</did_you_mean>
                 <did_you_mean_suggestions>5</did_you_mean_suggestions>
+                <suggestions_accuracy>70</suggestions_accuracy>
                 <max>100</max>
             </results>
             <reindexing>

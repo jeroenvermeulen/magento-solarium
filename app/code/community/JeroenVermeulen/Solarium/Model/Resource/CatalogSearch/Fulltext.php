@@ -49,31 +49,34 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             if ($engine->isWorking()) {
                 $searchResult = $engine->search( $query->getStoreId(), $queryText );
+                $searchResult->setUserQuery( $queryText );
                 Mage::register( 'solarium_search_result', $searchResult );
-                /** @deprecated The registry key 'solarium_suggest' is deprecated, it was used in 1.6.0 till 1.6.2 */
-                Mage::register( 'solarium_suggest', $searchResult->getBetterSuggestions() );
+                if ( ! $searchResult->getResultCount() ) {
+                    // Autocorrect
+                    if ( $engine->getConf( 'results/autocorrect', $query->getStoreId() ) ) {
+                        $searchResult->autoCorrect();
+                    }
+                }
                 $resultProducts = $searchResult->getResultProducts();
-                if ( is_array($resultProducts) ) {
-                    if (0 == count( $resultProducts )) {
-                        // No results, we need to check if the index is empty.
-                        if ($engine->isEmpty( $query->getStoreId() )) {
-                            Mage::Log( sprintf( '%s - Warning: index is empty', __CLASS__ ), Zend_Log::WARN );
-                        } else {
-                            $query->setIsProcessed( 1 );
-                        }
+                if ( ! $searchResult->getResultCount() ) {
+                    // No results, we need to check if the index is empty.
+                    if ($engine->isEmpty( $query->getStoreId() )) {
+                        Mage::Log( sprintf( '%s - Warning: index is empty', __CLASS__ ), Zend_Log::WARN );
                     } else {
-                        $columns    = array( 'query_id', 'product_id', 'relevance' );
-                        $insertRows = array();
-                        $queryId    = $query->getId();
-                        foreach ($resultProducts as $data) {
-                            $insertRows[ ] = array( $queryId, $data[ 'product_id' ], $data[ 'relevance' ] );
-                        }
-                        $adapter->beginTransaction();
-                        $adapter->delete( $searchResultTable, 'query_id = ' . $queryId );
-                        $adapter->insertArray( $searchResultTable, $columns, $insertRows );
-                        $adapter->commit();
                         $query->setIsProcessed( 1 );
                     }
+                } else {
+                    $columns    = array( 'query_id', 'product_id', 'relevance' );
+                    $insertRows = array();
+                    $queryId    = $query->getId();
+                    foreach ($resultProducts as $data) {
+                        $insertRows[ ] = array( $queryId, $data[ 'product_id' ], $data[ 'relevance' ] );
+                    }
+                    $adapter->beginTransaction();
+                    $adapter->delete( $searchResultTable, 'query_id = ' . $queryId );
+                    $adapter->insertArray( $searchResultTable, $columns, $insertRows );
+                    $adapter->commit();
+                    $query->setIsProcessed( 1 );
                 }
                 // Autocorrect notification
                 if ( $searchResult->didAutoCorrect() ) {
@@ -91,6 +94,8 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                     }
                     $catSearchHelper->addNoteMessage( $helper->__('Did you mean:') . $suggestHtml );
                 }
+                /** @deprecated The registry key 'solarium_suggest' is deprecated, it was used in 1.6.0 till 1.6.2 */
+                Mage::register( 'solarium_suggest', $searchResult->getBetterSuggestions() );
             }
         }
         if (!$query->getIsProcessed()) {
