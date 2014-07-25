@@ -33,3 +33,8 @@ This extension is also on [Magento Connect](http://www.magentocommerce.com/magen
 A lot of info can be found in our [Wiki Pages](https://github.com/jeroenvermeulen/magento-solarium/wiki)
 
 If you have an issue, you can open a bug report in [GitHub's issue tracker](https://github.com/jeroenvermeulen/magento-solarium/issues).
+
+## Core Developers
+
+  * [Jeroen Vemeulen](http://www.jeroenvermeulen.eu/)
+  * [Toon van Dooren](http://www.magentocommerce.com/certification/directory/dev/172433/)
