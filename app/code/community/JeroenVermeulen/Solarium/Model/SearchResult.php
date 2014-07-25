@@ -23,6 +23,8 @@
 /**
  * Class JeroenVermeulen_Solarium_Model_SearchResult
  *
+ * Most of the work is done by Magento's Mage_Core_Model_Abstract.
+ *
  * Container for search result data from Solr.
  * When a search has been executed, this object is available via:
  *   Mage::registry( 'solarium_search_result' );
@@ -36,12 +38,6 @@
  * @method JeroenVermeulen_Solarium_Model_SearchResult setResultProducts($data);
  * @method array getResultProducts();
  * @method array getSuggestions();
- */
-
-/**
- * Most of the work is done by Magento's Mage_Core_Model_Abstract.
- *
- * Class JeroenVermeulen_Solarium_Model_SearchResult
  */
 class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstract
 {
@@ -94,10 +90,10 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
      */
     public function getBetterSuggestions() {
         if ( is_null($this->betterSuggestions) ) {
+            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             $this->betterSuggestions = array();
             $suggestions = $this->getSuggestions();
             $resultCount = $this->getResultCount();
-            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             if ( is_array($suggestions) ) {
                 foreach ( $suggestions as $term => $freq ) {
                     $termResult = $engine->search( $this->getStoreId(),
@@ -109,6 +105,9 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
                     }
                 }
             }
+            arsort( $this->betterSuggestions, SORT_NUMERIC );
+            $numSuggestions = $engine->getConf( 'results/did_you_mean_suggestions', $this->getStoreId() );
+            $this->betterSuggestions = array_slice( $this->betterSuggestions, 0, $numSuggestions );
         }
         return $this->betterSuggestions;
     }

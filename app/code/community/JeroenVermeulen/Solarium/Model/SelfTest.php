@@ -41,8 +41,13 @@ class JeroenVermeulen_Solarium_Model_SelfTest
         $insertOk      = true;
         $helper        = Mage::helper( 'jeroenvermeulen_solarium' );
         try {
-            $testProductId    = intval( time() . getmypid() );
-            $testProductText  = 'SELF TEST ENTRY ' . $testProductId;
+            $testProductId    = intval( time() . getmypid() . '1' );
+            $testProductId2   = intval( time() . getmypid() . '2' );
+            $testProductId3   = intval( time() . getmypid() . '3' );
+            $testProductText  = 'SOLARIUMSELFTEST ' . $testProductId;
+            $didYouMeanTest   = 'SOLARIUMSELFTEST';
+            $testProductText2 = 'SOLARIUMSELFTESTA ' . $testProductId;
+            $testProductText3 = 'SOLARIUMSELFTESTA ' . $testProductId;
             $testAutoComplete = substr( $testProductId, 0, -3 );
             $testAutoCorrect  = 'X'.substr( $testProductId, 1 );
             $defaultParam     = array(
@@ -73,22 +78,30 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $config[ 'server/password' ] = Mage::helper( 'core' )->encrypt( $param['password'] );
             }
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
+
+            //// Connect
             if ($ok) {
                 $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
                 $ok     = $engine->isWorking();
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Connection to Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
+
+            //// Ping
             if ($ok) {
                 $ok     = $engine->ping();
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Ping Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
+
+            //// Version
             if ($ok) {
                 $ok     = $engine->getClient()->checkMinimal( '3.0' );
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Check Solr version', $ok, 'Solr server version must be 3.0 or greater.' );
             }
+
+            /// Insert
             if ($ok) {
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $engine->getClient()->getPlugin( 'bufferedadd' );
@@ -113,6 +126,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             }
             if ($insertOk) {
 
+                //// Search
                 $searchResult = $engine->search( $this::TEST_STOREID, $testProductText, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
@@ -124,6 +138,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $allOk        = $allOk and $ok;
                 $this->addMessage( 'Search for test entry', $ok );
 
+                //// AutoComplete
                 $autoSuggest = $engine->getAutoSuggestions( $this::TEST_STOREID, $testAutoComplete );
                 $ok          = false;
                 foreach ($autoSuggest as $term => $count) {
@@ -134,22 +149,38 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $allOk       = $allOk and $ok;
                 $this->addMessage( 'Test Autocomplete', $ok );
 
+                //// Typo Correction
                 $correctResult = $engine->autoCorrect( $testAutoCorrect );
                 $ok           = ( $correctResult == $testProductId );
                 $allOk        = $allOk and $ok;
                 $this->addMessage( 'Test Correction of Typos', $ok );
 
-                $searchResult = $engine->search( $this::TEST_STOREID, $testAutoCorrect, $engine::SEARCH_TYPE_LITERAL );
-                $resultDocs   = $searchResult->getResultProducts();
-                $ok           = false;
-                foreach ($resultDocs as $resultDoc) {
-                    if ($testProductId == $resultDoc[ 'product_id' ]) {
-                        $ok = true;
-                    }
-                }
+                //// Did You Mean
+                $buffer = $engine->getClient()->getPlugin( 'bufferedadd' );
+                $buffer->setEndpoint( 'update' );
+                $data = array(
+                    'id'         => 'test2' . $testProductId,
+                    'product_id' => $testProductId2,
+                    'store_id'   => $this::TEST_STOREID,
+                    'text'       => $testProductText2
+                );
+                $buffer->createDocument( $data );
+                $data = array(
+                    'id'         => 'test3' . $testProductId,
+                    'product_id' => $testProductId3,
+                    'store_id'   => $this::TEST_STOREID,
+                    'text'       => $testProductText3
+                );
+                $buffer->createDocument( $data );
+                $buffer->commit();
+                $engine->optimize(); // ignore result
+                $searchResult = $engine->search( $this::TEST_STOREID, $didYouMeanTest, $engine::SEARCH_TYPE_LITERAL, true );
+                $suggestions  = $searchResult->getBetterSuggestions();
+                $ok           = !empty($suggestions);
                 $allOk        = $allOk and $ok;
-                $this->addMessage( 'Test Suggest + Correct Typos', $ok );
+                $this->addMessage( 'Test "Did You Mean..."', $ok );
 
+                //// Deleting
                 $ok     = $engine->cleanIndex( $this::TEST_STOREID, array( $testProductId ) );
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Deleting test entry from Solr', $ok );

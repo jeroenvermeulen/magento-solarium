@@ -537,7 +537,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             $groupComponent->setLimit( 1 );
 
             if ( $doDidYouMean ) {
-                $numSuggestions = $this->getConf( 'results/did_you_mean_suggestions', $storeId );
+                // We do one extra because one may get removed because of auto correct.
+                $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
                 $spellCheck = $query->getSpellcheck();
                 $spellCheck->setQuery( $queryString );
                 $spellCheck->setCount( 10 * $numSuggestions );
@@ -578,11 +579,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                         }
                     }
                     arsort( $suggest, SORT_NUMERIC );
-                    $suggest =
-                        array_slice( $suggest, 0, $this->getConf( 'results/did_you_mean_suggestions', $storeId ) );
-                    if ($doDidYouMean) {
-                        $result->setSuggestions( $suggest );
-                    }
+                    $result->setSuggestions( $suggest );
                 }
             }
         } catch ( Exception $e ) {
