@@ -502,7 +502,8 @@ class JeroenVermeulen_Solarium_Model_Engine
         $storeId,
         $queryString,
         $searchType = JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_USE_CONFIG,
-        $doDidYouMean = null
+        $doDidYouMean = null,
+        $useAutosuggest = false
     ) {
         if ( is_null($doDidYouMean) ) {
             $doDidYouMean = $this->getConf( 'results/did_you_mean', $storeId );
@@ -525,7 +526,12 @@ class JeroenVermeulen_Solarium_Model_Engine
             }
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
+            if($useAutosuggest){
+            $query->setRows( $this->getConf( 'results/autocomplete_suggestions' ) );
+            }
+            else{
             $query->setRows( $this->getConf( 'results/max', $storeId ) );
+            }
             $query->setFields( array( 'product_id', 'score' ) );
             if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
@@ -660,6 +666,7 @@ class JeroenVermeulen_Solarium_Model_Engine
 
         $solariumResult = $this->_client->select( $query );
         $this->debugQuery( $query );
+        Mage::log( $solariumResult->getDebug() );
         if ($solariumResult) {
             $result = array();
             foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
