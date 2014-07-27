@@ -666,7 +666,6 @@ class JeroenVermeulen_Solarium_Model_Engine
 
         $solariumResult = $this->_client->select( $query );
         $this->debugQuery( $query );
-        Mage::log( $solariumResult->getDebug() );
         if ($solariumResult) {
             $result = array();
             foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
