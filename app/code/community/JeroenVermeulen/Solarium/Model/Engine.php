@@ -491,10 +491,11 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Query the Solr server to search for a string.
      *
-     * @param int $storeId                                            - Store View Id
-     * @param string $queryString                                     - Text to search for
-     * @param int $searchType                                         - 0 = Literal, 1 = Search completion
-     * @param JeroenVermeulen_Solarium_Model_SearchResult $prevResult - Result from previous try
+     * @param int $storeId            - Store View Id
+     * @param string $queryString     - Text to search for
+     * @param int $searchType         - 0 = use config, 1 = Literal2 = Search completion
+     * @param null|bool $doDidYouMean - null = use config
+     * @param int|null $maxResults    - null = use config
      * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public
@@ -502,10 +503,14 @@ class JeroenVermeulen_Solarium_Model_Engine
         $storeId,
         $queryString,
         $searchType = JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_USE_CONFIG,
-        $doDidYouMean = null
+        $doDidYouMean = null,
+        $maxResults = null
     ) {
         if ( is_null($doDidYouMean) ) {
             $doDidYouMean = $this->getConf( 'results/did_you_mean', $storeId );
+        }
+        if ( is_null($maxResults) ) {
+            $maxResults = $this->getConf( 'results/max', $storeId );
         }
         $result = Mage::getModel( 'jeroenvermeulen_solarium/searchResult' );
         $result->setStoreId( $storeId );
@@ -525,7 +530,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             }
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
-            $query->setRows( $this->getConf( 'results/max', $storeId ) );
+            $query->setRows( $maxResults );
             $query->setFields( array( 'product_id', 'score' ) );
             if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
