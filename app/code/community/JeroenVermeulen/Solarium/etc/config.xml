@@ -47,6 +47,11 @@
                     <fulltext>JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext</fulltext>
                 </rewrite>
             </catalogsearch_resource>
+            <catalogsearch>
+                <rewrite>
+                    <indexer_fulltext>JeroenVermeulen_Solarium_Model_CatalogSearch_Indexer_Fulltext</indexer_fulltext>
+                </rewrite>
+            </catalogsearch>
         </models>
         <helpers>
             <jeroenvermeulen_solarium>
