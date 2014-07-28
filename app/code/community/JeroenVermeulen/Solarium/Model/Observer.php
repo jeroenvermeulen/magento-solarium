@@ -163,14 +163,15 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
         $block = $observer->getData( 'block' );
         if (is_a( $block, 'Mage_Index_Block_Adminhtml_Process_Grid' )) {
             /** @var Mage_Index_Block_Adminhtml_Process_Grid $block */
-            $collection = $block->getCollection();
-            foreach ($collection as $item) {
-                /** @var Mage_Index_Model_Process $item */
-                if ('catalogsearch_fulltext' == $item->getIndexerCode()) {
-                    $item->setData(
-                         'description',
-                             'Rebuild Catalog product fulltext search index - POWERED BY SOLARIUM'
-                    );
+            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            if ( $engine->isWorking() ) {
+                $collection = $block->getCollection();
+                foreach ($collection as $item) {
+                    /** @var Mage_Index_Model_Process $item */
+                    if ('catalogsearch_fulltext' == $item->getIndexerCode()) {
+                        $item->setData( 'description',
+                                        'Rebuild Catalog product fulltext search index - POWERED BY SOLARIUM' );
+                    }
                 }
             }
         }

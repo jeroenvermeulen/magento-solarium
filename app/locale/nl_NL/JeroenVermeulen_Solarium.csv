@@ -40,7 +40,7 @@
 "Please check the server settings. Please verify the Solr server is running and accessible.","Gelieve de server instellingen na te kijken. Controleer of Solr server gestart en bereikbaar is."
 "Please follow these steps:","Gelieve deze stappen te volgen:"
 "Port Number","Poort Nummer"
-"POWERED BY SOLARIUM","POWERED BY SOLARIUM"
+"Rebuild Catalog product fulltext search index - POWERED BY SOLARIUM","Herindexeer de Catalogus Zoekindex - WERKT VIA SOLARIUM"
 "Reindex Data","Herindexeren"
 "Reindex the Catalog Search Index","Herindexeer de Catalogus Zoekindex"
 "Results","Resultaten"
