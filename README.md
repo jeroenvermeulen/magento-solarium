@@ -13,7 +13,8 @@ This extension is also on [Magento Connect](http://www.magentocommerce.com/magen
   * Free and Open Source
   * Fast results
   * Can handle high number of products
-  * Autocomplete search query while typing
+  * Fast autocomplete search query while typing
+  * Optional: Show products with images as suggestions
   * Autocorrect typos in search terms
   * "Did you mean..." suggestions
   * Solr 3 & 4 support
