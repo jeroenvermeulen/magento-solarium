@@ -105,4 +105,49 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         return $this;
     }
 
+    /**
+     * Override to prevent table locking during cleanup of previous search results by Magento
+     * - Update `catalogsearch_query`.`is_processed` in steps of 100
+     * - Clean `catalogsearch_result` in steps of 100
+     *
+     * @return Mage_CatalogSearch_Model_Resource_Fulltext
+     */
+    public function resetSearchResults()
+    {
+        $read = $this->_getReadAdapter();
+        $write = $this->_getWriteAdapter();
+
+        $pageSize    = 100;
+
+        $queryTable  = $this->getTable('catalogsearch/search_query');
+        $querySelect = $read->select()->from( $queryTable, 'COUNT(*)' )->where( 'is_processed' );
+        $queryCount  = intval( $read->fetchOne( $querySelect ) );
+        $queryPages  = ceil( $queryCount / $pageSize );
+        $querySql    = sprintf( 'UPDATE %s SET %s=0 WHERE %s=1 LIMIT %d',
+                                $read->quoteIdentifier( $queryTable ),
+                                $read->quoteIdentifier( 'is_processed' ),
+                                $read->quoteIdentifier( 'is_processed' ),
+                                $pageSize );
+        for ( $page=0; $page < $queryPages; $page++ ) {
+            // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on update.
+            $write->query( $querySql );
+        }
+
+        $resultTable  = $this->getTable('catalogsearch/result');
+        $resultSelect = $read->select()->from( $resultTable, 'COUNT(*)' );
+        $resultCount  = intval( $read->fetchOne( $resultSelect ) );
+        $resultPages  = ceil( $resultCount / $pageSize );
+        $resultSql    = sprintf( 'DELETE FROM %s LIMIT %d',
+                                 $read->quoteIdentifier( $resultTable ),
+                                 $pageSize );
+        for ( $page=0; $page < $resultPages; $page++ ) {
+            // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on delete.
+            $write->query( $resultSql );
+        }
+
+        Mage::dispatchEvent('catalogsearch_reset_search_result');
+
+        return $this;
+    }
+
 }
