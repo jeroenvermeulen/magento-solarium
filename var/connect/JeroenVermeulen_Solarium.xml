@@ -1,5 +1,5 @@
 <_>
-   <form_key>JnxKOQt4VXsNTmtF</form_key>
+   <form_key>V4v0eqxC2Yuz1izP</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -24,15 +24,14 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.6</version>
+   <version>1.6.7</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-* Improved typo correct results
-* Improved Did You Mean results
-* Config setting: Suggestion Accuracy
+* Fix for nr of suggestions with &quot;Products as suggestions&quot;
+* Suggestions are now very fast
 
-Please clear Magento cache after upgrading.</notes>
+Please clear Magento + browser cache after upgrading.</notes>
    <authors>
       <name>
          <name>Jeroen Vermeulen BVBA</name>
@@ -64,7 +63,7 @@ Please clear Magento cache after upgrading.</notes>
             <max/>
          </max>
          <files>
-            <files>                                                                             </files>
+            <files>                                                                               </files>
          </files>
       </package>
       <extension>
@@ -151,8 +150,4 @@ Please clear Magento cache after upgrading.</notes>
          <ignore/>
       </ignore>
    </contents>
-   <page>1</page>
-   <limit>200</limit>
-   <folder/>
-   <package/>
 </_>
