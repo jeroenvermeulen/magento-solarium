@@ -31,7 +31,7 @@ Varien.searchForm.addMethods({
                 method: 'get',
                 minChars: 2,
                 updateElement: this._selectAutocompleteItem.bind(this),
-                frequency: "0",
+                frequency: 0.0001,
                 onShow: function (element, update) {
                     if (!update.style.position || update.style.position == 'absolute') {
                         update.style.position = 'absolute';
