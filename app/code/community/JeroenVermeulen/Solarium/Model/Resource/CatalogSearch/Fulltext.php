@@ -129,12 +129,14 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                                 $read->quoteIdentifier( 'is_processed' ),
                                 $pageSize );
         for ( $page=0; $page < $queryPages; $page++ ) {
-            // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on update.
             try {
+                // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on update.
                 $write->query( $querySql );
             } catch ( Exception $e ) {
                 // This happens on busy sites because of deadlock
-                Mage::log( sprintf('Catched error during search reindex, but we can continue: %s',$e->getMessage()), Zend_Log::ERR );
+                Mage::log( sprintf('Update error during search reindex, but we can continue: %s', $e->getMessage()),
+                           Zend_Log::ERR );
+                sleep(1);
                 $page--;
             }
         }
@@ -147,8 +149,17 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                                  $read->quoteIdentifier( $resultTable ),
                                  $pageSize );
         for ( $page=0; $page < $resultPages; $page++ ) {
-            // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on delete.
-            $write->query( $resultSql );
+            try {
+                // It would be better to do this using a Varien or Zend object, but they don't support LIMIT on delete.
+                $write->query( $resultSql );
+                break;
+            } catch ( Exception $e ) {
+                // This happens on busy sites because of deadlock
+                Mage::log( sprintf('Delete error during search reindex, but we can continue: %s', $e->getMessage()),
+                           Zend_Log::ERR );
+                sleep(1);
+                $page--;
+            }
         }
 
         Mage::dispatchEvent('catalogsearch_reset_search_result');
