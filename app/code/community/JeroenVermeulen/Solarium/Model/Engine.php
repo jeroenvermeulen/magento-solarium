@@ -413,11 +413,14 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer->setEndpoint( 'update' );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ($product = $products->fetch()) {
+                    $text = $product[ 'data_index' ];
+                    $text = preg_replace( '/\s*\,\s*+/', ' ', $text ); // Replace comma separation by spaces
+                    $text = $this->_filterString( $text );
                     $data = array(
                         'id'         => intval( $product[ 'fulltext_id' ] ),
                         'product_id' => intval( $product[ 'product_id' ] ),
                         'store_id'   => intval( $product[ 'store_id' ] ),
-                        'text'       => $this->_filterString( $product[ 'data_index' ] )
+                        'text'       => $text
                     );
                     $buffer->createDocument( $data );
                 }
