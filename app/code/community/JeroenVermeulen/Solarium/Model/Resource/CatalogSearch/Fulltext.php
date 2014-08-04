@@ -107,8 +107,8 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
 
     /**
      * Override to prevent table locking during cleanup of previous search results by Magento
-     * - Update `catalogsearch_query`.`is_processed` in steps of 100
-     * - Clean `catalogsearch_result` in steps of 100
+     * - Update `catalogsearch_query`.`is_processed` in steps of 20
+     * - Clean `catalogsearch_result` in steps of 20
      *
      * @return Mage_CatalogSearch_Model_Resource_Fulltext
      */
@@ -117,7 +117,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $read = $this->_getReadAdapter();
         $write = $this->_getWriteAdapter();
 
-        $pageSize    = 100;
+        $pageSize    = 20;
 
         $queryTable  = $this->getTable('catalogsearch/search_query');
         $querySelect = $read->select()->from( $queryTable, 'COUNT(*)' )->where( 'is_processed' );
