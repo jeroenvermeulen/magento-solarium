@@ -1,5 +1,5 @@
 <_>
-   <form_key>V4v0eqxC2Yuz1izP</form_key>
+   <form_key>IEY1TjMwGY4LMaTD</form_key>
    <name>JeroenVermeulen_Solarium</name>
    <channel>community</channel>
    <version_ids>
@@ -24,12 +24,11 @@ Wiki: https://github.com/jeroenvermeulen/magento-solarium/wiki
 </description>
    <license>OSL-3.0</license>
    <license_uri>http://opensource.org/licenses/osl-3.0.php</license_uri>
-   <version>1.6.7</version>
+   <version>1.6.8</version>
    <stability>beta</stability>
    <notes>WARNING: Beta version, do not use on production without extensive testing.
 
-* Fix for nr of suggestions with &quot;Products as suggestions&quot;
-* Suggestions are now very fast
+* Improvements to lower chances of deadlocks during reindexing
 
 Please clear Magento + browser cache after upgrading.</notes>
    <authors>
@@ -63,7 +62,7 @@ Please clear Magento + browser cache after upgrading.</notes>
             <max/>
          </max>
          <files>
-            <files>                                                                               </files>
+            <files>                                                                                 </files>
          </files>
       </package>
       <extension>
