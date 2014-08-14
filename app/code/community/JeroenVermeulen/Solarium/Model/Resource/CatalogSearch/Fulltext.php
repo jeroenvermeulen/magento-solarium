@@ -114,6 +114,8 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      */
     public function resetSearchResults()
     {
+        Mage::log( 'Solarium resetSearchResults: start', Zend_Log::DEBUG );
+
         $read = $this->_getReadAdapter();
         $write = $this->_getWriteAdapter();
 
@@ -122,6 +124,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $queryTable  = $this->getTable('catalogsearch/search_query');
         $querySelect = $read->select()->from( $queryTable, 'COUNT(*)' )->where( 'is_processed' );
         $queryCount  = intval( $read->fetchOne( $querySelect ) );
+        Mage::log( sprintf('Solarium resetSearchResults: clearing %d search queries', $queryCount), Zend_Log::DEBUG );
         $queryPages  = ceil( $queryCount / $pageSize );
         $querySql    = sprintf( 'UPDATE %s SET %s=0 WHERE %s=1 LIMIT %d',
                                 $read->quoteIdentifier( $queryTable ),
@@ -134,7 +137,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 $write->query( $querySql );
             } catch ( Exception $e ) {
                 // This happens on busy sites because of deadlock
-                Mage::log( sprintf('Update error during search reindex, but we can continue: %s', $e->getMessage()),
+                Mage::log( sprintf('Solarium resetSearchResults: Update error during search reindex, but we can continue: %s', $e->getMessage()),
                            Zend_Log::ERR );
                 sleep(1);
                 $page--;
@@ -144,6 +147,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $resultTable  = $this->getTable('catalogsearch/result');
         $resultSelect = $read->select()->from( $resultTable, 'COUNT(*)' );
         $resultCount  = intval( $read->fetchOne( $resultSelect ) );
+        Mage::log( sprintf('Solarium resetSearchResults: clearing %d search results', $queryCount), Zend_Log::DEBUG );
         $resultPages  = ceil( $resultCount / $pageSize );
         $resultSql    = sprintf( 'DELETE FROM %s LIMIT %d',
                                  $read->quoteIdentifier( $resultTable ),
@@ -155,12 +159,14 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 break;
             } catch ( Exception $e ) {
                 // This happens on busy sites because of deadlock
-                Mage::log( sprintf('Delete error during search reindex, but we can continue: %s', $e->getMessage()),
+                Mage::log( sprintf('Solarium resetSearchResults: Delete error during search reindex, but we can continue: %s', $e->getMessage()),
                            Zend_Log::ERR );
                 sleep(1);
                 $page--;
             }
         }
+
+        Mage::log( 'Solarium resetSearchResults: done.', Zend_Log::DEBUG );
 
         Mage::dispatchEvent('catalogsearch_reset_search_result');
 
