@@ -38,15 +38,21 @@ class JeroenVermeulen_Solarium_AjaxController extends Mage_Core_Controller_Front
             // No query received
             $this->getResponse()->setRedirect( Mage::getSingleton( 'core/url' )->getBaseUrl() );
         }
-        /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
-        $engine    = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-        $blockType = 'catalogsearch/autocomplete';
-        if ($engine->isWorking()) {
-            $blockType = 'jeroenvermeulen_solarium/catalogsearch_autocomplete';
+        try {
+            /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
+            $engine    = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
+            $blockType = 'catalogsearch/autocomplete';
+            if ($engine->isWorking()) {
+                $blockType = 'jeroenvermeulen_solarium/catalogsearch_autocomplete';
+            }
+            /** @var Mage_CatalogSearch_Block_Autocomplete $block */
+            $block = $this->getLayout()->createBlock( $blockType );
+            $this->getResponse()->setBody( $block->toHtml() );
         }
-        /** @var Mage_CatalogSearch_Block_Autocomplete $block */
-        $block = $this->getLayout()->createBlock( $blockType );
-        $this->getResponse()->setBody( $block->toHtml() );
+        catch ( Exception $e ) {
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
+            $this->getResponse()->setBody( '' );
+        }
     }
 
 }
