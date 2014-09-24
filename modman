@@ -43,3 +43,7 @@ app/code/community/JeroenVermeulen/Solarium/                                app/
 # 11-- Dutch translation
 # Magento Locale language      - File          - nl_NL/JeroenVermeulen_Solarium.csv
 app/locale/nl_NL/JeroenVermeulen_Solarium.csv                               app/locale/nl_NL/JeroenVermeulen_Solarium.csv
+
+# 11-- German translation
+# Magento Locale language      - File          - de_DE/JeroenVermeulen_Solarium.csv
+app/locale/de_DE/JeroenVermeulen_Solarium.csv                               app/locale/de_DE/JeroenVermeulen_Solarium.csv
