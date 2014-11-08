@@ -130,6 +130,14 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $searchResult = $engine->search( $this::TEST_STOREID, $testProductText, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
+                
+                /**
+                 * Make sure it's an array
+                 */
+                if (!is_array($resultDocs)) {
+                    $resultDocs = array();
+                }
+                
                 foreach ($resultDocs as $resultDoc) {
                     if ($testProductId == $resultDoc[ 'product_id' ]) {
                         $ok = true;
