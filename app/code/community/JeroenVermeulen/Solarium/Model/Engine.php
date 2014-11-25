@@ -666,15 +666,21 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField->setLimit( $this->getConf( 'results/autocomplete_suggestions' ) );
         $facetField->setPrefix( $escapedQueryString );
 
-        $solariumResult = $this->_client->select( $query );
-        $this->debugQuery( $query );
-        if ($solariumResult) {
-            $result = array();
-            foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
-                if ($matches) {
-                    $result[ $term ] = $matches;
-                }
-            };
+        try {
+            $solariumResult = $this->_client->select( $query );
+            $this->debugQuery( $query );
+            if ($solariumResult) {
+                $result = array();
+                foreach ($solariumResult->getFacetSet()->getFacet( 'auto_complete' ) as $term => $matches) {
+                    if ($matches) {
+                        $result[ $term ] = $matches;
+                    }
+                };
+            }
+        }
+        catch ( Exception $e ) {
+            Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
+            $this->debugQuery( $query );
         }
 
         return $result;

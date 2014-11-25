@@ -84,12 +84,14 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
             $suggestions = $engine->getAutoSuggestions( $storeId, $query );
 
             $this->_suggestData = array();
-            foreach ($suggestions as $value => $count) {
-                $this->_suggestData[ ] = array(
-                    'title'          => $value,
-                    'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
-                    'num_of_results' => $count
-                );
+            if ( is_array($suggestions) ) {
+                foreach ($suggestions as $value => $count) {
+                    $this->_suggestData[ ] = array(
+                        'title'          => $value,
+                        'row_class'      => ( ++$counter ) % 2 ? 'odd' : 'even',
+                        'num_of_results' => $count
+                    );
+                }
             }
         }
         return $this->_suggestData;
