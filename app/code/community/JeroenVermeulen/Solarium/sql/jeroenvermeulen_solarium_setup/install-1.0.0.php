@@ -37,7 +37,7 @@ $configSteps = array(
     $helper->__( 'Solarium Search' )
 );
 
-$notice .= $helper->__('Please follow these steps:').'<br />';
+$notice  = $helper->__('Please follow these steps:').'<br />';
 $notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Flush Magento's Cache Storage").'<br />';
 $notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Log out").'<br />';
 $notice .= '&nbsp; &nbsp; &#8226; '.$helper->__("Log in").'<br />';
