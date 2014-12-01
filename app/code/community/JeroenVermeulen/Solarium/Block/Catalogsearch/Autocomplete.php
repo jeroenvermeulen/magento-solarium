@@ -102,14 +102,14 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
     {
         /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
         $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-        if (empty( $this->_suggestProductIds ) && $engine->isWorking()) {
+        $storeId = Mage::app()->getStore()->getId();
+        if (empty( $this->_suggestProductIds ) && $engine->isWorking($storeId)) {
             $query                    = $this->helper( 'catalogsearch' )->getQueryText();
-            $storeId                  = Mage::app()->getStore()->getId();
             $searchResult             = $engine->search( $storeId,
                                                          $query,
                                                          $engine::SEARCH_TYPE_STRING_COMPLETION,
                                                          null,
-                                                         $engine->getConf('results/autocomplete_suggestions') );
+                                                         $engine->getConf('results/autocomplete_suggestions', $storeId) );
             $this->_suggestProductIds = $searchResult->getResultProductIds();
         }
         return $this->_suggestProductIds;

@@ -37,7 +37,9 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
         $request = $this->getRequest();
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
         $helper = Mage::helper( 'jeroenvermeulen_solarium' );
-        $config = array(
+        $storeId = JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID;
+        $config = array();
+        $config[$storeId] = array(
             'general/enabled'                => true,
             'server/host'                    => $request->getParam( 'host', false ),
             'server/port'                    => $request->getParam( 'port', false ),
@@ -48,17 +50,17 @@ class JeroenVermeulen_Solarium_Admin_SolariumController extends Mage_Adminhtml_C
             'server/search_timeout'          => $request->getParam( 'timeout', false )
         );
         if (!preg_match( '|^\*+$|', $request->getParam( 'password', false ) )) {
-            $config[ 'server/password' ] = Mage::helper( 'core' )->encrypt( $request->getParam( 'password', false ) );
+            $config[$storeId][ 'server/password' ] = Mage::helper( 'core' )->encrypt( $request->getParam( 'password', false ) );
         }
         /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
         $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
         $class  = 'error';
         $state  = 'FAILED';
-        if ($engine->isWorking()) {
+        if ($engine->ping($storeId)) {
             $class = 'available';
             $state = 'Success';
         }
-        $versions = $engine->getVersionInfo();
+        $versions = $engine->getVersionInfo( $storeId, false );
         ob_start();
         ?>
         <tr id="solarium_test_connection_result">

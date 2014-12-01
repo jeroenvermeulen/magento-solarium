@@ -61,16 +61,16 @@
                     <frontend_model>jeroenvermeulen_solarium/adminhtml_system_config_form_fieldset_server</frontend_model>
                     <sort_order>300</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <host translate="label">
                             <label>Hostname or IP</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </host>
                         <port translate="label">
                             <label>Port Number</label>
@@ -78,24 +78,24 @@
                             <sort_order>20</sort_order>
                             <validate>validate-greater-than-zero</validate>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </port>
                         <path translate="label">
                             <label>Path</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </path>
                         <core translate="label">
                             <label>Solr Core</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </core>
                         <timeout translate="label">
                             <label>General Timeout (seconds)</label>
@@ -103,8 +103,8 @@
                             <sort_order>50</sort_order>
                             <validate>validate-greater-than-zero</validate>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </timeout>
                         <search_timeout translate="label">
                             <label>Search Timeout (seconds)</label>
@@ -112,8 +112,8 @@
                             <sort_order>60</sort_order>
                             <validate>validate-greater-than-zero</validate>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                         </search_timeout>
                         <requires_authentication translate="label comment">
                             <label>Authentication Required</label>
@@ -156,8 +156,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>400</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <autocomplete_product_suggestions translate="label">
                             <label>Show Products as Autocomplete</label>
@@ -245,8 +245,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>500</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <buffersize translate="label">
                             <label>Updates to Post At Once</label>

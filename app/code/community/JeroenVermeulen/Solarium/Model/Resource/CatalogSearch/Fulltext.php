@@ -40,27 +40,28 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $queryText,
         $query
     ) {
-        if (JeroenVermeulen_Solarium_Model_Engine::isEnabled( $query->getStoreId() )) {
+        $storeId = $query->getStoreId();
+        if (JeroenVermeulen_Solarium_Model_Engine::isEnabled( $storeId )) {
             $helper            = Mage::helper('jeroenvermeulen_solarium');
             $adapter           = $this->_getWriteAdapter();
             $searchResultTable = $this->getTable( 'catalogsearch/result' );
             $catSearchHelper   = Mage::helper('catalogsearch');
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
             $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            if ($engine->isWorking()) {
-                $searchResult = $engine->search( $query->getStoreId(), $queryText );
+            if ($engine->isWorking( $storeId )) {
+                $searchResult = $engine->search( $storeId, $queryText );
                 $searchResult->setUserQuery( $queryText );
                 Mage::register( 'solarium_search_result', $searchResult );
                 if ( ! $searchResult->getResultCount() ) {
                     // Autocorrect
-                    if ( $engine->getConf( 'results/autocorrect', $query->getStoreId() ) ) {
+                    if ( $engine->getConf( 'results/autocorrect', $storeId ) ) {
                         $searchResult->autoCorrect();
                     }
                 }
                 $resultProducts = $searchResult->getResultProducts();
                 if ( ! $searchResult->getResultCount() ) {
                     // No results, we need to check if the index is empty.
-                    if ($engine->isEmpty( $query->getStoreId() )) {
+                    if ($engine->isEmpty( $storeId )) {
                         Mage::Log( sprintf( '%s - Warning: index is empty', __CLASS__ ), Zend_Log::WARN );
                     } else {
                         $query->setIsProcessed( 1 );

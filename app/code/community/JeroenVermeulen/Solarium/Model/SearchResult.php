@@ -36,6 +36,8 @@
  * @method JeroenVermeulen_Solarium_Model_SearchResult setResultQuery( string $query );
  * @method string getResultQuery();
  * @method JeroenVermeulen_Solarium_Model_SearchResult setResultProducts($data);
+ * @method JeroenVermeulen_Solarium_Model_Engine getEngine();
+ * @method JeroenVermeulen_Solarium_Model_SearchResult setEngine( $engine );
  * @method array getResultProducts();
  * @method array getSuggestions();
  */
@@ -90,13 +92,12 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
      */
     public function getBetterSuggestions() {
         if ( is_null($this->betterSuggestions) ) {
-            $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             $this->betterSuggestions = array();
             $suggestions = $this->getSuggestions();
             $resultCount = $this->getResultCount();
             if ( is_array($suggestions) ) {
                 foreach ( $suggestions as $term => $freq ) {
-                    $termResult = $engine->search( $this->getStoreId(),
+                    $termResult = $this->getEngine()->search( $this->getStoreId(),
                                                    $term,
                                                    JeroenVermeulen_Solarium_Model_Engine::SEARCH_TYPE_LITERAL,
                                                    false );
@@ -106,7 +107,7 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
                 }
             }
             arsort( $this->betterSuggestions, SORT_NUMERIC );
-            $numSuggestions = $engine->getConf( 'results/did_you_mean_suggestions', $this->getStoreId() );
+            $numSuggestions = $this->getEngine()->getConf( 'results/did_you_mean_suggestions', $this->getStoreId() );
             $this->betterSuggestions = array_slice( $this->betterSuggestions, 0, $numSuggestions );
         }
         return $this->betterSuggestions;
@@ -116,10 +117,9 @@ class JeroenVermeulen_Solarium_Model_SearchResult extends Mage_Core_Model_Abstra
      * @return JeroenVermeulen_Solarium_Model_SearchResult
      */
     public function autoCorrect() {
-        $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-        $correctQueryText = $engine->autoCorrect( $this->getResultQuery() );
+        $correctQueryText = $this->getEngine()->autoCorrect( $this->getStoreId(), $this->getResultQuery() );
         if ( $correctQueryText ) {
-            $correctSearchResult = $engine->search( $this->getStoreId(), $correctQueryText );
+            $correctSearchResult = $this->getEngine()->search( $this->getStoreId(), $correctQueryText );
             if ( $correctSearchResult->getResultCount() ) {
                 $this->setResultQuery( $correctSearchResult->getResultQuery() );
                 $this->setResultProducts( $correctSearchResult->getResultProducts() );

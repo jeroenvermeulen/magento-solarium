@@ -27,7 +27,6 @@ class JeroenVermeulen_Solarium_Model_SelfTest
 {
     protected $message;
     const WIKI_URL     = 'https://github.com/jeroenvermeulen/magento-solarium/wiki';
-    const TEST_STOREID = 999999;
 
     /**
      * @param array $param - Connection parameters
@@ -41,6 +40,7 @@ class JeroenVermeulen_Solarium_Model_SelfTest
         $insertOk      = true;
         $helper        = Mage::helper( 'jeroenvermeulen_solarium' );
         try {
+            $storeId          = JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID;
             $testProductId    = intval( time() . getmypid() . '1' );
             $testProductId2   = intval( time() . getmypid() . '2' );
             $testProductId3   = intval( time() . getmypid() . '3' );
@@ -59,7 +59,8 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 'username' => '',
             );
             $param         = array_merge( $defaultParam, $param );
-            $config        = array(
+            $config        = array();
+            $config[$storeId] = array(
                 'general/enabled'                  => true,
                 'server/host'                      => $param[ 'host' ],
                 'server/port'                      => $param[ 'port' ],
@@ -82,14 +83,14 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             //// Connect
             if ($ok) {
                 $engine = Mage::getModel( 'jeroenvermeulen_solarium/engine', $config );
-                $ok     = $engine->isWorking();
+                $ok     = $engine->isWorking($storeId);
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Connection to Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
 
             //// Ping
             if ($ok) {
-                $ok     = $engine->ping();
+                $ok     = $engine->ping($storeId);
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Ping Solr', $ok, 'Please check the server settings. Please verify the Solr server is running and accessible.' );
             }
@@ -105,16 +106,16 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             if ($ok) {
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $engine->getClient()->getPlugin( 'bufferedadd' );
-                $buffer->setEndpoint( 'update' );
+                $buffer->setEndpoint( $engine->getEndpointKey($storeId,JeroenVermeulen_Solarium_Model_Engine::ENDPOINT_FUNCTION_UPDATE) );
                 $data = array(
                     'id'         => 'test' . $testProductId,
                     'product_id' => $testProductId,
-                    'store_id'   => $this::TEST_STOREID,
+                    'store_id'   => $storeId,
                     'text'       => $testProductText
                 );
                 $buffer->createDocument( $data );
                 $solariumResult = $buffer->commit();
-                $engine->optimize(); // ignore result
+                $engine->optimize( $storeId ); // ignore result
                 $insertOk = $engine->processResult( $solariumResult, 'flushing buffered add' );
                 $allOk    = $insertOk and $ok;
                 $this->addMessage(
@@ -127,19 +128,21 @@ class JeroenVermeulen_Solarium_Model_SelfTest
             if ($insertOk) {
 
                 //// Search
-                $searchResult = $engine->search( $this::TEST_STOREID, $testProductText, $engine::SEARCH_TYPE_LITERAL );
+                $searchResult = $engine->search( $storeId, $testProductText, $engine::SEARCH_TYPE_LITERAL );
                 $resultDocs   = $searchResult->getResultProducts();
                 $ok           = false;
-                foreach ($resultDocs as $resultDoc) {
-                    if ($testProductId == $resultDoc[ 'product_id' ]) {
-                        $ok = true;
+                if ( is_array($resultDocs) ) {
+                    foreach ($resultDocs as $resultDoc) {
+                        if ($testProductId == $resultDoc[ 'product_id' ]) {
+                            $ok = true;
+                        }
                     }
                 }
                 $allOk        = $allOk and $ok;
                 $this->addMessage( 'Search for test entry', $ok );
 
                 //// AutoComplete
-                $autoSuggest = $engine->getAutoSuggestions( $this::TEST_STOREID, $testAutoComplete );
+                $autoSuggest = $engine->getAutoSuggestions( $storeId, $testAutoComplete );
                 $ok          = false;
                 foreach ($autoSuggest as $term => $count) {
                     if ( $testProductId == $term && 0 < $count ) {
@@ -150,38 +153,38 @@ class JeroenVermeulen_Solarium_Model_SelfTest
                 $this->addMessage( 'Test Autocomplete', $ok );
 
                 //// Typo Correction
-                $correctResult = $engine->autoCorrect( $testAutoCorrect );
+                $correctResult = $engine->autoCorrect( $storeId, $testAutoCorrect );
                 $ok           = ( $correctResult == $testProductId );
                 $allOk        = $allOk and $ok;
                 $this->addMessage( 'Test Correction of Typos', $ok );
 
                 //// Did You Mean
                 $buffer = $engine->getClient()->getPlugin( 'bufferedadd' );
-                $buffer->setEndpoint( 'update' );
+                $buffer->setEndpoint( $engine->getEndpointKey( $storeId, JeroenVermeulen_Solarium_Model_Engine::ENDPOINT_FUNCTION_UPDATE ) );
                 $data = array(
                     'id'         => 'test2' . $testProductId,
                     'product_id' => $testProductId2,
-                    'store_id'   => $this::TEST_STOREID,
+                    'store_id'   => JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID,
                     'text'       => $testProductText2
                 );
                 $buffer->createDocument( $data );
                 $data = array(
                     'id'         => 'test3' . $testProductId,
                     'product_id' => $testProductId3,
-                    'store_id'   => $this::TEST_STOREID,
+                    'store_id'   => JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID,
                     'text'       => $testProductText3
                 );
                 $buffer->createDocument( $data );
                 $buffer->commit();
-                $engine->optimize(); // ignore result
-                $searchResult = $engine->search( $this::TEST_STOREID, $didYouMeanTest, $engine::SEARCH_TYPE_LITERAL, true );
+                $engine->optimize( $storeId ); // ignore result
+                $searchResult = $engine->search( JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID, $didYouMeanTest, $engine::SEARCH_TYPE_LITERAL, true );
                 $suggestions  = $searchResult->getBetterSuggestions();
                 $ok           = !empty($suggestions);
                 $allOk        = $allOk and $ok;
                 $this->addMessage( 'Test "Did You Mean..."', $ok );
 
                 //// Deleting
-                $ok     = $engine->cleanIndex( $this::TEST_STOREID, array( $testProductId ) );
+                $ok     = $engine->cleanIndex( JeroenVermeulen_Solarium_Model_Engine::TEST_STOREID, array( $testProductId ) );
                 $allOk  = $allOk and $ok;
                 $this->addMessage( 'Deleting test entry from Solr', $ok );
 

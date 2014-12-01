@@ -28,11 +28,15 @@ class JeroenVermeulen_Solarium_Model_Engine
     const SEARCH_TYPE_USE_CONFIG        = 0;
     const SEARCH_TYPE_LITERAL           = 1;
     const SEARCH_TYPE_STRING_COMPLETION = 2;
+    const ENDPOINT_FUNCTION_UPDATE      = 'update';
+    const ENDPOINT_FUNCTION_QUERY       = 'query';
+    const ENDPOINT_FUNCTION_ADMIN       = 'admin';
+    const TEST_STOREID                  = 999999;
 
-    /** @var \Solarium\Client */
-    protected $_client;
-    /** @var bool */
-    protected $_working = false;
+    /** @var \Solarium\Client[] */
+    protected $_clients;
+    /** @var bool[] */
+    protected $_working = array();
     /** @var Exception|Solarium\Exception\HttpException|string */
     protected $_lastError = '';
     /** @var int - in milliseconds */
@@ -90,6 +94,9 @@ class JeroenVermeulen_Solarium_Model_Engine
                     array_push( $this->_enabledStoreIds, $store->getId() );
                 }
             }
+            if ( $this->getConf('general/enabled', self::TEST_STOREID) ) {
+                array_push( $this->_enabledStoreIds, self::TEST_STOREID );
+            }
         }
         return $this->_enabledStoreIds;
     }
@@ -99,8 +106,7 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Constructor, initialize Solarium client and check if it is working.
      *
-     * The 'admin' core is a workaround used to execute 'non core specific' admin queries.
-     * @see https://github.com/basdenooijer/solarium/issues/254
+     * @param array $overrideConfig
      */
     public
     function __construct(
@@ -118,11 +124,42 @@ class JeroenVermeulen_Solarium_Model_Engine
         $enabledStoreIds = $this->getEnabledStoreIds();
         if (!empty( $enabledStoreIds )) {
             $this->_client = new Solarium\Client( $this->_getSolariumClientConfig() );
-            $this->setWorking( $this->ping() );
+            $this->setWorking( Mage_Core_Model_App::ADMIN_STORE_ID, $this->ping(Mage_Core_Model_App::ADMIN_STORE_ID) );
+            foreach ( $enabledStoreIds as $storeId ) {
+                $this->setWorking( $storeId, $this->ping($storeId) );
+            }
         } else {
             // This should not happen, you should not construct this class when it is disabled.
             $this->_lastError =
                 new Exception( $helper->__( 'Solarium Search is not enabled via System Configuration.' ) );
+        }
+    }
+
+    /**
+     * Get a the key used to tell the Solarium library which endpoint to use.
+     *
+     * @param int|Mage_Core_Model_Store $store
+     * @param string $endpointFunction
+     * @return string
+     * @throws Exception
+     */
+    public
+    function getEndpointKey( $store, $endpointFunction ) {
+        if ( $store instanceof Mage_Core_Model_Store ) {
+            $store = $store->getId();
+        }
+        if ( !is_numeric($store) ) {
+            throw new Exception( sprintf("getEndpointKey: invalid store received: '%s'", $store) );
+        }
+        $storeEndpointFunctions = array(self::ENDPOINT_FUNCTION_QUERY, self::ENDPOINT_FUNCTION_UPDATE);
+        if ( Mage_Core_Model_App::ADMIN_STORE_ID == $store || self::ENDPOINT_FUNCTION_ADMIN == $endpointFunction ) {
+            return 'admin';
+        } else {
+            if ( in_array($endpointFunction, $storeEndpointFunctions) ) {
+                return sprintf( "%d_%s", $store, $endpointFunction );
+            } else {
+                throw new Exception( sprintf("getEndpointKey: invalid endpoint function received: '%s'", $endpointFunction) );
+            }
         }
     }
 
@@ -137,13 +174,12 @@ class JeroenVermeulen_Solarium_Model_Engine
     public
     function getConf(
         $setting,
-        $storeId = null
+        $storeId
     ) {
-        if (JeroenVermeulen_Solarium_Model_SelfTest::TEST_STOREID == $storeId) {
-            $storeId = null;
-        }
-        if (isset( $this->_overrideConfig[ $setting ] )) {
-            return $this->_overrideConfig[ $setting ];
+        if (isset( $this->_overrideConfig[ $storeId ][ $setting ] )) {
+            return $this->_overrideConfig[ $storeId ][ $setting ];
+        } elseif( self::TEST_STOREID == $storeId ) {
+            return null;
         } else {
             return Mage::getStoreConfig( 'jeroenvermeulen_solarium/' . $setting, $storeId );
         }
@@ -169,33 +205,26 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
+     * @param int $storeId
      * @param boolean $working
      */
     public
     function setWorking(
-        $working
+        $storeId, $working
     ) {
-        $this->_working = $working;
+        $this->_working[$storeId] = $working;
     }
 
     /**
-     * @return boolean
-     */
-    public
-    function getWorking()
-    {
-        return $this->_working;
-    }
-
-    /**
-     * This function returns the cached status if Solr is working.
+     * This function returns the cached status if Solr is working for a specific store id.
      *
+     * @param int $storeId
      * @return bool - True if engine is working
      */
     public
-    function isWorking()
+    function isWorking( $storeId )
     {
-        return (boolean) $this->_working;
+        return !empty( $this->_working[$storeId] );
     }
 
     /**
@@ -252,11 +281,13 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Return an array with version info, to show in backend.
      *
+     * @param int $storeId
      * @param bool $extended - When true we will output more information
      * @return array
      */
     public
     function getVersionInfo(
+        $storeId,
         $extended = false
     ) {
         /** @var JeroenVermeulen_Solarium_Helper_Data $helper */
@@ -271,15 +302,16 @@ class JeroenVermeulen_Solarium_Model_Engine
         }
         $versions[ 'Solr version' ] = $helper->__( 'unknown' );
         $versions[ 'Java version' ] = $helper->__( 'unknown' );
-        if ($this->isWorking()) {
+        if ( $this->isWorking( $storeId ) ) {
             try {
                 /**
                  * Abusing ping query to get system info
                  * @see https://github.com/basdenooijer/solarium/issues/254
                  */
                 $query = $this->_client->createPing();
-                $query->setHandler( 'system' );
-                $data = $this->_client->ping( $query, 'admin' )->getData();
+                $query->setHandler( 'admin/system' );
+                $data = $this->_client->ping( $query, $this->getEndpointKey( Mage_Core_Model_App::ADMIN_STORE_ID, self::ENDPOINT_FUNCTION_ADMIN ) )->getData();
+                $this->debugQuery( $query );
                 if (!empty( $data[ 'lucene' ][ 'solr-impl-version' ] )) {
                     $versions[ 'Solr version' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
                 }
@@ -296,10 +328,11 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Ping Solr to test if it is working.
      *
+     * @param int $storeId
      * @return bool - True on success
      */
     public
-    function ping()
+    function ping( $storeId )
     {
         /**
          * This function should not check the $this->_working variable,
@@ -309,8 +342,8 @@ class JeroenVermeulen_Solarium_Model_Engine
         try {
             $query = $this->_client->createPing();
             // Not 100% sure if this setTimeAllowed works.
-            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
-            $solariumResult = $this->_client->ping( $query );
+            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
+            $solariumResult = $this->_client->ping( $query, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_QUERY) );
             $this->debugQuery( $query );
             $resultData     = $solariumResult->getData();
             if (!empty( $resultData[ 'status' ] ) && 'OK' === $resultData[ 'status' ]) {
@@ -332,7 +365,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      */
     public
     function cleanIndex(
-        $storeId = null,
+        $storeId,
         $productIds = null
     ) {
         if (!$this->_working) {
@@ -344,7 +377,8 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
             $query->addCommit();
 
-            $solariumResult = $this->_client->update( $query, 'update' );
+            $solariumResult = $this->_client->update( $query, self::getEndpointKey($storeId,self::ENDPOINT_FUNCTION_UPDATE) );
+            $this->debugQuery( $query );
             $result         = $this->processResult( $solariumResult, 'clean' );
         } catch ( Exception $e ) {
             $this->_lastError = $e;
@@ -356,14 +390,14 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Rebuild the index. If a Store ID or Product IDs are specified it is only rebuilt for those.
      *
-     * @param int|null $storeId - Store View Id, null or 0 means all storeViews
+     * @param int $storeId - Store View Id, null or 0 means all storeViews
      * @param int[]|null $productIds - Product Entity Id(s)
      * @param bool $cleanFirst - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
     public
     function rebuildIndex(
-        $storeId = null,
+        $storeId,
         $productIds = null,
         $cleanFirst = false
     ) {
@@ -380,12 +414,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                    $coreResource->getTableName( 'catalogsearch/fulltext' ),
                        array( 'product_id', 'store_id', 'data_index', 'fulltext_id' )
             );
-
-            if (empty( $storeId )) {
-                $select->where( 'store_id IN (?)', $this->getEnabledStoreIds() );
-            } else {
-                $select->where( 'store_id', $storeId );
-            }
+            $select->where( 'store_id', $storeId );
             if (!empty( $productIds )) {
                 if (is_numeric( $productIds )) {
                     $select->where( 'product_id = ?', $productIds );
@@ -406,11 +435,12 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $deleteQuery->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
                     // No commit yet, will be done after BufferedAdd
                     $this->_client->update( $deleteQuery );
+                    $this->debugQuery( $deleteQuery );
                 }
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
                 $buffer = $this->_client->getPlugin( 'bufferedadd' );
                 $buffer->setBufferSize( max( 1, $this->getConf( 'reindexing/buffersize', $storeId ) ) );
-                $buffer->setEndpoint( 'update' );
+                $buffer->setEndpoint( $this->getEndpointKey($storeId, self::ENDPOINT_FUNCTION_UPDATE) );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ($product = $products->fetch()) {
                     $text = $product[ 'data_index' ];
@@ -425,7 +455,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->commit();
-                $this->optimize(); // ignore result
+                $this->optimize( $storeId ); // ignore result
                 $result = $this->processResult( $solariumResult, 'flushing buffered add' );
             }
         } catch ( Exception $e ) {
@@ -438,10 +468,11 @@ class JeroenVermeulen_Solarium_Model_Engine
     /**
      * Optimize the Solr index.
      *
+     * @param int $storeId
      * @return bool - True on success
      */
     public
-    function optimize()
+    function optimize( $storeId )
     {
         if (!$this->_working) {
             return false;
@@ -449,7 +480,8 @@ class JeroenVermeulen_Solarium_Model_Engine
         // get an update query instance
         $update = $this->_client->createUpdate();
         $update->addOptimize();
-        $solariumResult = $this->_client->update( $update, 'update' );
+        $solariumResult = $this->_client->update( $update, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_UPDATE) );
+        $this->debugQuery( $update );
         return $this->processResult( $solariumResult, 'optimize' );
     }
 
@@ -468,25 +500,22 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
-     * Get number of documents in Solr index.
-     * If storeId is supplied it is used as a filter.
+     * Get number of documents in Solr index for a specific store id.
      *
-     * @param null|int $storeId
+     * @param int $storeId
      * @return int
      */
     public
     function getDocumentCount(
-        $storeId = null
+        $storeId
     ) {
         $query = $this->_client->createSelect();
         $query->setQueryDefaultField( 'text' );
         $query->setRows( 0 );
         $query->setFields( array( 'product_id' ) );
-        if (is_numeric( $storeId )) {
-            $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
-        }
-        $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout' ) ) );
-        $solrResultSet = $this->_client->select( $query );
+        $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
+        $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
+        $solrResultSet = $this->_client->select( $query, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_QUERY) );
         $this->debugQuery( $query );
         return ( $solrResultSet ) ? $solrResultSet->getNumFound() : 0;
     }
@@ -518,8 +547,9 @@ class JeroenVermeulen_Solarium_Model_Engine
         $result = Mage::getModel( 'jeroenvermeulen_solarium/searchResult' );
         $result->setStoreId( $storeId );
         $result->setResultQuery( $queryString );
+        $result->setEngine( $this );
         if ( $this::SEARCH_TYPE_USE_CONFIG == $searchType ) {
-            $searchType = $this->getConf( 'results/search_type' );
+            $searchType = $this->getConf( 'results/search_type', $storeId );
         }
         if (!$this->_working) {
             return $result;
@@ -558,7 +588,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             }
 
             $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
-            $solrResultSet = $this->_client->select( $query );
+            $solrResultSet = $this->_client->select( $query, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_QUERY) );
             $this->debugQuery( $query );
 
             $this->_lastQueryTime = $solrResultSet->getQueryTime();
@@ -598,10 +628,11 @@ class JeroenVermeulen_Solarium_Model_Engine
     }
 
     /**
-     * @param JeroenVermeulen_Solarium_Model_SearchResult $prevResult - Result from previous try
+     * @param int $storeId
+     * @param string $queryString
      * @return string|null
      */
-    public function autoCorrect( $queryString ) {
+    public function autoCorrect( $storeId, $queryString ) {
         $result = null;
 
         $query = $this->_client->createSelect();
@@ -614,7 +645,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $spellcheck->setCollate(true);
         $query->addParam( 'spellcheck.alternativeTermCount', 1 );
 
-        $resultSet = $this->_client->select($query);
+        $resultSet = $this->_client->select( $query, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_QUERY) );
         $this->debugQuery( $query );
         $spellCheckResult = $resultSet->getSpellcheck();
 
@@ -663,11 +694,11 @@ class JeroenVermeulen_Solarium_Model_Engine
         $facetField = $facetSet->createFacetField( 'auto_complete' );
         $facetField->setField( 'text' );
         $facetField->setMincount( 1 );
-        $facetField->setLimit( $this->getConf( 'results/autocomplete_suggestions' ) );
+        $facetField->setLimit( $this->getConf( 'results/autocomplete_suggestions', $storeId ) );
         $facetField->setPrefix( $escapedQueryString );
 
         try {
-            $solariumResult = $this->_client->select( $query );
+            $solariumResult = $this->_client->select( $query, $this->getEndpointKey($storeId,self::ENDPOINT_FUNCTION_QUERY) );
             $this->debugQuery( $query );
             if ($solariumResult) {
                 $result = array();
@@ -731,28 +762,58 @@ class JeroenVermeulen_Solarium_Model_Engine
     protected
     function _getSolariumClientConfig()
     {
-        $host = trim( $this->getConf( 'server/host' ) );
-        // If the user pasted a URL as hostname, clean it.
-        $host                     = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
-        $endPointConfig           = array();
-        $endPointConfig[ 'host' ] = $host;
-        $endPointConfig[ 'port' ] = intval( $this->getConf( 'server/port' ) );
-        $endPointConfig[ 'path' ] = trim( $this->getConf( 'server/path' ) );
-        $endPointConfig[ 'core' ] = trim( $this->getConf( 'server/core' ) );
-        if ($this->getConf( 'server/requires_authentication' )) {
-            $endPointConfig[ 'username' ] = trim( $this->getConf( 'server/username' ) );
-            $endPointConfig[ 'password' ] = Mage::helper( 'core' )->decrypt( $this->getConf( 'server/password' ) );
+        $config = array();
+        $config[ 'endpoint' ] = array();
+
+        /**
+         * The 'admin' core is a workaround used to execute 'non core specific' admin queries.
+         * @see https://github.com/basdenooijer/solarium/issues/254
+         */
+        $storeId = Mage_Core_Model_App::ADMIN_STORE_ID;
+        $endpointFunction = self::ENDPOINT_FUNCTION_ADMIN;
+        $endpointKey = $this->getEndpointKey( $storeId, $endpointFunction );
+        $config[ 'endpoint' ][ $endpointKey ] = $this->_getSolariumEndpointConfig( $storeId, self::ENDPOINT_FUNCTION_ADMIN );
+
+        /**
+         * Now we create the endpoints for each store
+         */
+        $enabledStoreIds = $this->getEnabledStoreIds();
+        $endpointFunctions = array(self::ENDPOINT_FUNCTION_QUERY, self::ENDPOINT_FUNCTION_UPDATE);
+        foreach ( $enabledStoreIds as $storeId ) {
+            foreach ( $endpointFunctions as $endpointFunction ) {
+                $endpointKey = $this->getEndpointKey( $storeId, $endpointFunction );
+                $config[ 'endpoint' ][ $endpointKey ] = $this->_getSolariumEndpointConfig( $storeId, $endpointFunction );
+            }
         }
-        $config                                         = array();
-        $config[ 'endpoint' ]                           = array();
-        $config[ 'endpoint' ][ 'default' ]              = $endPointConfig;
-        $config[ 'endpoint' ][ 'update' ]               = $endPointConfig;
-        $config[ 'endpoint' ][ 'admin' ]                = $endPointConfig;
-        $config[ 'endpoint' ][ 'default' ][ 'timeout' ] = intval( $this->getConf( 'server/search_timeout' ) );
-        $config[ 'endpoint' ][ 'update' ][ 'timeout' ]  = intval( $this->getConf( 'server/timeout' ) );
-        $config[ 'endpoint' ][ 'admin' ][ 'timeout' ]   = intval( $this->getConf( 'server/timeout' ) );
-        $config[ 'endpoint' ][ 'admin' ][ 'core' ]      = 'admin';
+
         return $config;
+    }
+
+    protected
+    function _getSolariumEndpointConfig( $storeId, $endpointFunction ) {
+        $host = trim( $this->getConf( 'server/host', $storeId ) );
+        // If the user pasted a URL as hostname, clean it.
+        $host             = str_replace( array( 'http://', '/' ), array( '', '' ), $host );
+        $result           = array();
+        $result[ 'host' ] = $host;
+        $result[ 'port' ] = intval( $this->getConf( 'server/port', $storeId ) );
+        $result[ 'path' ] = trim( $this->getConf( 'server/path', $storeId ) );
+        $result[ 'core' ] = trim( $this->getConf( 'server/core', $storeId ) );
+        if ($this->getConf( 'server/requires_authentication', $storeId )) {
+            $result[ 'username' ] = trim( $this->getConf( 'server/username', $storeId ) );
+            $result[ 'password' ] = Mage::helper( 'core' )->decrypt( $this->getConf( 'server/password', $storeId ) );
+        }
+        if ( self::ENDPOINT_FUNCTION_ADMIN == $endpointFunction ) {
+            $result[ 'timeout' ] = intval( $this->getConf( 'server/timeout', $storeId ) );
+            $result[ 'core' ]      = '';
+        } elseif ( self::ENDPOINT_FUNCTION_QUERY == $endpointFunction ) {
+            $result[ 'timeout' ] = intval( $this->getConf( 'server/search_timeout', $storeId ) );
+        } elseif ( self::ENDPOINT_FUNCTION_UPDATE == $endpointFunction ) {
+            $result[ 'timeout' ] = intval( $this->getConf( 'server/timeout', $storeId ) );
+        } else {
+            throw new Exception( sprintf("_getSolariumEndpointConfig: Unknown endpoint function: '%s'.", $endpointFunction) );
+        }
+        return $result;
     }
 
     /**

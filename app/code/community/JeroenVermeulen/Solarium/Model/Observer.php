@@ -77,9 +77,15 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
             $engine    = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             $startTime = microtime( true );
-            $ok        = $engine->rebuildIndex( null, null, true );
+            $storeIds = $engine->getEnabledStoreIds();
+            $ok = true;
+            $storeCount = 0;
+            foreach ($storeIds as $storeId) {
+                $ok = $ok and $engine->rebuildIndex( $storeId, null, true );
+                $storeCount++;
+            }
             $timeUsed  = microtime( true ) - $startTime;
-            if ($ok) {
+            if ($ok && $storeCount) {
                 $message = $helper->__( 'Solr Index was rebuilt in %s seconds.', sprintf( '%.02f', $timeUsed ) );
                 if ($engine->isShellScript()) {
                     echo $message . "\n";
@@ -164,7 +170,7 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
         if (is_a( $block, 'Mage_Index_Block_Adminhtml_Process_Grid' )) {
             /** @var Mage_Index_Block_Adminhtml_Process_Grid $block */
             $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
-            if ( $engine->isWorking() ) {
+            if ( $engine->isWorking( Mage_Core_Model_App::ADMIN_STORE_ID ) ) {
                 $collection = $block->getCollection();
                 foreach ($collection as $item) {
                     /** @var Mage_Index_Model_Process $item */
