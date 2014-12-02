@@ -176,6 +176,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $setting,
         $storeId
     ) {
+        $storeId = intval($storeId);
         if (isset( $this->_overrideConfig[ $storeId ][ $setting ] )) {
             return $this->_overrideConfig[ $storeId ][ $setting ];
         } elseif( self::TEST_STOREID == $storeId ) {
@@ -406,15 +407,16 @@ class JeroenVermeulen_Solarium_Model_Engine
         }
         $result = false;
         try {
+            $storeId = intval( $storeId );
             $coreResource = Mage::getSingleton( 'core/resource' );
             $readAdapter  = $coreResource->getConnection( 'core_read' );
 
             $select = $readAdapter->select();
             $select->from(
                    $coreResource->getTableName( 'catalogsearch/fulltext' ),
-                       array( 'product_id', 'store_id', 'data_index', 'fulltext_id' )
+                       array( 'product_id', 'data_index', 'fulltext_id' )
             );
-            $select->where( 'store_id', $storeId );
+            $select->where( 'store_id = ?', $storeId );
             if (!empty( $productIds )) {
                 if (is_numeric( $productIds )) {
                     $select->where( 'product_id = ?', $productIds );
@@ -434,7 +436,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $deleteQuery = $this->_client->createUpdate();
                     $deleteQuery->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
                     // No commit yet, will be done after BufferedAdd
-                    $this->_client->update( $deleteQuery );
+                    $this->_client->update( $deleteQuery, $this->getEndpointKey($storeId, self::ENDPOINT_FUNCTION_UPDATE) );
                     $this->debugQuery( $deleteQuery );
                 }
                 /** @var Solarium\Plugin\BufferedAdd\BufferedAdd $buffer */
@@ -449,7 +451,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $data = array(
                         'id'         => intval( $product[ 'fulltext_id' ] ),
                         'product_id' => intval( $product[ 'product_id' ] ),
-                        'store_id'   => intval( $product[ 'store_id' ] ),
+                        'store_id'   => $storeId,
                         'text'       => $text
                     );
                     $buffer->createDocument( $data );
