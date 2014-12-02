@@ -384,7 +384,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             if (empty( $storeId )) {
                 $select->where( 'store_id IN (?)', $this->getEnabledStoreIds() );
             } else {
-                $select->where( 'store_id', $storeId );
+                $select->where( 'store_id = ?', $storeId );
             }
             if (!empty( $productIds )) {
                 if (is_numeric( $productIds )) {
