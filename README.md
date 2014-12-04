@@ -1,5 +1,7 @@
 Solr search extension for Magento
 ================
+**We are sorry but we can not actively support this extension. We use it at a number of big shops. You can also use it for free, 'as is'.**
+
 [![Solr](http://upload.wikimedia.org/wikipedia/en/3/3e/Solr.png)](https://lucene.apache.org/solr/)
 [![Solarium](http://www.raspberry.nl/wp-content/uploads/2011/12/solarium.gif)](http://www.solarium-project.org/)
 [![Magento](http://21inspired.com/wp-content/uploads/2010/01/magento-logo-1.jpg)](http://magento.com/)
