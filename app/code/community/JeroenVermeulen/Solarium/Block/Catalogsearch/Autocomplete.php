@@ -38,29 +38,36 @@ class JeroenVermeulen_Solarium_Block_Catalogsearch_Autocomplete extends Mage_Cat
         if (empty( $productIds )) {
             return parent::_toHtml();
         } else {
-            $html              =
-                '<ul class="product_suggest"><li style="display: none"></li>'; // Magento by default starts with a hidden <li>, don't know why.
-            $productCollection = $products = Mage::getModel( 'catalog/product' )->getCollection()->addAttributeToFilter(
-                                                 'entity_id',
-                                                     array( 'in' => $productIds )
-                )->addAttributeToSelect( array( 'name', 'thumbnail', 'product_url' ) );
-            $counter           = 0;
-            foreach ($productCollection as $product) {
-                $rowClass = ( ++$counter ) % 2 ? 'odd' : 'even';
-                $html .= sprintf( '<li title="%s" class="%s" data-url="%s">',
-                                  htmlentities( $product->getName() ),
-                                  $rowClass,
-                                  htmlentities( $product->getProductUrl() ) );
-                $html .= '<span class="suggestions-productimage">';
-                $html .= sprintf(
-                    '<img src="%s" />',
-                    htmlentities( Mage::helper( 'catalog/image' )->init( $product, 'thumbnail' )->resize( '50' ) )
-                );
-                $html .= '</span>';
-                $html .= '<span class="suggestions-productname">';
-                $html .= htmlentities( Mage::helper( 'core/string' )->truncate( $product->getName(), 100 ) );
-                $html .= '</span>';
-                $html .= '</li>';
+            // Magento by default starts with a hidden <li>, don't know why.
+            $html = '<ul class="product_suggest"><li style="display: none"></li>';
+            $transport = new Varien_Object();
+            $transport->setHtml(null); // Event listener can fill this with HTML, <li> tags.
+            Mage::dispatchEvent( 'jeroenvermeulen_solarium_get_product_suggest_html',
+                                 array('product_ids'=>$productIds,'transport'=>$transport) );
+            if ( !is_null($transport->getHtml()) ) {
+                $html .= $transport->getHtml();
+            } else {
+                $productCollection = $products = Mage::getModel( 'catalog/product' )
+                                                       ->getCollection()
+                                                       ->addAttributeToFilter( 'entity_id', array('in'=>$productIds) )
+                                                       ->addAttributeToSelect( array('name','thumbnail','product_url') );
+                $counter           = 0;
+                foreach ($productCollection as $product) {
+                    $rowClass = ( ++$counter ) % 2 ? 'odd' : 'even';
+                    $imageUrl = Mage::helper( 'catalog/image' )->init( $product, 'thumbnail' )->resize( '50' );
+                    $showName = Mage::helper( 'core/string' )->truncate( $product->getName(), 100 );
+                    $html .= sprintf( '<li title="%s" class="%s" data-url="%s">',
+                                      htmlentities($product->getName()),
+                                      $rowClass,
+                                      htmlentities($product->getProductUrl()) );
+                    $html .= '<span class="suggestions-productimage">';
+                    $html .= sprintf( '<img src="%s" />', htmlentities( $imageUrl ) );
+                    $html .= '</span>';
+                    $html .= '<span class="suggestions-productname">';
+                    $html .= htmlentities( $showName );
+                    $html .= '</span>';
+                    $html .= '</li>';
+                }
             }
             $html .= '</ul>';
         }
