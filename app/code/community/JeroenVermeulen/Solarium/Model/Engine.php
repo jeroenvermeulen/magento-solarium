@@ -528,11 +528,12 @@ class JeroenVermeulen_Solarium_Model_Engine
         try {
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
-            $escapedQueryString = $queryHelper->escapeTerm( $queryString );
+            $escapedQueryString = $queryHelper->escapeTerm( trim($queryString) );
             if ( $this::SEARCH_TYPE_STRING_COMPLETION == $searchType ) {
                 $escapedQueryString = $escapedQueryString . '*';
             } elseif ( $this::SEARCH_TYPE_WILDCARD == $searchType ) {
-                $escapedQueryString = '*' . $escapedQueryString . '*';
+                // Stars around every word
+                $escapedQueryString = '*' . preg_replace('|\s+|','* *',$escapedQueryString) . '*';
             }
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
