@@ -25,7 +25,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>1.6.9</version>
+            <version>1.6.10</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
@@ -212,6 +212,7 @@
                 <did_you_mean_suggestions>5</did_you_mean_suggestions>
                 <suggestions_accuracy>70</suggestions_accuracy>
                 <max>100</max>
+                <search_type>1</search_type>
             </results>
             <reindexing>
                 <buffersize>100</buffersize>
