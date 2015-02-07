@@ -561,7 +561,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query->addParam( 'spellcheck.alternativeTermCount', 10 * $numSuggestions );
             }
 
-            $query->setTimeAllowed( intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
+            $query->setTimeAllowed( 1000 * intval( $this->getConf( 'server/search_timeout', $storeId ) ) );
             $solrResultSet = $this->_client->select( $query );
             $this->debugQuery( $query );
 
