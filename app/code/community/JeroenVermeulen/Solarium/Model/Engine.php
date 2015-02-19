@@ -281,7 +281,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query = $this->_client->createPing();
                 $query->setHandler( 'system' );
                 $data = $this->_client->ping( $query, 'admin' )->getData();
-                $this->debugQuery( $query );
+                $this->debugQuery( $query, 'admin' );
                 if (!empty( $data[ 'lucene' ][ 'solr-impl-version' ] )) {
                     $versions[ 'Solr version' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
                 }
@@ -813,11 +813,12 @@ class JeroenVermeulen_Solarium_Model_Engine
 
     /**
      * @param Solarium\Core\Query\Query $query
+     * @param string|null $endpoint
      */
     protected
-    function debugQuery( $query ) {
+    function debugQuery( $query, $endpoint=null ) {
         if ( !empty($query) && Mage::getIsDeveloperMode() ) {
-            $url = $this->getClient()->getEndpoint()->getBaseUri();
+            $url = $this->getClient()->getEndpoint($endpoint)->getBaseUri();
             $url .= $query->getRequestBuilder()->build( $query )->getUri();
             // Modify URL for easier debugging
             $url = str_replace( 'omitHeader=true&', '', $url );
