@@ -281,6 +281,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $query = $this->_client->createPing();
                 $query->setHandler( 'system' );
                 $data = $this->_client->ping( $query, 'admin' )->getData();
+                $this->debugQuery( $query );
                 if (!empty( $data[ 'lucene' ][ 'solr-impl-version' ] )) {
                     $versions[ 'Solr version' ] = $data[ 'lucene' ][ 'solr-impl-version' ];
                 }
