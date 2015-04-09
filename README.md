@@ -1,8 +1,8 @@
 Solr search extension for Magento
 ================
-**We are sorry but we can not actively support this extension. We use it at a number of big shops. You can also use it for free, 'as is'.**
+**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free. We use it at a number of big shops and it works well.**
 
-[![Solr](http://upload.wikimedia.org/wikipedia/en/3/3e/Solr.png)](https://lucene.apache.org/solr/)
+[![Solr](http://upload.wikimedia.org/wikipedia/en/archive/3/3e/20150220230831!Solr.png)](https://lucene.apache.org/solr/)
 [![Solarium](http://www.raspberry.nl/wp-content/uploads/2011/12/solarium.gif)](http://www.solarium-project.org/)
 [![Magento](http://21inspired.com/wp-content/uploads/2010/01/magento-logo-1.jpg)](http://magento.com/)
 
@@ -33,7 +33,7 @@ This extension is also on [Magento Connect](http://www.magentocommerce.com/magen
 
 ## Support
 
-**We are sorry but we can not actively support this extension. We use it at a number of big shops. You can also use it for free, 'as is'.**
+**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free. We use it at a number of big shops and it works well.**
 
 A lot of info can be found in our [Wiki Pages](https://github.com/jeroenvermeulen/magento-solarium/wiki)
 
