@@ -50,7 +50,8 @@ $inboxRecord = array(
     'severity'    => Mage_AdminNotification_Model_Inbox::SEVERITY_NOTICE,
     'title'       => $title,
     'description' => $notice,
-    'internal'    => true
+    'internal'    => true,
+    'date_added'  => date('Y-m-d H:i:s')
 );
 // Not using "Mage::getModel('adminnotification/inbox')->add()" because it does not work in Magento 1.6
 Mage::getModel( 'adminnotification/inbox' )->parse( array( $inboxRecord ) );
