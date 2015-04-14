@@ -511,6 +511,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         $doDidYouMean = null,
         $maxResults = null
     ) {
+        $queryString = trim($queryString);
         if ( is_null($doDidYouMean) ) {
             $doDidYouMean = $this->getConf( 'results/did_you_mean', $storeId );
         }
@@ -529,7 +530,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         try {
             $query              = $this->_client->createSelect();
             $queryHelper        = $query->getHelper();
-            $escapedQueryString = $queryHelper->escapeTerm( trim($queryString) );
+            $escapedQueryString = $queryHelper->escapeTerm( $this->_filterString($queryString) );
             if ( $this::SEARCH_TYPE_STRING_COMPLETION == $searchType ) {
                 $escapedQueryString = $escapedQueryString . '*';
             } elseif ( $this::SEARCH_TYPE_WILDCARD == $searchType ) {
@@ -553,7 +554,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 // We do one extra because one may get removed because of auto correct.
                 $numSuggestions = 1 + $this->getConf( 'results/did_you_mean_suggestions', $storeId );
                 $spellCheck = $query->getSpellcheck();
-                $spellCheck->setQuery( $queryString );
+                $spellCheck->setQuery( $this->_filterString($queryString) );
                 $spellCheck->setCount( 10 * $numSuggestions );
                 $spellCheck->setExtendedResults( true );
                 $spellCheck->setOnlyMorePopular( true );
@@ -775,6 +776,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             for ($ord = 0; $ord < 32; $ord++) {
                 $badChars .= chr( $ord );
             }
+            $badChars .= '-'; // Dash does not work well in Solr, needs to be replaced by space
         }
         return preg_replace( '/[' . preg_quote( $badChars, '/' ) . ']+/', ' ', strval( $str ) );
     }
