@@ -543,7 +543,9 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
             $query->setRows( $maxResults );
-            $query->setFields( array( 'product_id', 'score' ) );
+            $query->setFields( array( 'product_id', 'score', 'name', 'image', 'url' ) );
+            $dismax = $query->getEDisMax();
+            $dismax->setQueryFields('name^2 product_id^1.5 text');
             if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
