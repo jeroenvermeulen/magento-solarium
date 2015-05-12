@@ -363,6 +363,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param bool $cleanFirst - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
+
     public
     function rebuildIndex(
         $storeId = null,
@@ -415,6 +416,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer->setEndpoint( 'update' );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ($product = $products->fetch()) {
+                    $productModel = Mage::getModel('catalog/product');
                     $text = $product[ 'data_index' ];
                     $text = preg_replace( '/\s*\,\s*+/', ' ', $text ); // Replace comma separation by spaces
                     $text = $this->_filterString( $text );
@@ -422,7 +424,8 @@ class JeroenVermeulen_Solarium_Model_Engine
                         'id'         => intval( $product[ 'fulltext_id' ] ),
                         'product_id' => intval( $product[ 'product_id' ] ),
                         'store_id'   => intval( $product[ 'store_id' ] ),
-                        'text'       => $text
+                        'text'       => $text,
+                        'name'       => $productModel->getName()
                     );
                     $buffer->createDocument( $data );
                 }
