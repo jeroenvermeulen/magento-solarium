@@ -45,6 +45,18 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             $adapter           = $this->_getWriteAdapter();
             $searchResultTable = $this->getTable( 'catalogsearch/result' );
             $catSearchHelper   = Mage::helper('catalogsearch');
+		    $stringHelper      = Mage::helper('core/string');
+            $thisQueryLength = $stringHelper->strlen($queryText);
+            $wordsFull = $stringHelper->splitWords($queryText, true);
+            $wordsLike = $stringHelper->splitWords($queryText, true, $catSearchHelper->getMaxQueryWords());
+
+            /* Validate strings and return normal search to handle messages */
+            if($catSearchHelper->getMaxQueryLength() < $thisQueryLength ||
+                $catSearchHelper->getMinQueryLength() > $thisQueryLength ||
+                count($wordsFull) > count($wordsLike)){
+                return parent::prepareResult($object, $queryText, $query);
+            }
+
             /** @var JeroenVermeulen_Solarium_Model_Engine $engine */
             $engine = Mage::getSingleton( 'jeroenvermeulen_solarium/engine' );
             if ($engine->isWorking()) {
