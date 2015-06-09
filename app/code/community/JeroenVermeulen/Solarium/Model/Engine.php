@@ -345,7 +345,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         try {
             $query = $this->_client->createUpdate();
             $query->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
-            $query->addCommit();
+            //$query->addCommit();
 
             $solariumResult = $this->_client->update( $query, 'update' );
             $result         = $this->processResult( $solariumResult, 'clean' );
@@ -430,7 +430,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->commit();
-                $this->optimize(); // ignore result
+               // $this->optimize(); // ignore result
                 $result = $this->processResult( $solariumResult, 'flushing buffered add' );
             }
         } catch ( Exception $e ) {
