@@ -25,7 +25,7 @@
 <config>
     <modules>
         <JeroenVermeulen_Solarium>
-            <version>1.6.11</version>
+            <version>1.6.12</version>
         </JeroenVermeulen_Solarium>
     </modules>
     <global>
@@ -131,6 +131,15 @@
                     </jeroenvermeulen_solarium>
                 </observers>
             </start_index_events_catalog_product_delete>
+            <adminhtml_catalog_product_attribute_edit_prepare_form>
+            <observers>
+                <jeroenvermeulen_solarium>
+                    <type>singleton</type>
+                    <class>jeroenvermeulen_solarium/observer</class>
+                    <method>addFieldToAttributeEditForm</method>
+                </jeroenvermeulen_solarium>
+            </observers>
+        </adminhtml_catalog_product_attribute_edit_prepare_form>
         </events>
     </global>
     <frontend>
