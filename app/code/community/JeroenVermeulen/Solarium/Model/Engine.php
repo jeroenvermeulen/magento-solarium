@@ -340,11 +340,12 @@ class JeroenVermeulen_Solarium_Model_Engine
         if (!$this->_working) {
             return false;
         }
+        Varien_Profiler::start('solarium_cleanIndex');
         $result = false;
         try {
             $query = $this->_client->createUpdate();
             $query->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
-            $query->addCommit();
+            //$query->addCommit();
 
             $solariumResult = $this->_client->update( $query, 'update' );
             $result         = $this->processResult( $solariumResult, 'clean' );
@@ -352,6 +353,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
+        Varien_Profiler::stop('solarium_cleanIndex');
         return $result;
     }
 
@@ -373,6 +375,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         if (!$this->_working) {
             return false;
         }
+        Varien_Profiler::start('solarium_rebuildIndex');
         $result = false;
         try {
             $coreResource = Mage::getSingleton( 'core/resource' );
@@ -430,13 +433,14 @@ class JeroenVermeulen_Solarium_Model_Engine
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->commit();
-                $this->optimize(); // ignore result
+               // $this->optimize(); // ignore result
                 $result = $this->processResult( $solariumResult, 'flushing buffered add' );
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
+        Varien_Profiler::stop('solarium_rebuildIndex');
         return $result;
     }
 
