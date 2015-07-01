@@ -207,5 +207,18 @@ class JeroenVermeulen_Solarium_Model_Observer extends Varien_Event_Observer
             $engine->cleanIndex( null, $productIds );
         }
     }
+    
+    public 
+    function addFieldToAttributeEditForm($observer)
+    {
+        // Add an extra field to the base fieldset:
+        $fieldset = $observer->getForm()->getElement('base_fieldset');
+        $fieldset->addField('search_weight', 'text', array(
+            'name' => 'tooltip',
+            'label' => Mage::helper('core')->__('Search Weight'),
+            'title' => Mage::helper('core')->__('Search Weight')
+        ));
+    }
+
 
 }

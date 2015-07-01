@@ -48,7 +48,10 @@
         <field name="store_id" type="int" indexed="true" stored="true" required="true"/>
 
         <!-- Magento Product Fulltext -->
-        <field name="text" type="text_general" indexed="true" stored="false"/>
+        <field name="text" type="text_general" indexed="true" stored="true"/>
+        <field name="url" type="string" indexed="false" stored="true"/>
+        <field name="image" type="string" indexed="false" stored="true"/>
+        <field name="name" type="text_general" indexed="true" stored="true"/>
 
         <field name="_version_" type="long" indexed="true" stored="true"/>
     </fields>

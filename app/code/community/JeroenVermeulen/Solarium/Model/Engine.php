@@ -340,11 +340,12 @@ class JeroenVermeulen_Solarium_Model_Engine
         if (!$this->_working) {
             return false;
         }
+        Varien_Profiler::start('solarium_cleanIndex');
         $result = false;
         try {
             $query = $this->_client->createUpdate();
             $query->addDeleteQuery( $this->_getDeleteQueryText( $storeId, $productIds ) );
-            $query->addCommit();
+            //$query->addCommit();
 
             $solariumResult = $this->_client->update( $query, 'update' );
             $result         = $this->processResult( $solariumResult, 'clean' );
@@ -352,6 +353,7 @@ class JeroenVermeulen_Solarium_Model_Engine
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
+        Varien_Profiler::stop('solarium_cleanIndex');
         return $result;
     }
 
@@ -363,6 +365,7 @@ class JeroenVermeulen_Solarium_Model_Engine
      * @param bool $cleanFirst - If set to true the index will be cleared first
      * @return bool                  - True on success
      */
+
     public
     function rebuildIndex(
         $storeId = null,
@@ -372,6 +375,7 @@ class JeroenVermeulen_Solarium_Model_Engine
         if (!$this->_working) {
             return false;
         }
+        Varien_Profiler::start('solarium_rebuildIndex');
         $result = false;
         try {
             $coreResource = Mage::getSingleton( 'core/resource' );
@@ -415,6 +419,7 @@ class JeroenVermeulen_Solarium_Model_Engine
                 $buffer->setEndpoint( 'update' );
                 /** @noinspection PhpAssignmentInConditionInspection */
                 while ($product = $products->fetch()) {
+                    $productModel = Mage::getModel('catalog/product');
                     $text = $product[ 'data_index' ];
                     $text = preg_replace( '/\s*\,\s*+/', ' ', $text ); // Replace comma separation by spaces
                     $text = $this->_filterString( $text );
@@ -422,18 +427,20 @@ class JeroenVermeulen_Solarium_Model_Engine
                         'id'         => intval( $product[ 'fulltext_id' ] ),
                         'product_id' => intval( $product[ 'product_id' ] ),
                         'store_id'   => intval( $product[ 'store_id' ] ),
-                        'text'       => $text
+                        'text'       => $text,
+                        'name'       => $productModel->getName()
                     );
                     $buffer->createDocument( $data );
                 }
                 $solariumResult = $buffer->commit();
-                $this->optimize(); // ignore result
+               // $this->optimize(); // ignore result
                 $result = $this->processResult( $solariumResult, 'flushing buffered add' );
             }
         } catch ( Exception $e ) {
             $this->_lastError = $e;
             Mage::log( sprintf( '%s->%s: %s', __CLASS__, __FUNCTION__, $e->getMessage() ), Zend_Log::ERR );
         }
+        Varien_Profiler::stop('solarium_rebuildIndex');
         return $result;
     }
 
@@ -540,7 +547,9 @@ class JeroenVermeulen_Solarium_Model_Engine
             $query->setQueryDefaultField( array( 'text' ) );
             $query->setQuery( $escapedQueryString );
             $query->setRows( $maxResults );
-            $query->setFields( array( 'product_id', 'score' ) );
+            $query->setFields( array( 'product_id', 'score', 'name', 'image', 'url' ) );
+            $dismax = $query->getEDisMax();
+            $dismax->setQueryFields('name^2 product_id^1.5 text');
             if (is_numeric( $storeId )) {
                 $query->createFilterQuery( 'store_id' )->setQuery( 'store_id:' . intval( $storeId ) );
             }
