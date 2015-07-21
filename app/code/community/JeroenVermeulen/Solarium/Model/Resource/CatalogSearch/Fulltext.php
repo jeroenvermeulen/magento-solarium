@@ -27,6 +27,17 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
 {
 
     /**
+     * Flag for verbose logging
+     */
+    protected $verboseLogging = false;
+
+
+    public function __construct() {
+        parent::__construct();
+        $this->verboseLogging = Mage::getStoreConfigFlag('jeroenvermeulen_solarium/general/verboseLogging');
+    }
+
+    /**
      * This function is called when a visitor searches
      *
      * @param Mage_CatalogSearch_Model_Fulltext $object
@@ -126,7 +137,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
      */
     public function resetSearchResults()
     {
-        Mage::log( 'Solarium resetSearchResults: start', Zend_Log::DEBUG );
+        $this->log( 'Solarium resetSearchResults: start', Zend_Log::DEBUG );
 
         $read = $this->_getReadAdapter();
         $write = $this->_getWriteAdapter();
@@ -137,7 +148,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $querySelect = $read->select()->from( $queryTable, 'COUNT(*)' )->where( 'is_processed' );
         $queryCount  = intval( $read->fetchOne( $querySelect ) );
         if ( $queryCount ) {
-            Mage::log( sprintf('Solarium resetSearchResults: clearing %d search queries', $queryCount), Zend_Log::DEBUG );
+            $this->log( sprintf('Solarium resetSearchResults: clearing %d search queries', $queryCount), Zend_Log::DEBUG );
             $queryPages  = ceil( $queryCount / $pageSize );
             $querySql    = sprintf( 'UPDATE %s SET %s=0 WHERE %s=1 LIMIT %d',
                                     $read->quoteIdentifier( $queryTable ),
@@ -161,7 +172,7 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
         $resultSelect = $read->select()->from( $resultTable, 'COUNT(*)' );
         $resultCount  = intval( $read->fetchOne( $resultSelect ) );
         if ( $resultCount ) {
-            Mage::log( sprintf('Solarium resetSearchResults: clearing %d search results', $queryCount), Zend_Log::DEBUG );
+            $this->log( sprintf('Solarium resetSearchResults: clearing %d search results', $queryCount), Zend_Log::DEBUG );
             $resultPages  = ceil( $resultCount / $pageSize );
             $resultSql    = sprintf( 'DELETE FROM %s LIMIT %d',
                                      $read->quoteIdentifier( $resultTable ),
@@ -181,11 +192,25 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
             }
         }
 
-        Mage::log( 'Solarium resetSearchResults: done.', Zend_Log::DEBUG );
+        $this->log( 'Solarium resetSearchResults: done.', Zend_Log::DEBUG );
 
         Mage::dispatchEvent('catalogsearch_reset_search_result');
 
         return $this;
+    }
+
+    /**
+     * Log message to system log when verbose logging is enabled
+     *
+     * @param string $message
+     * @param integer $level
+     * @param string $file
+     * @param bool $forceLog
+     */
+    public function log($message, $level = null, $file = '', $forceLog = false) {
+        if ($this->verboseLogging) {
+            Mage::log($message, $level, $file, $forceLog);
+        }
     }
 
 }
