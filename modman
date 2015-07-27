@@ -51,3 +51,7 @@ app/locale/de_DE/JeroenVermeulen_Solarium.csv                               app/
 # 13-- Japanese translation
 # Magento Locale language      - File          - ja_JP/JeroenVermeulen_Solarium.csv
 app/locale/ja_JP/JeroenVermeulen_Solarium.csv                               app/locale/ja_JP/JeroenVermeulen_Solarium.csv
+
+# 14-- French translation
+# Magento Locale language      - File          - fr_FR/JeroenVermeulen_Solarium.csv
+app/locale/fr_FR/JeroenVermeulen_Solarium.csv                               app/locale/fr_FR/JeroenVermeulen_Solarium.csv
