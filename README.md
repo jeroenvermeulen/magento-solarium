@@ -4,7 +4,7 @@ Solr search extension for Magento
 
 The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. We have used the Solarium PHP library to build Solr into Magento CE.
 
-This project is abandoned. Please do **not** contact any of the developers for support.
+**This project is abandoned. Please do NOT contact any of the developers for support.**
 
 ## Features
 
