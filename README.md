@@ -30,6 +30,7 @@ The default MySQL Fulltext search is not performing very well on more serious sh
 ## Support
 
 **We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free.**
+**This project is abandoned. Please do NOT contact any of the developers for support.**
 
 A lot of info can be found in our [Wiki Pages](https://github.com/jeroenvermeulen/magento-solarium/wiki)
 
