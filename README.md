@@ -1,14 +1,10 @@
 Solr search extension for Magento
 ================
-**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free. We use it at a number of big shops and it works well.**
+**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free.**
 
-[![Solr](http://upload.wikimedia.org/wikipedia/en/archive/3/3e/20150220230831!Solr.png)](https://lucene.apache.org/solr/)
-[![Solarium](http://www.raspberry.nl/wp-content/uploads/2011/12/solarium.gif)](http://www.solarium-project.org/)
-[![Magento](http://21inspired.com/wp-content/uploads/2010/01/magento-logo-1.jpg)](http://magento.com/)
+The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. We have used the Solarium PHP library to build Solr into Magento CE.
 
-The default MySQL Fulltext search is not performing very well on more serious shops. It is slow and the results aren't very relevant. Apache's Solr does a much better job in delivering fast and relevant results. I have used the Solarium PHP library to build Solr into Magento CE. If you have some funds available for improvements, pleas contact me.
-
-This extension is also on [Magento Connect](http://www.magentocommerce.com/magento-connect/solr-search-based-on-solarium.html).
+This project is abandoned. Please do **not** contact any of the developers for support.
 
 ## Features
 
@@ -33,11 +29,9 @@ This extension is also on [Magento Connect](http://www.magentocommerce.com/magen
 
 ## Support
 
-**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free. We use it at a number of big shops and it works well.**
+**We are sorry but we cannot offer customer support for this extension, and it is provided "as-is" for free.**
 
 A lot of info can be found in our [Wiki Pages](https://github.com/jeroenvermeulen/magento-solarium/wiki)
-
-If you have an issue, you can open a bug report in [GitHub's issue tracker](https://github.com/jeroenvermeulen/magento-solarium/issues). However we can not guarantee you will get an answer, it depends on the community.
 
 ## Core Developers
 
