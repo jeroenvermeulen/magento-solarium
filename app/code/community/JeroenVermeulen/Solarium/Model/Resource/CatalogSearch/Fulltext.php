@@ -25,6 +25,12 @@
  */
 class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mage_CatalogSearch_Model_Resource_Fulltext
 {
+	
+	
+    /**
+     * @var array
+     */
+    protected $_foundData = array();
 
     /**
      * Flag for verbose logging
@@ -91,15 +97,18 @@ class JeroenVermeulen_Solarium_Model_Resource_CatalogSearch_Fulltext extends Mag
                 } else {
                     $columns    = array( 'query_id', 'product_id', 'relevance' );
                     $insertRows = array();
+		    $foundData  = array();
                     $queryId    = $query->getId();
                     foreach ($resultProducts as $data) {
                         $insertRows[ ] = array( $queryId, $data[ 'product_id' ], $data[ 'relevance' ] );
+			$foundData [$data['product_id']] =  $data[ 'relevance' ];
                     }
                     $adapter->beginTransaction();
                     $adapter->delete( $searchResultTable, 'query_id = ' . $queryId );
                     $adapter->insertArray( $searchResultTable, $columns, $insertRows );
                     $adapter->commit();
                     $query->setIsProcessed( 1 );
+		    $this->_foundData = $foundData;
                 }
                 // Autocorrect notification
                 if ( $searchResult->didAutoCorrect() ) {
